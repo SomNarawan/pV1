@@ -7,7 +7,7 @@
     include_once("./../layout/LayoutHeader.php");
     include_once("./../../dbConnect.php");
     include_once("./../../query/query.php");
-    $myConDB = connectDB();
+    include_once("./searchUsers.php");
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
@@ -25,61 +25,7 @@
     border-top: none;
 }
 </style>
-<?php 
 
-$admin=0;
-$admin2=0;
-$research=0;
-$operator=0;
-$farmer=0;
-$block=0;
-$unblock=0;
-
-if(isset($_POST['s_admin'])){
-    $admin=1;
-}
-if(isset($_POST['s_admin2'])){
-    $admin2=1;
-}
-if(isset($_POST['s_research'])){
-    $research=1;
-}
-if(isset($_POST['s_operator'])){
-    $operator=1;
-}
-if(isset($_POST['s_farmer'])){
-    $farmer=1;
-    
-}
-
-$department = 0;
-if(isset($_POST['s_department'])){
-    $department = $_POST['s_department'];
-}
-
-if(isset($_POST['s_block'])){
-    $block=1;
-}   
-if(isset($_POST['s_unblock'])){
-    $unblock=1;
-} 
-$sql = "SELECT * FROM `db-user` 
-        INNER JOIN `db-department` ON `db-user`.`DID` = `db-department`.`DID` 
-        INNER JOIN `db-emailtype` on `db-emailtype`.`ETID` = `db-user`.`ETID`
-        WHERE 1 ";
-if($department != 0) $sql = $sql." AND `db-department`.`DID` = '".$department."' ";
-if($admin   ==1) $sql = $sql."  AND IsAdmin = 1 ";
-if($admin2  ==1) $sql = $sql."  AND IsAdmin2 = 1 ";
-if($research==1) $sql = $sql."  AND IsResearch = 1 ";
-if($operator==1) $sql = $sql."  AND IsOperator = 1 ";
-if($farmer  ==1) $sql = $sql."  AND IsFarmer = 1 ";
-if($block==1&&$unblock==0) $sql = $sql."  AND IsBlock = 1 ";
-if($block==0&&$unblock==1) $sql = $sql."  AND IsBlock = 0 ";
-
-//echo $sql;
-$USERLIST = selectData($sql);
-
-?>
 
 <div class="container">
     <div class="row">
@@ -102,56 +48,13 @@ $USERLIST = selectData($sql);
         </div>
     </div>
     <div class="row">
-        <div class="col-xl-3 col-12 mb-4">
-            <div class="card border-left-primary card-color-one shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">หน่วยงาน</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php  
-                                    echo $DEPARTMENT[0]['numrow']; ?> หน่วยงาน</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">waves</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-12 mb-4">
-            <div class="card border-left-primary card-color-two shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">ผู้ใช้งานทั้งหมด</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php  
-                                    echo $USER[0]['numrow']; ?> คน</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">dashboard</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-12 mb-4">
-            <div class="card border-left-primary card-color-three shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">ผู้ดูแลระบบ</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php  
-                                    echo $ADMIN[0]['numrow']; ?> คน</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">format_size</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+        <?php   
+            creatCard( "card-color-one",   "หน่วยงาน", getcountDepartment()." หน่วยงาน", "waves" ); 
+            creatCard( "card-color-two",   "ผู้ใช้งานทั้งหมด", getcountUser()." คน", "dashboard" ); 
+            creatCard( "card-color-three",   "ผู้ดูแลระบบ", getcountAdmin()." คน", "format_size" ); 
+        ?>
+
         <div class="col-xl-3 col-12 mb-4">
             <div class="card border-left-primary card-color-four shadow h-100 py-2" id="addUser"
                 style="cursor:pointer;">
@@ -215,6 +118,7 @@ $USERLIST = selectData($sql);
                                 <select class="form-control" id="s_department" name="s_department">
                                     <option value="0">ทุกหน่วยงาน</option>
                                     <?php 
+                                    $DEPARTMENT = getDepartment();
                                     for($i=1;$i<sizeof($DEPARTMENT);$i++){ 
                                         if($department==$DEPARTMENT[$i]["DID"])
                                             echo '<option value="'.$DEPARTMENT[$i]["DID"].'" selected>'.$DEPARTMENT[$i]["Department"].'</option>';
@@ -269,7 +173,7 @@ $USERLIST = selectData($sql);
                         </div>
                         <div class="row mb-4">
                             <div class="col-xl-4 col-12 text-right">
-                                <span>การบล็อกการเข้าใช้งานของผู้ใช้</span>
+                                <span>การบล็อกการเข้าใช้งานขอ งผู้ใช้</span>
                             </div>
                             <div class="col-xl-6 col-12">
                                 <div class="form-check form-check-inline">
@@ -348,43 +252,43 @@ $USERLIST = selectData($sql);
                     </tfoot>
                     <tbody>
                         <?php 
-                    for($i=1;$i<sizeof($USERLIST);$i++){
+                    for($i=1;$i<sizeof($USER);$i++){
                         ?>
                         <tr>
-                            <td><?php echo $USERLIST[$i]["UserName"]; ?></td>
-                            <td><?php echo $USERLIST[$i]["EMAIL"]; ?>@<?php echo $USERLIST[$i]["Type"]; ?></td>
-                            <td><?php echo $USERLIST[$i]["FirstName"]; ?> <?php echo $USERLIST[$i]["LastName"]; ?></td>
-                            <td><?php echo $USERLIST[$i]["Department"]; ?></td>
+                            <td><?php echo $USER[$i]["UserName"]; ?></td>
+                            <td><?php echo $USER[$i]["EMAIL"]; ?>@<?php echo $USER[$i]["Type"]; ?></td>
+                            <td><?php echo $USER[$i]["FirstName"]; ?> <?php echo $USER[$i]["LastName"]; ?></td>
+                            <td><?php echo $USER[$i]["Department"]; ?></td>
                             <td style="text-align:center;">
-                                <?php if($USERLIST[$i]["IsAdmin"] ){?>
+                                <?php if($USER[$i]["IsAdmin"] ){?>
                                 <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน"
                                     class="btn btn-success btn-sm btn-circle tt">A</button>
                                 <?php }else{ ?>
                                     <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน"
                                     class="btn btn-secondary btn-sm btn-circle tt">A</button>
                                 <?php } ?>
-                                <?php if($USERLIST[$i]["IsAdmin2"] ){?>
+                                <?php if($USER[$i]["IsAdmin2"] ){?>
                                 <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน2"
                                     class="btn btn-success btn-sm btn-circle tt">A2</button>
                                 <?php }else{ ?>
                                     <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน2"
                                     class="btn btn-secondary btn-sm btn-circle tt">A2</button>
                                 <?php } ?>
-                                <?php if($USERLIST[$i]["IsResearch"] ){?>
+                                <?php if($USER[$i]["IsResearch"] ){?>
                                 <button type="button" id="btn_info" data-toggle="tooltip" title="นักวิจัย"
                                     class=" btn btn-success btn-sm btn-circle tt">R</button>
                                 <?php }else{ ?>
                                     <button type="button" id="btn_comfirm" data-toggle="tooltip" title="นักวิจัย"
                                     class="btn btn-secondary btn-sm btn-circle tt">R</button>
                                 <?php } ?>
-                                <?php if($USERLIST[$i]["IsOperator"] ){ ?>
+                                <?php if($USER[$i]["IsOperator"] ){ ?>
                                 <button type="button" id="btn_delete" data-toggle="tooltip" title="พนักงานทั่วไป"
                                     class="btn btn-success btn-sm btn-circle tt">O</button>
                                 <?php }else{ ?>
                                     <button type="button" id="btn_comfirm" data-toggle="tooltip" title="พนักงานทั่วไป"
                                     class="btn btn-secondary btn-sm btn-circle tt">O</button>
                                 <?php } ?>
-                                <?php if($USERLIST[$i]["IsFarmer"] ){?>
+                                <?php if($USER[$i]["IsFarmer"] ){?>
                                 <button type="button" id="btn_delete" data-toggle="tooltip" title="เกษตรกร"
                                     class="btn btn-success btn-sm btn-circle tt">F</button>
                                 <?php }else{ ?>
@@ -397,39 +301,39 @@ $USERLIST = selectData($sql);
                             <td style="text-align:center;">
                                 <!-- <button type="button" data-toggle="tooltip" title="บล็อค"  -->
                         <?php 
-                        if($USERLIST[$i]["IsBlock"] == 0){ 
+                        if($USER[$i]["IsBlock"] == 0){ 
                             echo "<button type='button' data-toggle='tooltip' title='บล็อค' class='btn btn-success btn-sm tt' ";
                         }else{
                             echo "<button type='button' data-toggle='tooltip' title='ปลดบล็อค' class='btn btn-danger btn-sm tt' ";
                         }
-                        ?> id="<?php echo $USERLIST[$i]["UID"] ?>" onclick="
-                        <?php if($USERLIST[$i]["IsBlock"] == 0){
+                        ?> id="<?php echo $USER[$i]["UID"] ?>" onclick="
+                        <?php if($USER[$i]["IsBlock"] == 0){
                             echo "block";
                         }else{
                             echo "unblock"; 
                         }
                          ?>
-                        ('<?php echo $USERLIST[$i]["UserName"]; ?>' , '<?php echo $roUSERLIST[$i]["UID"] ?>')">
+                        ('<?php echo $USER[$i]["UserName"]; ?>' , '<?php echo $USER[$i]["UID"] ?>')">
                                     <i class="fas fa-ban"></i></button>
 
                                 <button type="button" class="btn btn-info btn-sm pass_edit tt" data-toggle="tooltip" title="แก้ไขรหัสผ่าน"
-                                    uid="<?php echo $USERLIST[$i]["UID"]; ?>" username="<?php echo $USERLIST[$i]["UserName"]; ?>"
-                                    pass="<?php echo $USERLIST[$i]["PWD"]; ?>" titles="<?php echo $USERLIST[$i]["Title"]; ?>"
-                                    fname="<?php echo $USERLIST[$i]["FirstName"]; ?>" lname="<?php echo $USERLIST[$i]["LastName"]; ?>">
+                                    uid="<?php echo $USER[$i]["UID"]; ?>" username="<?php echo $USER[$i]["UserName"]; ?>"
+                                    pass="<?php echo $USER[$i]["PWD"]; ?>" titles="<?php echo $USER[$i]["Title"]; ?>"
+                                    fname="<?php echo $USER[$i]["FirstName"]; ?>" lname="<?php echo $USER[$i]["LastName"]; ?>">
                                     <i class="fas fa-lock"></i></button>
 
                                 <button type="button" class="btn btn-warning btn-sm btn_edit tt" data-toggle="tooltip" title="แก้ไขข้อมูล"
-                                    uid="<?php echo $USERLIST[$i]["UID"]; ?>" titles="<?php echo $USERLIST[$i]["Title"]; ?>"
-                                    username="<?php echo $USERLIST[$i]["UserName"]; ?>" fname="<?php echo $USERLIST[$i]["FirstName"]; ?>"
-                                    lname="<?php echo $USERLIST[$i]["LastName"]; ?>" mail="<?php echo $USERLIST[$i]["EMAIL"]; ?>"
-                                    type_email="<?php echo $USERLIST[$i]["ETID"]; ?>" department="<?php echo $USERLIST[$i]["DID"]; ?>"
-                                    admin="<?php echo $USERLIST[$i]["IsAdmin"]; ?>" admin2="<?php echo $USERLIST[$i]["IsAdmin2"]; ?>"
-                                    research="<?php echo $USERLIST[$i]["IsResearch"]; ?>"
-                                    operator="<?php echo $USERLIST[$i]["IsOperator"]; ?>"
-                                    farmer="<?php echo $USERLIST[$i]["IsFarmer"]; ?> ">
+                                    uid="<?php echo $USER[$i]["UID"]; ?>" titles="<?php echo $USER[$i]["Title"]; ?>"
+                                    username="<?php echo $USER[$i]["UserName"]; ?>" fname="<?php echo $USER[$i]["FirstName"]; ?>"
+                                    lname="<?php echo $USER[$i]["LastName"]; ?>" mail="<?php echo $USER[$i]["EMAIL"]; ?>"
+                                    type_email="<?php echo $USER[$i]["ETID"]; ?>" department="<?php echo $USER[$i]["DID"]; ?>"
+                                    admin="<?php echo $USER[$i]["IsAdmin"]; ?>" admin2="<?php echo $USER[$i]["IsAdmin2"]; ?>"
+                                    research="<?php echo $USER[$i]["IsResearch"]; ?>"
+                                    operator="<?php echo $USER[$i]["IsOperator"]; ?>"
+                                    farmer="<?php echo $USER[$i]["IsFarmer"]; ?> ">
                                     <i class="fas fa-edit"></i></button>
                                 <button type="button" class="btn btn-danger btn-sm tt" data-toggle="tooltip" title="ลบ"
-                                    onclick="delfunction('<?php echo $USERLIST[$i]["UserName"]; ?>' , '<?php echo $USERLIST[$i]["UID"] ?>')">
+                                    onclick="delfunction('<?php echo $USER[$i]["UserName"]; ?>' , '<?php echo $USER[$i]["UID"] ?>')">
                                     <i class="fas fa-trash-alt"></i></button>
 
 

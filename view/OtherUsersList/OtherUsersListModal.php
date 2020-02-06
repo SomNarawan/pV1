@@ -98,7 +98,9 @@
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                 <select class="form-control" id="type" name="type">
-                                <?php for($i=1;$i<sizeof($EMAILTYPE);$i++){  ?>
+                                <?php 
+                                    $EMAILTYPE = getEmailtype();
+                                    for($i=1;$i<sizeof($EMAILTYPE);$i++){  ?>
                                     <option value=<?php echo $EMAILTYPE[$i]["ETID"]; ?>><?php echo $EMAILTYPE[$i]["Type"]; ?></option>
                                     <?php
                                     }
@@ -115,7 +117,9 @@
 
                             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                                 <select class="form-control" id="department" name="department">
-                                    <?php for($i=1;$i<sizeof($DEPARTMENT);$i++){  ?>
+                                    <?php 
+                                    $DEPARTMENT = getDepartment();
+                                    for($i=1;$i<sizeof($DEPARTMENT);$i++){  ?>
                                     <option value=<?php echo $DEPARTMENT[$i]["DID"]; ?>><?php echo $DEPARTMENT[$i]["Department"]; ?></option>
                                     <?php
                                     }
@@ -251,7 +255,9 @@
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 ">
                                 <select class="form-control" id="e_type" name="e_type">
-                                <?php for($i=1;$i<sizeof($EMAILTYPE);$i++){  ?>
+                                <?php 
+                                    $EMAILTYPE = getEmailtype();                                    
+                                    for($i=1;$i<sizeof($EMAILTYPE);$i++){  ?>
                                     <option value=<?php echo $EMAILTYPE[$i]["ETID"]; ?>><?php echo $EMAILTYPE[$i]["Type"]; ?></option>
                                     <?php
                                     }
@@ -268,7 +274,9 @@
 
                             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                                 <select class="form-control" name="e_department" id="e_department">
-                                <?php for($i=1;$i<sizeof($DEPARTMENT);$i++){  ?>
+                                <?php 
+                                    $DEPARTMENT = getDepartment();                                    
+                                    for($i=1;$i<sizeof($DEPARTMENT);$i++){  ?>
                                     <option value=<?php echo $DEPARTMENT[$i]["DID"]; ?>><?php echo $DEPARTMENT[$i]["Department"]; ?></option>
                                     <?php
                                     }
