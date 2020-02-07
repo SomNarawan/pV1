@@ -49,4 +49,5 @@ function getCountAdmin(){
     return $countAdmin;
 }
 
+$test = 1;
 ?>
