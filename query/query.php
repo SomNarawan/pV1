@@ -30,7 +30,13 @@ function getEmailtype(){
     $EMAILTYPE = selectData($sql);
     return $EMAILTYPE;
 }
+function getAllDepartment(){
+    $sql = "SELECT `db-department`.`DID`,`db-department`.`Department`,`db-department`.`Alias`,`db-department`.`Note`,COUNT(`db-user`.`DID`) AS count_de FROM `db-department` 
+    LEFT JOIN `db-user` ON `db-department`.DID = `db-user`.DID GROUP BY `db-department`.`DID`,`db-department`.`Department`,`db-department`.`Alias`,`db-department`.`Note`";
+    $ALLDEPARTMENT = selectData($sql);
+    return $ALLDEPARTMENT;
 
+}
 function getCountDepartment(){
     $sql = "SELECT COUNT(*) AS countDepartment FROM `db-department`";
     $countDepartment = selectData($sql)[1]['countDepartment'];

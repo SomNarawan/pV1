@@ -5,9 +5,10 @@
     $CurrentMenu = "OtherUsersList";
 
     include_once("./../layout/LayoutHeader.php");
-    include_once("./../../dbConnect.php");
     include_once("./../../query/query.php");
     include_once("./searchUsers.php");
+
+    $DEPARTMENT = getDepartment();
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
@@ -118,7 +119,6 @@
                                 <select class="form-control" id="s_department" name="s_department">
                                     <option value="0">ทุกหน่วยงาน</option>
                                     <?php 
-                                    $DEPARTMENT = getDepartment();
                                     for($i=1;$i<sizeof($DEPARTMENT);$i++){ 
                                         if($department==$DEPARTMENT[$i]["DID"])
                                             echo '<option value="'.$DEPARTMENT[$i]["DID"].'" selected>'.$DEPARTMENT[$i]["Department"].'</option>';

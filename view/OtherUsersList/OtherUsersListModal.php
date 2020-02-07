@@ -1,3 +1,6 @@
+<?php
+    $EMAILTYPE = getEmailtype();
+?>
 <!-- addModal -->
 
 <div class="modal fade" id="addModal" tabindex="-1" role="dialog">
@@ -99,7 +102,6 @@
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                 <select class="form-control" id="type" name="type">
                                 <?php 
-                                    $EMAILTYPE = getEmailtype();
                                     for($i=1;$i<sizeof($EMAILTYPE);$i++){  ?>
                                     <option value=<?php echo $EMAILTYPE[$i]["ETID"]; ?>><?php echo $EMAILTYPE[$i]["Type"]; ?></option>
                                     <?php
@@ -118,7 +120,6 @@
                             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                                 <select class="form-control" id="department" name="department">
                                     <?php 
-                                    $DEPARTMENT = getDepartment();
                                     for($i=1;$i<sizeof($DEPARTMENT);$i++){  ?>
                                     <option value=<?php echo $DEPARTMENT[$i]["DID"]; ?>><?php echo $DEPARTMENT[$i]["Department"]; ?></option>
                                     <?php
@@ -256,7 +257,6 @@
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 ">
                                 <select class="form-control" id="e_type" name="e_type">
                                 <?php 
-                                    $EMAILTYPE = getEmailtype();                                    
                                     for($i=1;$i<sizeof($EMAILTYPE);$i++){  ?>
                                     <option value=<?php echo $EMAILTYPE[$i]["ETID"]; ?>><?php echo $EMAILTYPE[$i]["Type"]; ?></option>
                                     <?php
@@ -275,7 +275,6 @@
                             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                                 <select class="form-control" name="e_department" id="e_department">
                                 <?php 
-                                    $DEPARTMENT = getDepartment();                                    
                                     for($i=1;$i<sizeof($DEPARTMENT);$i++){  ?>
                                     <option value=<?php echo $DEPARTMENT[$i]["DID"]; ?>><?php echo $DEPARTMENT[$i]["Department"]; ?></option>
                                     <?php
