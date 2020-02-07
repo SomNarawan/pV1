@@ -3,12 +3,15 @@
     
     $idUT = $_SESSION[md5('typeid')];
     $CurrentMenu = "FarmerListAdmin";
+    include_once("../layout/LayoutHeader.php"); 
+    include_once("./../../query/query.php");
+    include_once("./search.php");
+
+    $PROVINCE = getProvince();
+    $DISTRINCT_PROVINCE = getDistrinctInProvince($fpro);
 ?>
 
-
-<?php include_once("../layout/LayoutHeader.php"); ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
-
 
 <style>
 #serach {
@@ -22,50 +25,6 @@
     border-top: none;
 }
 </style>
-<?php 
-include_once("../../dbConnect.php");
-$myConDB = connectDB();
-
-if( isset($_POST['s_formalid']))  $idformal = rtrim($_POST['s_formalid']);
-if( isset($_POST['s_province']))  $fpro     = $_POST['s_province'];
-if( isset($_POST['s_distrinct'])) $fdist    = $_POST['s_distrinct'];
-if( isset($_POST['s_name'])){
-  $fullname = rtrim($_POST['s_name']); 
-  $fullname = preg_replace('/[[:space:]]+/', ' ', trim($fullname));
-  $namef = explode(" ",$fullname);
-  if(isset($namef[1])){
-      $fnamef =$namef[0];
-      $lnamef = $namef[1];
-  }else{
-      $fnamef =$fullname;
-      $lnamef= $fullname;
-  } 
-}
-
-$sql = "SELECT UFID,Title,FirstName,LastName,FormalID,Icon,`Address`,`db-farmer`.`AD3ID`,IsBlock,`db-farmer`.`ModifyDT`,`db-distrinct`.AD2ID,`db-distrinct`.AD1ID,subDistrinct,Distrinct,Province FROM `db-farmer` 
-                INNER JOIN `db-subdistrinct` ON `db-farmer`.`AD3ID`=  `db-subdistrinct`.AD3ID
-                INNER JOIN `db-distrinct` ON `db-subdistrinct`.`AD2ID`=  `db-distrinct`.AD2ID
-                INNER JOIN `db-province` ON `db-distrinct`.`AD1ID`=  `db-province`.AD1ID
-                WHERE 1 ";
-
-if($idformal!='') $sql = $sql." AND FormalID LIKE '%".$idformal."%' ";
-if($fullname!='') $sql = $sql." AND (FirstName LIKE '%".$fnamef."%' OR LastName LIKE '%".$lnamef."%') ";
-if($fpro    !=0)  $sql = $sql." AND `db-distrinct`.AD1ID = '".$fpro."' ";
-if($fdist   !=0)  $sql = $sql." AND `db-distrinct`.AD2ID = '".$fdist."' ";
-
-//echo $sql;
-
-$result2 = $myConDB->prepare($sql); 
-$result2->execute();
-
-// $sql2 = "SELECT UFID,Title,FirstName,LastName,FormalID,Icon,`Address`,`db-farmer`.`AD3ID`,IsBlock,`db-farmer`.`ModifyDT`,`db-distrinct`.AD2ID,`db-distrinct`.AD1ID,subDistrinct,Distrinct,Province FROM `db-farmer` 
-// INNER JOIN `db-subdistrinct` ON `db-farmer`.`AD3ID`=  `db-subdistrinct`.AD3ID
-// INNER JOIN `db-distrinct` ON `db-subdistrinct`.`AD2ID`=  `db-distrinct`.AD2ID
-// INNER JOIN `db-province` ON `db-distrinct`.`AD1ID`=  `db-province`.AD1ID";
-// $result2 = $myConDB->prepare( $sql2 ); 
-// $result2->execute();
-
-?>
 
 <div class="container">
     <div class="row">
@@ -88,25 +47,9 @@ $result2->execute();
         </div>
     </div>
     <div class="row">
-
-        <div class="col-xl-3 col-12 mb-4">
-            <div class="card border-left-primary card-color-two shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">จำนวนเกษตรกร</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php  
-                                    $count = $result2->rowCount();
-                                    echo $count; ?> คน</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">waves</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php   
+            creatCard( "card-color-one",   "จำนวนเกษตรกร", getcountFarmer()." คน", "waves" );
+        ?>
 
         <div class="col-xl-3 col-12 mb-4">
             <div class="card border-left-primary card-color-four shadow h-100 py-2" id="addUser"
@@ -194,16 +137,12 @@ $result2->execute();
                                 <select id="s_province" name="s_province" class="form-control">
                                     <option selected value=0>เลือกจังหวัด</option>        
                                     <?php 
-                                    $sql = "SELECT * FROM `db-province`";
-                                    $myConDB = connectDB();
-                                    $result = $myConDB->prepare($sql);
-                                    $result->execute();
-
-                                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) 
-                                        if($fpro==$row["AD1ID"])
-                                            echo '<option value="'.$row["AD1ID"].'" selected>'.$row["Province"].'</option>';
+                                    for($i=1;$i<sizeof($PROVINCE);$i++){ 
+                                        if($fpro==$PROVINCE[$i]["AD1ID"])
+                                            echo '<option value="'.$PROVINCE[$i]["AD1ID"].'" selected>'.$PROVINCE[$i]["Province"].'</option>';
                                         else
-                                            echo '<option value="'.$row["AD1ID"].'">'.$row["Province"].'</option>';
+                                            echo '<option value="'.$PROVINCE[$i]["AD1ID"].'">'.$PROVINCE[$i]["Province"].'</option>';
+                                    }
                                     ?>
                                 </select>
                             </div>
@@ -217,16 +156,12 @@ $result2->execute();
                                     <option selected value=0>เลือกอำเภอ</option>>        
                                     <?php 
                                     if($fpro!=0){
-                                        $sql = "SELECT * FROM `db-distrinct` WHERE `AD1ID`=".$fpro;
-                                        $myConDB = connectDB();
-                                        $result = $myConDB->prepare($sql);
-                                        $result->execute();
-                                    
-                                        while ($row = $result->fetch(PDO::FETCH_ASSOC)) 
-                                            if($fdist==$row["AD2ID"])
-                                                echo '<option value="'.$row["AD2ID"].'" selected>'.$row["Distrinct"].'</option>';
+                                        for($i=1;$i<sizeof($DISTRINCT_PROVINCE);$i++){ 
+                                            if($fdist==$DISTRINCT_PROVINCE[$i]["AD2ID"])
+                                                echo '<option value="'.$DISTRINCT_PROVINCE[$i]["AD2ID"].'" selected>'.$DISTRINCT_PROVINCE[$i]["Distrinct"].'</option>';
                                             else
-                                                echo '<option value="'.$row["AD2ID"].'">'.$row["Distrinct"].'</option>';
+                                                echo '<option value="'.$DISTRINCT_PROVINCE[$i]["AD2ID"].'">'.$DISTRINCT_PROVINCE[$i]["Distrinct"].'</option>';
+                                        }
                                     }
                                     ?>
                                     
@@ -290,20 +225,20 @@ $result2->execute();
                         </tr>
                     </tfoot>
                     <tbody>
-                        <?php 
-                    while ($row = $result2->fetch(PDO::FETCH_ASSOC)){
-                        $fid = $row["FormalID"];
-                        $formalid = substr_replace($fid,"xxxxxxx",3,7);
-                ?>
+                    <?php 
+                        for($i=1;$i<sizeof($FARMER);$i++){ 
+                            $fid = $FARMER[$i]["FormalID"];
+                            $formalid = substr_replace($fid,"xxxxxxx",3,7);
+                    ?>
                         <tr>
                             <td align="center"><?php echo $formalid; ?></td>
-                            <td><?php echo $row["FirstName"]; ?> <?php echo $row["LastName"]; ?></td>
-                            <td><?php echo $row["Distrinct"]; ?></td>
-                            <td><?php echo $row["Province"]; ?></td>
+                            <td><?php echo $FARMER[$i]["FirstName"]; ?> <?php echo $FARMER[$i]["LastName"]; ?></td>
+                            <td><?php echo $FARMER[$i]["Distrinct"]; ?></td>
+                            <td><?php echo $FARMER[$i]["Province"]; ?></td>
                             <td style="text-align:center;">
                                 <?php 
-                                $isBlock = $row["IsBlock"];
-                                $uid = $row["UFID"];
+                                $isBlock = $FARMER[$i]["IsBlock"];
+                                $uid = $FARMER[$i]["UFID"];
                                 if($isBlock == NULL){
                                     echo "<a href='manage.php?confirm=1&uid=$uid'>กดเพื่อยืนยัน</a>";
                                 }else{
@@ -315,33 +250,32 @@ $result2->execute();
                             </td>
 
                             <td style="text-align:center;">
-                                <!-- <button type="button" data-toggle="tooltip" title="บล็อค" -->
                         <?php
-                        if($row["IsBlock"] == 0){ 
+                        if($FARMER[$i]["IsBlock"] == 0){ 
                             echo "<button type='button' data-toggle='tooltip' title='บล็อค' class='btn btn-success btn-sm tt' ";
                         }else{
                             echo "<button type='button' data-toggle='tooltip' title='ปลดบล็อค' class='btn btn-danger btn-sm tt' ";
                         }
-                        ?> id="<?php echo $row["UFID"] ?>" onclick="
-                        <?php if($row["IsBlock"] == 0){
+                        ?> id="<?php echo $FARMER[$i]["UFID"] ?>" onclick="
+                        <?php if($FARMER[$i]["IsBlock"] == 0){
                             echo "block";
                         }else{
                             echo "unblock"; 
                         }
                          ?>
-                        ('<?php echo $row["FirstName"]; ?>' ,'<?php echo $row["LastName"]; ?>', '<?php echo $row["UFID"] ?>')">
+                        ('<?php echo $FARMER[$i]["FirstName"]; ?>' ,'<?php echo $FARMER[$i]["LastName"]; ?>', '<?php echo $FARMER[$i]["UFID"] ?>')">
                                     <i class="fas fa-ban"></i></button>
 
                                 <button type="button" class="btn btn-warning btn-sm btn_edit tt" data-toggle="tooltip" title="แก้ไขข้อมูล"
-                                    uid="<?php echo $row["UFID"]; ?>" titles="<?php echo $row["Title"]; ?>"
-                                    formalid="<?php echo $formalid; ?>" fname="<?php echo $row["FirstName"]; ?>"
-                                    lname="<?php echo $row["LastName"]; ?>" mail="<?php echo $row["EMAIL"]; ?>"
-                                    type_email="<?php echo $row["ETID"]; ?>" address="<?php echo $row["Address"]; ?>"
-                                    province="<?php echo $row["AD1ID"]; ?>" distrinct="<?php echo $row["AD2ID"]; ?>"
-                                    subdistrinct="<?php echo $row["AD3ID"]; ?>">
+                                    uid="<?php echo $FARMER[$i]["UFID"]; ?>" titles="<?php echo $FARMER[$i]["Title"]; ?>"
+                                    formalid="<?php echo $formalid; ?>" fname="<?php echo $FARMER[$i]["FirstName"]; ?>"
+                                    lname="<?php echo $FARMER[$i]["LastName"]; ?>" mail="<?php echo $FARMER[$i]["EMAIL"]; ?>"
+                                    type_email="<?php echo $FARMER[$i]["ETID"]; ?>" address="<?php echo $FARMER[$i]["Address"]; ?>"
+                                    province="<?php echo $FARMER[$i]["AD1ID"]; ?>" distrinct="<?php echo $FARMER[$i]["AD2ID"]; ?>"
+                                    subdistrinct="<?php echo $FARMER[$i]["AD3ID"]; ?>">
                                     <i class="fas fa-edit"></i></button>
                                 <button type="button" class="btn btn-danger btn-sm tt" data-toggle="tooltip" title="ลบ"
-                                    onclick="delfunction('<?php echo $row["FirstName"]; ?>','<?php echo $row["LastName"]; ?>', '<?php echo $row["UFID"] ?>')">
+                                    onclick="delfunction('<?php echo $FARMER[$i]["FirstName"]; ?>','<?php echo $FARMER[$i]["LastName"]; ?>', '<?php echo $FARMER[$i]["UFID"] ?>')">
                                     <i class="fas fa-trash-alt"></i></button>
 
 

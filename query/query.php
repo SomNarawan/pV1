@@ -30,6 +30,16 @@ function getEmailtype(){
     $EMAILTYPE = selectData($sql);
     return $EMAILTYPE;
 }
+function getProvince(){
+    $sql = "SELECT * FROM `db-province` ORDER BY `db-province`.`Province`  ASC";
+    $PROVINCE = selectData($sql);
+    return $PROVINCE;
+}
+function getDistrinctInProvince($fpro){
+    $sql = "SELECT * FROM `db-distrinct` WHERE `AD1ID`=$fpro ORDER BY `db-distrinct`.`Distrinct`  ASC";
+    $DISTRINCT_PROVINCE = selectData($sql);
+    return $DISTRINCT_PROVINCE;
+}
 function getAllDepartment(){
     $sql = "SELECT `db-department`.`DID`,`db-department`.`Department`,`db-department`.`Alias`,`db-department`.`Note`,COUNT(`db-user`.`DID`) AS count_de FROM `db-department` 
     LEFT JOIN `db-user` ON `db-department`.DID = `db-user`.DID GROUP BY `db-department`.`DID`,`db-department`.`Department`,`db-department`.`Alias`,`db-department`.`Note`";
@@ -53,6 +63,11 @@ function getCountAdmin(){
     $sql = "SELECT COUNT(*) AS countAdmin FROM `db-user` WHERE IsAdmin = 1 ";
     $countAdmin = selectData($sql)[1]['countAdmin'];
     return $countAdmin;
+}
+function getCountFarmer(){
+    $sql = "SELECT COUNT(*) AS countFarmer FROM `db-farmer`";
+    $countFarmer = selectData($sql)[1]['countFarmer'];
+    return $countFarmer;    
 }
 
 ?>

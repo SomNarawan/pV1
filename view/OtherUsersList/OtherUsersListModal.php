@@ -85,11 +85,6 @@
                                     required="" oninput="setCustomValidity(' ')">
                                 <i class="far fa-eye-slash eye-setting" id="h_2"></i>
                             </div>
-                            <!-- <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                                <i class="fa fa-question-circle tt" style="color:red" data-toggle="tooltip"
-                                    data-placement="bottom"
-                                    title="-ต้องมีขนาดมากกว่า 7 ตัวอักษร -ต้องมีอักษรภาษาอังกฤษ ตัวเลข และอักขระพิเศษ"></i>
-                            </div> -->
                         </div>
                         <div class="row mb-4">
                             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 text-right">
@@ -163,10 +158,6 @@
                                         value="option5">
                                     <label class="form-check-label" for="inlineCheckbox5">เกษตรกร</label>
                                 </div>
-                                <!-- <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="error" name="error" value="option5" 
-                                required="" oninput="setCustomValidity(' ')">
-                            </div> -->
                             </div>
                         </div>
                         <div class="row mb-4">
@@ -374,11 +365,6 @@
                                 oninput="setCustomValidity('')">
                             <i class="far fa-eye-slash eye-setting" id="hide_2"></i>
                         </div>
-                        <!-- <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                            <i class="fa fa-question-circle tt" style="color:red" data-toggle="tooltip"
-                                data-placement="bottom"
-                                title="-ต้องมีขนาดมากกว่า 7 ตัวอักษร -ต้องมีอักษรภาษาอังกฤษ ตัวเลข และอักขระพิเศษ"></i>
-                        </div> -->
                     </div>
                     <div class="row mb-4">
                         <div class="col-xl-3 col-12 text-right">
@@ -399,11 +385,6 @@
                             <input type="text" hidden class="form-control" name="p_fname" id="p_fname" value="">
                             <input type="text" hidden class="form-control" name="p_lname" id="p_lname" value="">
                         </div>
-                        <!-- <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                            <i class="fa fa-question-circle tt" style="color:red" data-toggle="tooltip"
-                                data-placement="bottom"
-                                title="-ต้องมีขนาดมากกว่า 7 ตัวอักษร -ต้องมีอักษรภาษาอังกฤษ ตัวเลข และอักขระพิเศษ"></i>
-                        </div> -->
                     </div>
                 </div>
                 <div class="modal-footer">

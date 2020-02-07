@@ -156,7 +156,6 @@
 <?php include_once("../layout/LayoutFooter.php"); ?>
 <?php include_once("DepartmentListModal.php"); ?>
 
-<!-- <script src="DepartmentListModal.php"></script> -->
 <script src="DepartmentList.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>

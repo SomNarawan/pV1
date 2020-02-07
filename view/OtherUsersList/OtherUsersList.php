@@ -173,7 +173,7 @@
                         </div>
                         <div class="row mb-4">
                             <div class="col-xl-4 col-12 text-right">
-                                <span>การบล็อกการเข้าใช้งานขอ งผู้ใช้</span>
+                                <span>การบล็อกการเข้าใช้งานของผู้ใช้</span>
                             </div>
                             <div class="col-xl-6 col-12">
                                 <div class="form-check form-check-inline">

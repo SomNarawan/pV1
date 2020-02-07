@@ -127,22 +127,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="row mt-3">
-                <div class="col-xl-12 col-12">
-                    <div class="card">
-                        <div class="card-header card-bg">
-                            ตำแหน่งสวนปาล์ม
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-xl-12 col-12 mb-2">
-                                    <div id="map_area" style="width:auto; height:200px;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
         <div class="col-xl-8 col-12 mb-4">
             <div class="card">
@@ -193,14 +177,6 @@
                                 value="<?php echo $USER[1]['EMAIL']?>@<?php echo $EMIALTYPE[1]['Type']?>" disabled>
                         </div>
                     </div>
-                    <!-- <div class="row mb-4">
-                        <div class="col-xl-3 col-12 text-right">
-                            <span>เบอร์โทรศัพท์</span>
-                        </div>
-                        <div class="col-xl-9 col-12">
-                            <input type="text" class="form-control" id="mail" value="0866221212" disabled>
-                        </div>
-                    </div> -->
                     <div class="row mb-4">
                         <div class="col-xl-3 col-12 text-right">
                             <span>ชื่อบัญชี</span>
@@ -233,7 +209,7 @@
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="admin" name="admin" value="option1"
                                     disabled <?php if($USER[1]['IsAdmin2'] == 1) echo "checked"; ?>>
-                                <label class="form-check-label" for="inlineCheckbox1">ผู้ดูแลระบบ2</label>
+                                <label class="form-check-label" for="inlineCheckbox1">ผู้ช่วยผู้ดูแลระบบ</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="research" name="research"
@@ -262,12 +238,9 @@
 <?php include_once("../layout/LayoutFooter.php"); ?>
 <?php include_once("UserProfileModal.php"); ?>
 
-<!-- <script src="UserProfile.js"></script> -->
 <script src="../../croppie/croppie.js"></script>
 <script>
-// console.log("file");
 $(document).ready(function() {
-    // console.log("uu");
     let dataU;
     let logP;
     let pwd_md5 = 5;
