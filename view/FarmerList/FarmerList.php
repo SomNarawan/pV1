@@ -323,7 +323,6 @@
 
 
 <?php include_once("../layout/LayoutFooter.php"); ?>
-<?php include_once("FarmerListAdminModal.php"); ?>
 
 <script src="FarmerListAdmin.js"></script>
 
