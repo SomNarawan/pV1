@@ -45,11 +45,6 @@ $result_e2->execute();
                                 oninput="setCustomValidity('')">
                             <i class="far fa-eye-slash eye-setting" id="hide_2"></i>
                         </div>
-                        <!-- <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                            <i class="fa fa-question-circle tt" style="color:red" data-toggle="tooltip"
-                                data-placement="bottom"
-                                title="-ต้องมีขนาดมากกว่า 7 ตัวอักษร -ต้องมีอักษรภาษาอังกฤษ ตัวเลข และอักขระพิเศษ"></i>
-                        </div> -->
                     </div>
                     <div class="row mb-4">
                         <div class="col-xl-3 col-12 text-right">
@@ -69,11 +64,6 @@ $result_e2->execute();
                             <input type="text" hidden class="form-control" name="p_fname" id="p_fname" value="">
                             <input type="text" hidden class="form-control" name="p_lname" id="p_lname" value="">
                         </div>
-                        <!-- <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                            <i class="fa fa-question-circle tt" style="color:red" data-toggle="tooltip"
-                                data-placement="bottom"
-                                title="-ต้องมีขนาดมากกว่า 7 ตัวอักษร -ต้องมีอักษรภาษาอังกฤษ ตัวเลข และอักขระพิเศษ"></i>
-                        </div> -->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -187,7 +177,6 @@ $result_e2->execute();
                         <input type="text" hidden class="form-control" name="uid" id="uid" value="">
                         <div class="row mb-4" hidden>
                             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 text-right">
-                                <!-- <span>สิทธิการเข้าใช้งาน<span class="text-danger"> *</span></span> -->
                             </div>
                             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
 
@@ -279,37 +268,6 @@ $result_e2->execute();
     </form>
 </div>
 
-<!-- <div class="modal fade" id="photoModal" tabindex="-1" role="dialog">
-    <form method="post" id="formPhoto" name="formPhoto" action="manage.php">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header header-modal" >
-                    <h4 class="modal-title">เปลี่ยนรหัสผ่าน</h4>
-                </div>
-                <div class="modal-body" id="passModalBody">
-                    <div class="container">
-                        <div class="upload-demo-wrap">
-                            <div id="upload-demo">
-                            </div>
-                            <div class="actions">
-                                <a class="btn file-btn">
-                                    <span>upload</span>
-                                    <input type="file" id="upload" accept="image/*" value="Choose a file">
-                                </a>
-                                <button class="upload-result">Result</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" id="edit" class="btn btn-success">ยืนยัน</button>
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">ยกเลิก</button>
-                </div>
-            </div>
-
-        </div>
-    </form>
-</div> -->
 <script>
 $(document).ready(function() {
 

@@ -6,7 +6,7 @@
 
     include_once("./../layout/LayoutHeader.php");
     include_once("./../../query/query.php");
-    include_once("./searchUsers.php");
+    include_once("./search.php");
 
     $DEPARTMENT = getDepartment();
 ?>
@@ -80,17 +80,13 @@
             <div class="col-xl-12 col-12 mb-4">
                 <div id="accordion">
                     <div class="card">
-                        <div class="card-header collapsed" 
-                            id="headingOne" 
-                            data-toggle="collapse"
-                            data-target="#collapseOne" 
-                    <?php 
+                        <div class="card-header collapsed" id="headingOne" data-toggle="collapse"
+                            data-target="#collapseOne" <?php 
                         if(isset($_GET['isSearch']) && $_GET['isSearch']==1)
                             echo 'aria-expanded="true"';
                         else 
                             echo 'aria-expanded="false"';
-                    ?> 
-                            aria-controls="collapseOne"
+                    ?> aria-controls="collapseOne"
                             style="cursor:pointer; background-color: <?=$color?>; color: white;">
                             <div class="row">
                                 <div class="col-3">
@@ -100,15 +96,12 @@
                         </div>
                     </div>
                 </div>
-                <div id="collapseOne" 
-                <?php 
+                <div id="collapseOne" <?php 
                     if(isset($_GET['isSearch']) && $_GET['isSearch']==1)
                         echo 'class="collapse show"';
                     else 
                         echo 'class="collapse"';
-                ?>
-                    aria-labelledby="headingOne" 
-                    data-parent="#accordion">
+                ?> aria-labelledby="headingOne" data-parent="#accordion">
 
                     <div class="card-body" style="background-color: white;">
                         <div class="row mb-4 ">
@@ -135,38 +128,28 @@
                             </div>
                             <div class="col-xl-6 col-12">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" 
-                                        id="s_admin" name="s_admin"
-                                        <?php if($admin==1) echo ' checked ' ?>
-                                        value="option1" >
+                                    <input class="form-check-input" type="checkbox" id="s_admin" name="s_admin"
+                                        <?php if($admin==1) echo ' checked ' ?> value="option1">
                                     <label class="form-check-label" for="inlineCheckbox1">ผู้ดูแลระบบ</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" 
-                                        id="s_admin2" name="s_admin2"
-                                        <?php if($admin2==1) echo ' checked ' ?>
-                                        value="option1" >
+                                    <input class="form-check-input" type="checkbox" id="s_admin2" name="s_admin2"
+                                        <?php if($admin2==1) echo ' checked ' ?> value="option1">
                                     <label class="form-check-label" for="inlineCheckbox1">ผู้ช่วยผู้ดูแลระบบ</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" 
-                                        id="s_research" name="s_research"
-                                        <?php if($research==1) echo ' checked ' ?>
-                                        value="option2">
+                                    <input class="form-check-input" type="checkbox" id="s_research" name="s_research"
+                                        <?php if($research==1) echo ' checked ' ?> value="option2">
                                     <label class="form-check-label" for="inlineCheckbox2">นักวิจัย</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" 
-                                        id="s_operator" name="s_operator"
-                                        <?php if($operator==1) echo ' checked ' ?>
-                                        value="option3">
+                                    <input class="form-check-input" type="checkbox" id="s_operator" name="s_operator"
+                                        <?php if($operator==1) echo ' checked ' ?> value="option3">
                                     <label class="form-check-label" for="inlineCheckbox3">พนักงานทั่วไป</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" 
-                                        id="s_farmer" name="s_farmer"
-                                        <?php if($farmer==1) echo ' checked ' ?>
-                                        value="option4">
+                                    <input class="form-check-input" type="checkbox" id="s_farmer" name="s_farmer"
+                                        <?php if($farmer==1) echo ' checked ' ?> value="option4">
                                     <label class="form-check-label" for="inlineCheckbox4">เกษตรกร</label>
                                 </div>
                             </div>
@@ -177,17 +160,13 @@
                             </div>
                             <div class="col-xl-6 col-12">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" 
-                                        id="s_block" name="s_block" 
-                                        <?php if($block==1) echo ' checked ' ?>
-                                        value="1">
+                                    <input class="form-check-input" type="checkbox" id="s_block" name="s_block"
+                                        <?php if($block==1) echo ' checked ' ?> value="1">
                                     <label class="form-check-label" for="inlineCheckbox1">บล็อค</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" 
-                                        id="s_unblock" name="s_unblock"
-                                        <?php if($unblock==1) echo ' checked ' ?>
-                                        value="0">
+                                    <input class="form-check-input" type="checkbox" id="s_unblock" name="s_unblock"
+                                        <?php if($unblock==1) echo ' checked ' ?> value="0">
                                     <label class="form-check-label" for="inlineCheckbox2">ไม่บล็อก</label>
                                 </div>
 
@@ -252,7 +231,7 @@
                     </tfoot>
                     <tbody>
                         <?php 
-                    for($i=1;$i<sizeof($USER);$i++){
+                            for($i=1;$i<sizeof($USER);$i++){
                         ?>
                         <tr>
                             <td><?php echo $USER[$i]["UserName"]; ?></td>
@@ -264,35 +243,35 @@
                                 <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน"
                                     class="btn btn-success btn-sm btn-circle tt">A</button>
                                 <?php }else{ ?>
-                                    <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน"
+                                <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน"
                                     class="btn btn-secondary btn-sm btn-circle tt">A</button>
                                 <?php } ?>
                                 <?php if($USER[$i]["IsAdmin2"] ){?>
                                 <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน2"
                                     class="btn btn-success btn-sm btn-circle tt">A2</button>
                                 <?php }else{ ?>
-                                    <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน2"
+                                <button type="button" id="btn_comfirm" data-toggle="tooltip" title="แอดมิน2"
                                     class="btn btn-secondary btn-sm btn-circle tt">A2</button>
                                 <?php } ?>
                                 <?php if($USER[$i]["IsResearch"] ){?>
                                 <button type="button" id="btn_info" data-toggle="tooltip" title="นักวิจัย"
                                     class=" btn btn-success btn-sm btn-circle tt">R</button>
                                 <?php }else{ ?>
-                                    <button type="button" id="btn_comfirm" data-toggle="tooltip" title="นักวิจัย"
+                                <button type="button" id="btn_comfirm" data-toggle="tooltip" title="นักวิจัย"
                                     class="btn btn-secondary btn-sm btn-circle tt">R</button>
                                 <?php } ?>
                                 <?php if($USER[$i]["IsOperator"] ){ ?>
                                 <button type="button" id="btn_delete" data-toggle="tooltip" title="พนักงานทั่วไป"
                                     class="btn btn-success btn-sm btn-circle tt">O</button>
                                 <?php }else{ ?>
-                                    <button type="button" id="btn_comfirm" data-toggle="tooltip" title="พนักงานทั่วไป"
+                                <button type="button" id="btn_comfirm" data-toggle="tooltip" title="พนักงานทั่วไป"
                                     class="btn btn-secondary btn-sm btn-circle tt">O</button>
                                 <?php } ?>
                                 <?php if($USER[$i]["IsFarmer"] ){?>
                                 <button type="button" id="btn_delete" data-toggle="tooltip" title="เกษตรกร"
                                     class="btn btn-success btn-sm btn-circle tt">F</button>
                                 <?php }else{ ?>
-                                    <button type="button" id="btn_comfirm" data-toggle="tooltip" title="เกษตรกร"
+                                <button type="button" id="btn_comfirm" data-toggle="tooltip" title="เกษตรกร"
                                     class="btn btn-secondary btn-sm btn-circle tt">F</button>
                                 <?php } ?>
 
@@ -300,34 +279,41 @@
 
                             <td style="text-align:center;">
                                 <!-- <button type="button" data-toggle="tooltip" title="บล็อค"  -->
-                        <?php 
+                                <?php 
                         if($USER[$i]["IsBlock"] == 0){ 
                             echo "<button type='button' data-toggle='tooltip' title='บล็อค' class='btn btn-success btn-sm tt' ";
                         }else{
                             echo "<button type='button' data-toggle='tooltip' title='ปลดบล็อค' class='btn btn-danger btn-sm tt' ";
                         }
                         ?> id="<?php echo $USER[$i]["UID"] ?>" onclick="
-                        <?php if($USER[$i]["IsBlock"] == 0){
+                                <?php if($USER[$i]["IsBlock"] == 0){
                             echo "block";
                         }else{
                             echo "unblock"; 
                         }
                          ?>
-                        ('<?php echo $USER[$i]["UserName"]; ?>' , '<?php echo $USER[$i]["UID"] ?>')">
-                                    <i class="fas fa-ban"></i></button>
+                                ('<?php echo $USER[$i]["UserName"]; ?>' , '<?php echo $USER[$i]["UID"] ?>')">
+                                <i class="fas fa-ban"></i></button>
 
-                                <button type="button" class="btn btn-info btn-sm pass_edit tt" data-toggle="tooltip" title="แก้ไขรหัสผ่าน"
-                                    uid="<?php echo $USER[$i]["UID"]; ?>" username="<?php echo $USER[$i]["UserName"]; ?>"
+                                <button type="button" class="btn btn-info btn-sm pass_edit tt" data-toggle="tooltip"
+                                    title="แก้ไขรหัสผ่าน" uid="<?php echo $USER[$i]["UID"]; ?>"
+                                    username="<?php echo $USER[$i]["UserName"]; ?>"
                                     pass="<?php echo $USER[$i]["PWD"]; ?>" titles="<?php echo $USER[$i]["Title"]; ?>"
-                                    fname="<?php echo $USER[$i]["FirstName"]; ?>" lname="<?php echo $USER[$i]["LastName"]; ?>">
+                                    fname="<?php echo $USER[$i]["FirstName"]; ?>"
+                                    lname="<?php echo $USER[$i]["LastName"]; ?>">
                                     <i class="fas fa-lock"></i></button>
 
-                                <button type="button" class="btn btn-warning btn-sm btn_edit tt" data-toggle="tooltip" title="แก้ไขข้อมูล"
-                                    uid="<?php echo $USER[$i]["UID"]; ?>" titles="<?php echo $USER[$i]["Title"]; ?>"
-                                    username="<?php echo $USER[$i]["UserName"]; ?>" fname="<?php echo $USER[$i]["FirstName"]; ?>"
-                                    lname="<?php echo $USER[$i]["LastName"]; ?>" mail="<?php echo $USER[$i]["EMAIL"]; ?>"
-                                    type_email="<?php echo $USER[$i]["ETID"]; ?>" department="<?php echo $USER[$i]["DID"]; ?>"
-                                    admin="<?php echo $USER[$i]["IsAdmin"]; ?>" admin2="<?php echo $USER[$i]["IsAdmin2"]; ?>"
+                                <button type="button" class="btn btn-warning btn-sm btn_edit tt" data-toggle="tooltip"
+                                    title="แก้ไขข้อมูล" uid="<?php echo $USER[$i]["UID"]; ?>"
+                                    titles="<?php echo $USER[$i]["Title"]; ?>"
+                                    username="<?php echo $USER[$i]["UserName"]; ?>"
+                                    fname="<?php echo $USER[$i]["FirstName"]; ?>"
+                                    lname="<?php echo $USER[$i]["LastName"]; ?>"
+                                    mail="<?php echo $USER[$i]["EMAIL"]; ?>"
+                                    type_email="<?php echo $USER[$i]["ETID"]; ?>"
+                                    department="<?php echo $USER[$i]["DID"]; ?>"
+                                    admin="<?php echo $USER[$i]["IsAdmin"]; ?>"
+                                    admin2="<?php echo $USER[$i]["IsAdmin2"]; ?>"
                                     research="<?php echo $USER[$i]["IsResearch"]; ?>"
                                     operator="<?php echo $USER[$i]["IsOperator"]; ?>"
                                     farmer="<?php echo $USER[$i]["IsFarmer"]; ?> ">
@@ -341,11 +327,8 @@
                             </td>
                         </tr>
                         <?php 
-                    }
-                        
-
-                ?>
-
+                            }
+                        ?>
 
                     </tbody>
                 </table>

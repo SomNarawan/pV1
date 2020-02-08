@@ -7,7 +7,11 @@
     $farmer=0;
     $block=0;
     $unblock=0;
-    
+    $department = 0;
+
+    if(isset($_GET['did'])){
+        $department = $_GET['did'];
+    }
     if(isset($_POST['s_admin'])){
         $admin=1;
     }
@@ -24,8 +28,6 @@
         $farmer=1;
         
     }
-    
-    $department = 0;
     if(isset($_POST['s_department'])){
         $department = $_POST['s_department'];
     }
@@ -52,6 +54,7 @@
     //echo $sql;
     $USER = selectData($sql);
 
+    
 
 
 ?>
