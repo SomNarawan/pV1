@@ -1,3 +1,6 @@
+<?php
+    $EMAILTYPE = getEmailtype();
+?>
 <!-- addModal -->
 
 <div class="modal fade" id="addModal" tabindex="-1" role="dialog">
@@ -82,11 +85,6 @@
                                     required="" oninput="setCustomValidity(' ')">
                                 <i class="far fa-eye-slash eye-setting" id="h_2"></i>
                             </div>
-                            <!-- <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                                <i class="fa fa-question-circle tt" style="color:red" data-toggle="tooltip"
-                                    data-placement="bottom"
-                                    title="-ต้องมีขนาดมากกว่า 7 ตัวอักษร -ต้องมีอักษรภาษาอังกฤษ ตัวเลข และอักขระพิเศษ"></i>
-                            </div> -->
                         </div>
                         <div class="row mb-4">
                             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 text-right">
@@ -99,7 +97,6 @@
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                 <select class="form-control" id="type" name="type">
                                 <?php 
-                                    $EMAILTYPE = getEmailtype();
                                     for($i=1;$i<sizeof($EMAILTYPE);$i++){  ?>
                                     <option value=<?php echo $EMAILTYPE[$i]["ETID"]; ?>><?php echo $EMAILTYPE[$i]["Type"]; ?></option>
                                     <?php
@@ -118,7 +115,6 @@
                             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                                 <select class="form-control" id="department" name="department">
                                     <?php 
-                                    $DEPARTMENT = getDepartment();
                                     for($i=1;$i<sizeof($DEPARTMENT);$i++){  ?>
                                     <option value=<?php echo $DEPARTMENT[$i]["DID"]; ?>><?php echo $DEPARTMENT[$i]["Department"]; ?></option>
                                     <?php
@@ -162,10 +158,6 @@
                                         value="option5">
                                     <label class="form-check-label" for="inlineCheckbox5">เกษตรกร</label>
                                 </div>
-                                <!-- <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="error" name="error" value="option5" 
-                                required="" oninput="setCustomValidity(' ')">
-                            </div> -->
                             </div>
                         </div>
                         <div class="row mb-4">
@@ -256,7 +248,6 @@
                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 ">
                                 <select class="form-control" id="e_type" name="e_type">
                                 <?php 
-                                    $EMAILTYPE = getEmailtype();                                    
                                     for($i=1;$i<sizeof($EMAILTYPE);$i++){  ?>
                                     <option value=<?php echo $EMAILTYPE[$i]["ETID"]; ?>><?php echo $EMAILTYPE[$i]["Type"]; ?></option>
                                     <?php
@@ -275,7 +266,6 @@
                             <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
                                 <select class="form-control" name="e_department" id="e_department">
                                 <?php 
-                                    $DEPARTMENT = getDepartment();                                    
                                     for($i=1;$i<sizeof($DEPARTMENT);$i++){  ?>
                                     <option value=<?php echo $DEPARTMENT[$i]["DID"]; ?>><?php echo $DEPARTMENT[$i]["Department"]; ?></option>
                                     <?php
@@ -375,11 +365,6 @@
                                 oninput="setCustomValidity('')">
                             <i class="far fa-eye-slash eye-setting" id="hide_2"></i>
                         </div>
-                        <!-- <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                            <i class="fa fa-question-circle tt" style="color:red" data-toggle="tooltip"
-                                data-placement="bottom"
-                                title="-ต้องมีขนาดมากกว่า 7 ตัวอักษร -ต้องมีอักษรภาษาอังกฤษ ตัวเลข และอักขระพิเศษ"></i>
-                        </div> -->
                     </div>
                     <div class="row mb-4">
                         <div class="col-xl-3 col-12 text-right">
@@ -400,11 +385,6 @@
                             <input type="text" hidden class="form-control" name="p_fname" id="p_fname" value="">
                             <input type="text" hidden class="form-control" name="p_lname" id="p_lname" value="">
                         </div>
-                        <!-- <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                            <i class="fa fa-question-circle tt" style="color:red" data-toggle="tooltip"
-                                data-placement="bottom"
-                                title="-ต้องมีขนาดมากกว่า 7 ตัวอักษร -ต้องมีอักษรภาษาอังกฤษ ตัวเลข และอักขระพิเศษ"></i>
-                        </div> -->
                     </div>
                 </div>
                 <div class="modal-footer">

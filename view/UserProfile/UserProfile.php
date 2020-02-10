@@ -4,23 +4,17 @@
     $CurrentMenu = "UserProfile";
 
     include_once("../layout/LayoutHeader.php");
-    include_once("../../dbConnect.php");
+    include_once("./../../query/query.php");
 
     $USER = $_SESSION[md5('user')];
     $id_u=$USER[1]['UID'];
     $did = $USER[1]['DID'];
     $etid = $USER[1]['ETID'];
 
-    // echo $did;
-    $sql = "SELECT * FROM `db-department` WHERE DID = $did ";
-    $DEPARTMENT = selectData($sql);
-
-    $sql1 = "SELECT * FROM `db-emailtype` WHERE ETID = $etid ";
-    $EMIALTYPE= selectData($sql1);
- 
-    $sql2 ="SELECT * FROM `db-user` WHERE `UID`=$id_u";
-    $get_user= selectData($sql2);
-    $get_idUser=$get_user[1]['PWD'];
+    $DEPARTMENTUSER = getDepartmentUser($did);
+    $EMIALTYPEUSER = getEmailtypeUser($etid);
+    $GET_USER = getUser($id_u);
+    $pass=$GET_USER[1]['PWD'];
 
     $icon = $USER[1]['Icon'];
     if($icon == "default.jpg"){
@@ -31,11 +25,6 @@
         $userId = $USER[1]['UID'];
         $icon = $USER[1]['Icon'];
     }
-
-    // echo $USER[1]['Icon']." ";
-
-    // echo $userId." ";
-    // echo $icon;
 
 ?>
 <!-- ----------------------- crop photo ------------------------- -->
@@ -79,7 +68,7 @@
                                         if( $USER[1]['Title'] ==1 )
                                             echo 'src="../../icon/user/0/defaultM.jpg" />';
                                         else 
-                                            echo 'src="../../icon/user/0/defaultM.jpg" />';
+                                            echo 'src="../../icon/user/0/defaultW.jpg" />';
                                     }else{
                                         echo 'src="../../icon/user/'.$userId.'/'.$icon.'" />';
                                     }
@@ -97,7 +86,7 @@
                                         class="btn btn-warning btn-sm tt"
                                         title='เปลี่ยนข้อมูลบัญชี'
                                         uid="<?php echo $USER[1]['UID']; ?>" 
-                                        titles="<?php echo $USER[1]['Title']; ?>"
+                                        titles="<?php echo $USER[1]['Title'];?>"
                                         username="<?php echo $USER[1]['UserName']; ?>"
                                         fname="<?php echo $USER[1]['FirstName']; ?>"
                                         lname="<?php echo $USER[1]['LastName']; ?>"
@@ -115,7 +104,7 @@
                                         title='เปลี่ยนรหัสผ่าน'
                                         uid="<?php echo $USER[1]['UID']; ?>"
                                         username="<?php echo $USER[1]['UserName']; ?>" 
-                                        pass="<?php echo $get_idUser; ?>"
+                                        pass="<?php echo $pass; ?>"
                                         titles="<?php echo $USER[1]['Title']; ?>"
                                         fname="<?php echo $USER[1]['FirstName']; ?>"
                                         lname="<?php echo $USER[1]['LastName']; ?>">
@@ -127,22 +116,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="row mt-3">
-                <div class="col-xl-12 col-12">
-                    <div class="card">
-                        <div class="card-header card-bg">
-                            ตำแหน่งสวนปาล์ม
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-xl-12 col-12 mb-2">
-                                    <div id="map_area" style="width:auto; height:200px;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
         <div class="col-xl-8 col-12 mb-4">
             <div class="card">
@@ -172,7 +145,7 @@
                         </div>
                         <div class="col-xl-9 col-12">
                             <input type="text" class="form-control" id="firstname"
-                                value='<?php echo $USER[1]['FirstName']; ?>'' disabled>
+                                value="<?php echo $USER[1]['FirstName']; ?>" disabled>
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -181,7 +154,7 @@
                         </div>
                         <div class="col-xl-9 col-12">
                             <input type="text" class="form-control" id="lastname"
-                                value='<?php echo $USER[1]['LastName'] ?>'disabled>
+                                value="<?php echo $USER[1]['LastName'] ?>" disabled>
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -190,24 +163,16 @@
                         </div>
                         <div class="col-xl-9 col-12">
                             <input type="text" class="form-control" id="mail"
-                                value="<?php echo $USER[1]['EMAIL']?>@<?php echo $EMIALTYPE[1]['Type']?>" disabled>
+                                value="<?php echo $USER[1]['EMAIL']?>@<?php echo $EMIALTYPEUSER[1]['Type']?>" disabled>
                         </div>
                     </div>
-                    <!-- <div class="row mb-4">
-                        <div class="col-xl-3 col-12 text-right">
-                            <span>เบอร์โทรศัพท์</span>
-                        </div>
-                        <div class="col-xl-9 col-12">
-                            <input type="text" class="form-control" id="mail" value="0866221212" disabled>
-                        </div>
-                    </div> -->
                     <div class="row mb-4">
                         <div class="col-xl-3 col-12 text-right">
                             <span>ชื่อบัญชี</span>
                         </div>
                         <div class="col-xl-9 col-12">
                             <input type="text" class="form-control" id="username"
-                                value=<?php echo $USER[1]['UserName'] ?> disabled>
+                                value="<?php echo $USER[1]['UserName'] ?>" disabled>
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -216,7 +181,7 @@
                         </div>
                         <div class="col-xl-9 col-12">
                             <input type="text" class="form-control" id="department"
-                                value=<?php echo $DEPARTMENT[1]['Department']; ?> disabled>
+                                value="<?php echo $DEPARTMENTUSER[1]['Department']; ?>" disabled>
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -233,7 +198,7 @@
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="admin" name="admin" value="option1"
                                     disabled <?php if($USER[1]['IsAdmin2'] == 1) echo "checked"; ?>>
-                                <label class="form-check-label" for="inlineCheckbox1">ผู้ดูแลระบบ2</label>
+                                <label class="form-check-label" for="inlineCheckbox1">ผู้ช่วยผู้ดูแลระบบ</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="research" name="research"
@@ -262,12 +227,9 @@
 <?php include_once("../layout/LayoutFooter.php"); ?>
 <?php include_once("UserProfileModal.php"); ?>
 
-<!-- <script src="UserProfile.js"></script> -->
 <script src="../../croppie/croppie.js"></script>
 <script>
-// console.log("file");
 $(document).ready(function() {
-    // console.log("uu");
     let dataU;
     let logP;
     let pwd_md5 = 5;
@@ -322,7 +284,7 @@ $(document).ready(function() {
         document.getElementById("e_operator").checked = false;
         document.getElementById("e_farmer").checked = false;
 
-        var title = $(this).attr('title');
+        var titles = $(this).attr('titles');
         var fname = $(this).attr('fname');
         var lname = $(this).attr('lname');
         var username = $(this).attr('username');
@@ -334,6 +296,7 @@ $(document).ready(function() {
         var operator = $(this).attr('operator');
         var farmer = $(this).attr('farmer');
 
+        console.log(department);
         $('#uid').val(uid);
         $('#e_fname').val(fname);
         $('#e_lname').val(lname);
