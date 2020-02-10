@@ -35,6 +35,7 @@ if(isset($_POST['request'])){
             $get_idDim = getDIMu($uid);
             echo $get_idDim;
             break;
+            
         case 'insert' :
             $admin = 0;
             $admin2 = 0;
