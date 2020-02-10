@@ -7,106 +7,127 @@ $CurrentMenu = "OilPalmAreaList";
 
 
 <?php include_once("../layout/LayoutHeader.php");
-if (isset($_GET[('nfarm')]) && isset($_GET[('nsubfarm')]) && isset($_GET[('farmer')]) && isset($_GET[('logid')]) && isset($_GET[('numtree')])) {
-    $nfarm = $_SESSION[('nfarm')] = $_GET[('nfarm')];
-    $nsubfarm = $_SESSION[('nsubfarm')] = $_GET[('nsubfarm')];
-    $farmer = $_SESSION[('farmer')] = $_GET[('farmer')];
-    $ffullname = $_SESSION[('ffullname')] = $_GET[('ffullname')];
-    $logid = $_SESSION[('logid')] = $_GET[('logid')];
-    $numtree = $_SESSION[('numtree')] = $_GET[('numtree')];
-    $fmid = $_SESSION[('fmid')] = $_GET[('fmid')];
-    $numtree = $_SESSION[('numtree')] = $_GET[('numtree')];
+// if (isset($_GET[('nfarm')]) && isset($_GET[('nsubfarm')]) && isset($_GET[('farmer')]) && isset($_GET[('logid')]) && isset($_GET[('numtree')])) {
+//     $nfarm = $_SESSION[('nfarm')] = $_GET[('nfarm')];
+//     $nsubfarm = $_SESSION[('nsubfarm')] = $_GET[('nsubfarm')];
+//     $farmer = $_SESSION[('farmer')] = $_GET[('farmer')];
+//     $ffullname = $_SESSION[('ffullname')] = $_GET[('ffullname')];
+//     $logid = $_SESSION[('logid')] = $_GET[('logid')];
+//     $numtree = $_SESSION[('numtree')] = $_GET[('numtree')];
+//     $fmid = $_SESSION[('fmid')] = $_GET[('fmid')];
+//     $numtree = $_SESSION[('numtree')] = $_GET[('numtree')];
     
-    $DIMfarmID = $_SESSION[('DIMfarmID')] = $_GET[('DIMfarmID')];
-    $DIMSubfID = $_SESSION[('DIMSubfID')] = $_GET[('DIMSubfID')];
-} else {
-    $nfarm = $_SESSION[('nfarm')];
-    $nsubfarm = $_SESSION[('nsubfarm')];
-    $farmer = $_SESSION[('farmer')];
-    $ffullname = $_SESSION[('ffullname')];
-    $logid = $_SESSION[('logid')];
-    $numtree = $_SESSION[('numtree')];
-    $fmid = $_SESSION[('fmid')];
-    $numtree = $_SESSION[('numtree')];
+//     $DIMfarmID = $_SESSION[('DIMfarmID')] = $_GET[('DIMfarmID')];
+//     $DIMSubfID = $_SESSION[('DIMSubfID')] = $_GET[('DIMSubfID')];
+// } else {
+//     $nfarm = $_SESSION[('nfarm')];
+//     $nsubfarm = $_SESSION[('nsubfarm')];
+//     $farmer = $_SESSION[('farmer')];
+//     $ffullname = $_SESSION[('ffullname')];
+//     $logid = $_SESSION[('logid')];
+//     $numtree = $_SESSION[('numtree')];
+//     $fmid = $_SESSION[('fmid')];
+//     $numtree = $_SESSION[('numtree')];
     
-    $DIMfarmID = $_SESSION[('DIMfarmID')];
-    $DIMSubfID = $_SESSION[('DIMSubfID')];
-}
+//     $DIMfarmID = $_SESSION[('DIMfarmID')];
+//     $DIMSubfID = $_SESSION[('DIMSubfID')];
+// }
 $sumtree = 0;
 
-$suid = $_GET[('SFID')];
+$suid = $_POST[('fsid')];
+
+$sqllogfarmID = "SELECT  `db-farm`.`FMID`,`log-farm`.`ID`,`dim-farm`.`Name`,`db-farmer`.`FirstName`,`db-farmer`.`LastName`,`db-farm`.`Alias`, `db-subfarm`.`Name` as nsubfarm ,`log-farm`.`DIMfarmID`,`log-farm`.`DIMSubfID` ,`log-farm`.`NumTree`FROM `log-farm`
+INNER JOIN `dim-farm` ON `dim-farm`.`ID` = `log-farm`.`DIMfarmID`
+INNER JOIN `db-farm` ON `dim-farm`.`dbID` = `db-farm`.`FMID`
+INNER JOIN `db-farmer` ON `db-farmer`.`UFID` = `db-farm`.`UFID`
+INNER JOIN `db-subfarm` ON `db-subfarm`.`FMID`=`db-farm`.`FMID`
+WHERE  `dim-farm`.`IsFarm` = 1 AND`log-farm`.`EndT` is null AND `log-farm`.`DIMSubfID` is null AND `db-subfarm`.`FSID` = '" . $suid . "'";
+$logfarmID = selectData($sqllogfarmID);
+
 $StartT = time();
 $sql = "SELECT 	`db-subfarm`.* ,`db-subdistrinct`.`AD2ID`,`db-distrinct`.`AD1ID` FROM `db-subfarm` INNER JOIN `db-subdistrinct`ON `db-subfarm`.`AD3ID`=`db-subdistrinct`.`AD3ID`
  INNER JOIN `db-distrinct`ON`db-distrinct`.`AD2ID`=`db-subdistrinct`.`AD2ID` WHERE `FSID`='$suid'";
 $dataFarm = selectData($sql);
+
 $sql = "SELECT Address , subDistrinct , Distrinct , Province FROM `db-farm`
 inner join `db-subdistrinct` on `db-subdistrinct`.`AD3ID` = `db-farm`.`AD3ID`
 inner join `db-distrinct` on `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID`
 inner join `db-province` on `db-province`.`AD1ID` = `db-distrinct`.`AD1ID`
-where Name = '" . $nfarm . "'";
+where Name = '".$logfarmID[1]['Name']."'";
+
 $sql2 = "SELECT `log-farm`.`AreaRai`,`log-farm`.`AreaNgan`,`log-farm`.`AreaWa`,
 `log-farm`.`ID`, `log-farm`.`NumTree`
 FROM `db-farm`  
 inner join `db-subfarm` on `db-farm`.`FMID` = `db-subfarm`.`FMID` 
 INNER JOIN `dim-farm` on `db-farm`.FMID = `dim-farm`.`dbID`  
 INNER JOIN `log-farm` on `log-farm`.`DIMfarmID`=`dim-farm`.`ID`
-where `log-farm`.`ID` ='" . $logid . "'
+where `log-farm`.`ID` =".$logfarmID[1]['ID']."
 group by `log-farm`.`ID`";
+
 $sql3 = "SELECT `dim-farm`.`Name`,`log-planting`.`NumGrowth1`,`log-planting`.`NumGrowth2`,`log-planting`.`NumDead`,`dim-time`.`Date` 
  FROM `dim-farm`
 INNER JOIN `log-planting` on `log-planting`.`DIMsubFID` = `dim-farm`.`ID`
 INNER JOIN `dim-time` on `dim-time`.`ID` = `log-planting`.`DIMdateID`
-
-WHERE`dim-farm`.`Name` = '" . $nsubfarm . "'
+WHERE`dim-farm`.`Name` = '".$logfarmID[1]['nsubfarm']."'
 GROUP BY  `dim-farm`.`Name`,`log-planting`.`NumGrowth1`,`log-planting`.`NumGrowth2`,`log-planting`.`NumDead`
 ORDER BY `log-planting`.`NumGrowth1`  DESC";
+
 $sql4 = "SELECT `dim-farm`.`Name` , `log-planting`.`DIMdateID` ,FLOOR(TIMESTAMPDIFF(DAY,`dim-time`.`Date`,CURRENT_TIME)% 30.4375 )as day,FLOOR(TIMESTAMPDIFF( MONTH,`dim-time`.`Date`,CURRENT_TIME)% 12 )as month,FLOOR(TIMESTAMPDIFF( YEAR,`dim-time`.`Date`,CURRENT_TIME))as year from
 `dim-farm` INNER JOIN `log-planting` ON `dim-farm`.`ID` =`log-planting`.`DIMsubFID`
 INNER JOIN `dim-time` on `log-planting`.`DIMdateID` = `dim-time`.`ID`
-where `dim-farm`.`Name` = '" . $nsubfarm . "'
+where `dim-farm`.`Name` = '".$logfarmID[1]['nsubfarm']."'
 group by `dim-farm`.`Name`,`dim-time`.`ID`";
+
 $sql5 = "SELECT DISTINCT `dim-time`.`Year2` FROM `log-harvest`
 INNER JOIN `dim-time` on `log-harvest`.`DIMdateID` = `dim-time`.`ID`  
 ORDER BY `dim-time`.`Year2` DESC";
-$sql6 = "SELECT max(m.Year2) as max from (SELECT t.Year2 FROM(SELECT `dim-time`.`Year2`,`dim-farm`.`Name`,`log-harvest`.`Weight` FROM `log-harvest` INNER JOIN `dim-time` on `log-harvest`.`DIMdateID` = `dim-time`.`ID` INNER JOIN `dim-farm` on `dim-farm`.`ID` = `log-harvest`.`DIMsubFID` WHERE `dim-farm`.`Name` = '" . $nsubfarm . "' AND`dim-farm`.`IsFarm`='0' ORDER BY `dim-time`.`Year2` ASC) as t 
+
+$sql6 = "SELECT max(m.Year2) as max from (SELECT t.Year2 FROM(SELECT `dim-time`.`Year2`,`dim-farm`.`Name`,`log-harvest`.`Weight` FROM `log-harvest` INNER JOIN `dim-time` on `log-harvest`.`DIMdateID` = `dim-time`.`ID` INNER JOIN `dim-farm` on `dim-farm`.`ID` = `log-harvest`.`DIMsubFID` WHERE `dim-farm`.`Name` = '".$logfarmID[1]['nsubfarm']."' AND`dim-farm`.`IsFarm`='0' ORDER BY `dim-time`.`Year2` ASC) as t 
 GROUP BY t.`Year2`) as m";
+
 $sql7 = "SELECT `dim-fertilizer`.`ID`,`dim-fertilizer`.`Name` AS ferName,`dim-time`.`Year2` AS YY,
 SUM(`log-fertilising`.`Vol`) AS sumvol 
 FROM `log-fertilising` 
 INNER JOIN `dim-time` ON `dim-time`.`ID` = `log-fertilising`.`DIMdateID`
 INNER JOIN `dim-fertilizer` ON `dim-fertilizer`.`ID` = `log-fertilising`.`DIMferID`  
 INNER JOIN `dim-farm` on `dim-farm`.`ID` = `log-fertilising`.`DIMsubFID`
-where `DIMfarmID`='".$DIMfarmID."' AND `DIMsubFID`='".$DIMSubfID."'
+where `DIMfarmID`=".$logfarmID[1]['DIMfarmID']." AND `DIMsubFID`=".$logfarmID[1]['DIMSubFID']."
 GROUP BY `dim-fertilizer`.`Name` ,`dim-time`.`Year2`
 ORDER BY `dim-fertilizer`.`Name` ,`dim-time`.`Year2` ";
+
 $sql8 = "SELECT`dim-time`.`Year2`,`dim-farm`.`Name` FROM `log-fertilising`
 INNER JOIN `dim-time` ON `log-fertilising`.`DIMdateID` = `dim-time`.`ID`
 INNER JOIN `dim-farm` ON `dim-farm`.`ID` = `log-fertilising`.`DIMsubFID`
-where `dim-farm`.`Name` = '" . $nsubfarm . "'
+where `dim-farm`.`Name` = '".$logfarmID[1]['Name']."'
 group by `dim-time`.`Year2`  
 ORDER BY `dim-time`.`Year2`  DESC LIMIT 3";
+
 $sql9 = "SELECT `dim-fertilizer`.`ID`,`dim-fertilizer`.`Name`as namevol FROM `log-fertilising` 
 INNER JOIN `dim-time` ON `dim-time`.`ID` = `log-fertilising`.`DIMdateID`
 INNER JOIN `dim-fertilizer` ON `dim-fertilizer`.`ID` = `log-fertilising`.`DIMferID`  
 INNER JOIN `dim-farm` on `dim-farm`.`ID` = `log-fertilising`.`DIMsubFID`
-where `dim-farm`.`Name` = '" . $nsubfarm . "' 
+where `dim-farm`.`Name` = '".$logfarmID[1]['nsubfarm']."' 
 GROUP BY `dim-fertilizer`.`Name` 
 ORDER BY `dim-fertilizer`.`Name`";
+
 $sql10 = "SELECT `log-farm`.`Latitude` , `log-farm`.`Longitude`  FROM `log-farm`
-where `log-farm`.`ID` = '" . $logid . "'";
+where `log-farm`.`ID` = '".$logfarmID[1]['ID']."'";
+
 $sql11 = "SELECT  `db-fertilizer`.`EQ1`,`db-fertilizer`.`EQ2` FROM `db-fertilizer`
 INNER JOIN `dim-fertilizer` ON `dim-fertilizer`.`dbID` = `db-fertilizer`.`FID`
 INNER JOIN `log-fertilising` ON `log-fertilising`.`DIMferID` = `dim-fertilizer`.`ID`
 INNER JOIN `dim-farm` on `dim-farm`.`ID`= `log-fertilising`.`DIMsubFID`
-where `dim-farm`.`Name` ='" . $nsubfarm . "'  ";
+where `dim-farm`.`Name` ='".$logfarmID[1]['nsubfarm']."'  ";
+
 $sql12 = "SELECT `log-icon`.`DIMiconID`,`log-icon`.`Path`,`log-icon`.`FileName` FROM `log-icon` 
 INNER JOIN `dim-user` on`log-icon`.`DIMiconID` = `dim-user`.`ID`
 INNER JOIN `db-farmer` on `db-farmer`.`UFID` = `dim-user`.`dbID`
-WHERE `log-icon`.`Type` = 5 AND `db-farmer`.`FirstName`='" . $farmer . "'";
+WHERE `log-icon`.`Type` = 5 AND `db-farmer`.`FirstName`='".$logfarmID[1]['FirstName']."'";
+
 $sql13 = "SELECT `log-icon`.`DIMiconID`,`log-icon`.`Path`,`log-icon`.`FileName` FROM `log-icon` 
 INNER JOIN `dim-farm` on`log-icon`.`DIMiconID` = `dim-farm`.`ID`
 INNER JOIN `db-subfarm` on `db-subfarm`.`FSID` = `dim-farm`.`dbID`
-WHERE `log-icon`.`Type` = 3 AND `db-subfarm`.`Name`= '" . $nsubfarm . "' ";
+WHERE `log-icon`.`Type` = 3 AND `db-subfarm`.`Name`= '".$logfarmID[1]['nsubfarm']."' ";
 
 $address = selectData($sql);
 $areatotal = selectData($sql2);
@@ -115,7 +136,7 @@ $dmy = selectData($sql4);
 // echo $sql6;
 $year = selectData($sql5);
 $maxyear = selectData($sql6);
-$vol = selectDataArray($sql7);
+//$vol = selectDataArray($sql7);
 $tempVOL = selectData($sql7);
 $yearvol = selectData($sql8);
 $namevol = selectData($sql9);
@@ -131,8 +152,8 @@ $idfarm = selectData($sql13);
 //print_r($tempVOL);
 $numFer=0;
 foreach($namevol as $tmp1 => $ferDATA){
-    //print_r($ferDATA);
-    //echo $ferDATA['ID']."-".$ferDATA['namevol']."<br>";
+    print_r($ferDATA);
+    // echo $ferDATA['ID']."-".$ferDATA['namevol']."<br>";
     if($ferDATA['ID']>0){
         $ferUSAGE[$numFer]['ID']    = $ferDATA['ID'];
         $ferUSAGE[$numFer]['NAME']  = $ferDATA['namevol'];
@@ -199,7 +220,7 @@ foreach($tempVOL as $tmp2 => $ferVOLUME){
                             <span>ชื่อสวน : </span>
                         </div>
                         <div class="col-xl-8 col-8">
-                            <span><?php echo "$nfarm" ?></span>
+                            <span><?php echo "".$logfarmID[1]['Name']."" ?></span>
                         </div>
                     </div>
                     <div class="row justify-content-center">
@@ -207,7 +228,7 @@ foreach($tempVOL as $tmp2 => $ferVOLUME){
                             <span>ชื่อแปลง : </span>
                         </div>
                         <div class="col-xl-8 col-8">
-                            <span><?php echo "$nsubfarm" ?></span>
+                            <span><?php echo "".$logfarmID[1]['nsubfarm']."" ?></span>
                             <button type="button" id="edit_photo" 
                             class="btn btn-warning btn-sm tt" style="float:right;"
                             title='เปลี่ยนรูปโปรไฟล์สวน'
@@ -236,7 +257,8 @@ foreach($tempVOL as $tmp2 => $ferVOLUME){
                             <span>เกษตรกร : </span>
                         </div>
                         <div class="col-xl-8 col-8">
-                            <span><?php echo "$ffullname" ?></span>
+                            <span><?php echo "".$logfarmID[1]['FirstName']."" ?></span>
+                            <span><?php echo "".$logfarmID[1]['LastName']."" ?></span>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -248,7 +270,7 @@ foreach($tempVOL as $tmp2 => $ferVOLUME){
                         WHEN `Title` IN ('3') THEN 'นางสาว' END AS Title                   
                         FROM `db-farmer` JOIN `db-subdistrinct` ON `db-subdistrinct`.`AD3ID` = `db-farmer`.`AD3ID` 
                         JOIN `db-distrinct` ON `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID`
-                        JOIN `db-province` ON `db-province`.`AD1ID` = `db-distrinct`.`AD1ID` WHERE `UFID` =$fmid";
+                        JOIN `db-province` ON `db-province`.`AD1ID` = `db-distrinct`.`AD1ID` WHERE `UFID` =".$logfarmID[1]['FMID']." ";
                         $myConDB = connectDB();
                         $result = $myConDB->prepare($sql);
                         $result->execute();
@@ -256,7 +278,7 @@ foreach($tempVOL as $tmp2 => $ferVOLUME){
                             //echo "src=\"../../".$idfarmer[1]['Path']."/".$idfarmer[1]['FileName']."\" ";
                             
                         if ($row["Icon"] != NULL)
-                            echo $src = "src=\"../../icon/farmer/".$fmid."/".$row["Icon"]."\""; 
+                            echo $src = "src=\"../../icon/farmer/".$logfarmID[1]['FMID']."/".$row["Icon"]."\""; 
                         else if($row['Title']=='นาย') 
                             echo $src = "src=\"../../icon/farmer/man.jpg\"" ;
                         else 
@@ -356,7 +378,7 @@ foreach($tempVOL as $tmp2 => $ferVOLUME){
                     if ($dmy[0]['numrow'] == 0) {
                         echo "<h4>- ต้น อายุ - ปี - เดือน - วัน</h4>";
                     } else {
-                        echo "<h4>$numtree ต้น อายุ  {$dmy[1]['year']} ปี {$dmy[1]['month']} เดือน {$dmy[1]['day']} วัน</h4>";
+                        echo "<h4>".$logfarmID[1]['NumTree']." ต้น อายุ  {$dmy[1]['year']} ปี {$dmy[1]['month']} เดือน {$dmy[1]['day']} วัน</h4>";
                     }
                     ?>
                 </div>
