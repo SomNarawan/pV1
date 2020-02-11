@@ -1,13 +1,11 @@
 <?php
 session_start();
-include_once("../../dbConnect.php");
 $idUT = $_SESSION[md5('typeid')];
 $CurrentMenu = "OilPalmAreaList";
 include_once("../layout/LayoutHeader.php");
 include_once("./../../query/query.php");
 
 $OILPALMAREALIST = getOilPalmAreaList();
-
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
@@ -141,7 +139,6 @@ input.gj-textbox-md {
     </div>
 
     <div class="row">
-
         <?php 
         creatCard( "card-color-one",   "จำนวนสวน",  getCountFarm()." สวน ".getCountSubfarm()." แปลง", "group" );
         creatCard( "card-color-two",   "พื้นที่ทั้งหมด", getCountAreaRai()." ไร่", "dashboard" );
@@ -258,13 +255,8 @@ input.gj-textbox-md {
             <div class="card-header card-bg">
                 <div>
                     <span>สวนปาล์มน้ำมันในระบบ</span>
-                    <!--button type="button" style="float:right;" class="btn btn-success" 
-                        data-toggle="modal" data-target="#modal-1">
-                        <i class="fas fa-plus"></i> เพิ่มสวน
-                    </button-->
                 </div>
             </div>
-
             <div class="card-body" style="overflow-x:scroll;">
                 <div class="row mb-2">
                     <div class="col-xl-3 col-12">
@@ -277,7 +269,7 @@ input.gj-textbox-md {
 
                 </div>
                 <div class="table-responsive">
-                    <table id="example1" class="table table-bordered table-striped table-hover table-data" width="100%">
+                    <table class="table table-bordered table-data" id="dataTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>จังหวัด</th>
@@ -305,7 +297,7 @@ input.gj-textbox-md {
                         <tbody id="getData">
                             <?php 
                             for($i=1;$i<sizeof($OILPALMAREALIST);$i++){
-                                ?>
+                        ?>
                             <tr>
                                 <td class="text-left"><?php echo $OILPALMAREALIST[$i]['Province']; ?></td>
                                 <td class="text-left"><?php echo $OILPALMAREALIST[$i]['Distrinct']; ?></td>
@@ -317,7 +309,7 @@ input.gj-textbox-md {
                                 <td class="text-right"><?php echo $OILPALMAREALIST[$i]['NumTree']; ?> ต้น</td>
                                 <td style='text-align:center;'>
                                     <a
-                                        href='./OilPalmAreaListDetail.php?fmid=<?php echo $OILPALMAREALIST[$i]['FMID']; ?>'>
+                                        href='./OilPalmAreaListDetail.php?fid=<?php echo $OILPALMAREALIST[$i]['FMID']; ?>'>
                                         <button type='button' id='btn_info' class="btn btn-info btn-sm btn_edit tt"
                                             data-toggle="tooltip" title="รายละเอียดข้อมูลสวน">
                                             <i class='fas fa-bars'></i>
@@ -331,8 +323,8 @@ input.gj-textbox-md {
                                 </td>
                             </tr>
                             <?php 
-                                        }
-                                    ?>
+                                }
+                            ?>
                         </tbody>
                     </table>
                 </div>
@@ -430,7 +422,7 @@ input.gj-textbox-md {
         </div>
     </div>
 </div>
-<!-- 
+
 </div>
 
 </div>
@@ -441,13 +433,12 @@ input.gj-textbox-md {
 <!-- End of Content Wrapper -->
 </div>
 <!-- End of Page Wrapper -->
-<?php //include_once("./import_Js.php"); ?> -->
+<?php include_once("./import_Js.php"); ?>
 
 </body>
 
 </html>
 
-<?php include_once("../layout/LayoutFooter.php"); ?>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
@@ -555,7 +546,7 @@ $(document).ready(function() {
     loadFarmer();
     $('.js-example-basic-single').select2();
 
-    $('#example1').DataTable();
+
 
     function loadFarmer() {
         $("#farmer");
@@ -645,6 +636,7 @@ $(document).ready(function() {
     //     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     //     xhttp.send();
     // }
+
     pdfMake.fonts = {
         THSarabun: {
             normal: 'THSarabun.ttf',
@@ -654,30 +646,30 @@ $(document).ready(function() {
         }
     }
 
-    // $('#example1').DataTable({
-    //     dom: '<"row"<"col-sm-12"B>>' +
-    //         '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
-    //         '<"row"<"col-sm-12"tr>>' +
-    //         '<"row"<"col-sm-5"i><"col-sm-7"p>>',
-    //     buttons: [{
-    //             extend: 'excel',
-    //             text: '<i class="fas fa-file-excel"> <font> Excel</font> </i>',
-    //             className: 'btn btn-outline-success btn-sm export-button'
-    //         },
-    //         {
-    //             extend: 'pdf',
-    //             text: '<i class="fas fa-file-pdf"> <font> PDF</font> </i>',
-    //             className: 'btn btn-outline-danger btn-sm export-button',
-    //             pageSize: 'A4',
-    //             customize: function(doc) {
-    //                 doc.defaultStyle = {
-    //                     font: 'THSarabun',
-    //                     fontSize: 16
-    //                 };
-    //             }
-    //         }
-    //     ]
-    // });
+    $('#example1').DataTable({
+        dom: '<"row"<"col-sm-12"B>>' +
+            '<"row"<"col-sm-6"l><"col-sm-6"f>>' +
+            '<"row"<"col-sm-12"tr>>' +
+            '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+        buttons: [{
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel"> <font> Excel</font> </i>',
+                className: 'btn btn-outline-success btn-sm export-button'
+            },
+            {
+                extend: 'pdf',
+                text: '<i class="fas fa-file-pdf"> <font> PDF</font> </i>',
+                className: 'btn btn-outline-danger btn-sm export-button',
+                pageSize: 'A4',
+                customize: function(doc) {
+                    doc.defaultStyle = {
+                        font: 'THSarabun',
+                        fontSize: 16
+                    };
+                }
+            }
+        ]
+    });
 
 });
 
