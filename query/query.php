@@ -754,7 +754,18 @@ function getLogPlanting()
     $PLANTING = selectData($sql);
     return $PLANTING;
 }
-
+//getfarm หน้า OilPalmAreaVolDetail.php
+function getFarmByFMID($farmID){
+    $sql = "SELECT * FROM `db-farm` WHERE `FMID` = $farmID";
+    return selectData($sql);
+}
+//ใช้ดึง icon หน้า OilPalmAreaVolDetail.php
+function getIcon($farmID){
+    $sql = "SELECT * FROM `dim-farm` 
+    JOIN `db-farm` ON `dim-farm`.`dbID` = `db-farm`.`FMID` 
+    WHERE `dim-farm`.`dbID` = $farmID AND `isFarm` = 1";
+    return selectdata($sql);
+}
 //จำนวนต้นไม้ของฟาร์มนั้นๆ และ การ์ดจำนวนต้น หน้า OilPalmAreaVolDetail.php
 function getTreeID($farmID)
 {
@@ -989,13 +1000,13 @@ function getTableAllHarvest()
         $countWeight = (int)getHarvestID($FMID);
         $ownerName = (string)getOwnerName($FMID)[1]["FirstName"];
         $farmName = (string)getFarmFMID($FMID)[1]["Alias"];
-        $ALLHARVEST["$FARM[$i]"]["farmID"] = (int)$FMID;
-        $ALLHARVEST["$FARM[$i]"]["ownerName"] = (string)$ownerName;
-        $ALLHARVEST["$FARM[$i]"]["farmName"] = (string)$farmName;
-        $ALLHARVEST["$FARM[$i]"]["subFarm"] = (int)$countSubFarm;
-        $ALLHARVEST["$FARM[$i]"]["area"] = (int)$countArea;
-        $ALLHARVEST["$FARM[$i]"]["tree"] = (int)$countTree;
-        $ALLHARVEST["$FARM[$i]"]["weight"] = (int)$countWeight;
+        $ALLHARVEST[$i]["farmID"] = $FMID;
+        $ALLHARVEST[$i]["ownerName"] = $ownerName;
+        $ALLHARVEST[$i]["farmName"] = (string)$farmName;
+        $ALLHARVEST[$i]["subFarm"] = (int)$countSubFarm;
+        $ALLHARVEST[$i]["area"] = (int)$countArea;
+        $ALLHARVEST[$i]["tree"] = (int)$countTree;
+        $ALLHARVEST[$i]["weight"] = (int)$countWeight;
     }
 
     return $ALLHARVEST;

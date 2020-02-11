@@ -9,57 +9,15 @@
     include_once("../layout/LayoutHeader.php"); 
     include_once("../../dbConnect.php"); 
     include_once("import_Js.php");
+    include_once("./../../query/query.php");
+
     
     if(isset($_POST['farmID'])){
         $farmID = $_POST['farmID'];
-        $sql = "SELECT * FROM `dim-farm` WHERE `dbID` = $farmID AND `IsFarm`= 1";
-        $myConDB = connectDB();
-        $result = $myConDB->prepare( $sql ); 
-        $result->execute(); 
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)){
-            $_SESSION["farmID"] = $row["dbID"];
-            $_SESSION["DIMfarmID"] = $row["ID"];
-        }
     }
-    $farmID = $_SESSION["farmID"];
-    $DIMfarmID = $_SESSION["DIMfarmID"];
-
-    if(isset($_POST['userID'])){
-        $ownerID = $_POST['userID'];
-        $sql = "SELECT * FROM `dim-user` WHERE `dbID` = $ownerID AND `Type` = 'F'";
-        $myConDB = connectDB();
-        $result = $myConDB->prepare( $sql ); 
-        $result->execute(); 
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)){
-            $_SESSION["ownerID"] = $row["dbID"];
-            $_SESSION["DIMownerID"] = $row["ID"];
-        }
-    }
-    $ownerID = $_SESSION["ownerID"];
-    $DIMownerID = $_SESSION["DIMownerID"];
-
-    $icon = $USER[1]['Icon'];
-    if($icon == "default.jpg"){
-        // echo "yes";
-        $userId = 0;
-        $icon = "default.jpg";
-    }else{
-        $userId = $USER[1]['UID'];
-        $icon = $USER[1]['Icon'];
-    }
-
-
-    $sql = "SELECT * FROM `dim-farm` 
-            JOIN `db-farm` ON `dim-farm`.`dbID` = `db-farm`.`FMID` 
-            WHERE `dim-farm`.`dbID` = $farmID AND `isFarm` = 1";
-    $myConDB = connectDB();
-    $result = $myConDB->prepare($sql); 
-    $result->execute(); 
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)){
-        $iconFarm = $row['Icon'];
-    }
-    
-?>
+    $ICON = getIcon($farmID);
+    $FARM= getFarmByFMID($farmID);
+    ?>
 
 <div class="container">
     <div class="row">
@@ -90,7 +48,7 @@
             <div class="card">
                 <div class="card-body" id="for_card">
                     <div class="row">
-                        <img class="img-radius" width="200" height="200" src="../../icon/farm/<?php echo $farmID; ?>/<?php echo $iconFarm; ?>" />
+                        <img class="img-radius" width="200" height="200" src="../../icon/farm/<?php echo $farmID; ?>/<?php echo $ICON[1]['Icon']; ?>" />
                        
                     </div>
                     <div class="row mt-3 justify-content-center">
@@ -99,15 +57,8 @@
                         </div>
                         <div class="col-xl-6 col-3">
                             <span>
-                            <?php
-                             $sql = "SELECT * FROM `db-farm` WHERE `FMID` = $farmID";
-                            $myConDB = connectDB();
-                            $result = $myConDB->prepare( $sql ); 
-                            $result->execute();        
-                            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                                echo $row["Name"];
-                            }
-                            
+                            <?php 
+                                echo $FARM[1]["Name"];                           
                             ?></span>
                         </div>
                     </div>
