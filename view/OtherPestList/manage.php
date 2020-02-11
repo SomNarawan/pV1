@@ -1,17 +1,6 @@
 <?php
 session_start();
 
-function getImg($img)
-{
-  if ($img != null) {
-    $data = $img;
-    $img_array = explode(';', $data);
-    $img_array2 = explode(",", $img_array[1]);
-    $dataI = base64_decode($img_array2[1]);
-
-    return $dataI;
-  } else return null;
-}
 require "../../dbConnect.php";
 $request = $_POST['request'];
 require_once("../../set-log-login.php");
@@ -56,23 +45,20 @@ switch ($request) {
     $countfiles_danger = sizeof($dataPic3) - 1;
 
     $sql = "INSERT INTO `db-pestlist` (`PID`, `Name`, `Alias`, `PTID`, `Charactor`, `Danger`, `Icon` , `NumPicChar`, `NumPicDanger`)
-          VALUES ('','$Alias','$Name','1','$Charactor','$Danger','$nameImg1','$countfiles_style','$countfiles_danger')";
+          VALUES ('','$Alias','$Name','4','$Charactor','$Danger','$nameImg1','$countfiles_style','$countfiles_danger')";
     //echo $sql;
     $insertData = addinsertData($sql);
     echo $insertData;
     $sql = "SELECT `PID` FROM `db-pestlist` ORDER BY `PID` DESC LIMIT 1";
     $id = selectDataOne($sql)['PID'];
 
-
-
     //-------------------------------------------------------- log and dim --------------------------------------------------------
-
 
     $path = "../../icon/pest/$id";
     if (!file_exists($path)) {
       mkdir("../../icon/pest/$id");
-      mkdir("../../picture/Pest/insect/style/$id");
-      mkdir("../../picture/Pest/insect/danger/$id");
+      mkdir("../../picture/Pest/other/style/$id");
+      mkdir("../../picture/Pest/other/danger/$id");
     }
     if ($dataLogo != null) {
       file_put_contents("../../icon/pest/$id/$nameImg1", $dataLogo);
@@ -83,7 +69,7 @@ switch ($request) {
           $nameImg2 = $nameImg1;
         else $nameImg2 = ($i - 1) . "_" . $nameImg1;
         $Pic2 = getImg($dataPic2[$i]);
-        file_put_contents("../../picture/Pest/insect/style/$id/$nameImg2", $Pic2);
+        file_put_contents("../../picture/Pest/other/style/$id/$nameImg2", $Pic2);
       }
     }
 
@@ -93,7 +79,7 @@ switch ($request) {
           $nameImg3 = $nameImg1;
         else $nameImg3 = ($i - 1) . "_" . $nameImg1;
         $Pic3 = getImg($dataPic3[$i]);
-        file_put_contents("../../picture/Pest/insect/danger/$id/$nameImg3", $Pic3);
+        file_put_contents("../../picture/Pest/other/danger/$id/$nameImg3", $Pic3);
       }
     }
     $did = addinsertData($sql);
@@ -103,17 +89,18 @@ switch ($request) {
     $i = 1;
     $check_dim = 1;
     for ($i = 1; $i <= $DATA[0]['numrow']; $i++) {
-      if ($DATA[$i]['dbpestLID'] == $did && $DATA[$i]['dbpestTID'] == $dptid && $DATA[$i]['Name'] == $Name && $DATA[$i]['Alias'] == $Alias  && $DATA[$i]['Charactor'] == $Charactor && $DATA[$i]['Danger'] == $Danger && $DATA[$i]['TypeTH'] == $type) {
-        $check_dim = 0;
+        if ($DATA[$i]['dbpestLID'] == $did && $DATA[$i]['dbpestTID'] == $dptid && $DATA[$i]['Name'] == $Name && $DATA[$i]['Alias'] == $Alias  && $DATA[$i]['Charactor'] == $Charactor && $DATA[$i]['Danger'] == $Danger && $DATA[$i]['TypeTH'] == $type) {
+            $check_dim = 0;
         break;
-      }
+        }
     }
     echo   "<script>
-                            console.log('$check_dim');
-                            </script>";
+            console.log('$check_dim');
+            </script>";
+
     if ($check_dim) {
 
-      $sql = "SELECT `TypeTH` FROM `db-pesttype` WHERE `PTID` = 1";
+      $sql = "SELECT `TypeTH` FROM `db-pesttype` WHERE `PTID` = 4";
 
       $myConDB = connectDB();
       $result = $myConDB->prepare($sql);
@@ -123,27 +110,21 @@ switch ($request) {
       }
       $last_id = last_id();
 
-      //echo $last_id;
-      //echo toString($ptid);
       $sql = "INSERT INTO `dim-pest` (`ID`,`dbpestLID`,`dbpestTID`,`Name`,`Alias`,`Charactor`,`Danger`,`TypeTH`) 
-                  VALUES ('','$last_id','1','$Name','$Alias','$Charactor','$Danger','$ptid')";
+                VALUES ('','$last_id','4','$Name','$Alias','$Charactor','$Danger','$ptid')";
       echo "
       <script>
         alert($sql)
       </script>";
 
-
       $id_d = addinsertData($sql);
-      // echo $id_d;
       $data_t =  getDIMDate();
       $id_t = last_id();
-      // echo $id_t;
-
-      // echo $id_t[1]['ID'];
 
       echo   "<script>
-                            console.log($loglogin_id );
-                            </script>";
+            console.log($loglogin_id );
+            </script>";
+
       $sql = "INSERT INTO `log-pest` (`ID`,`DIMpestID`,`LOGloginID`,`StartT`,`StartID`,`EndT`,`EndID`,`NumPicChar`,`NumPicDanger`) 
                       VALUES ('','$id_d','$loglogin_id','$t','$startID',NULL,NULL,'$countfiles_style','$countfiles_danger')";
       echo $sql;
@@ -151,7 +132,7 @@ switch ($request) {
       echo $did;
     }
 
-    header("location:InsectList.php");
+    header("location:OtherPestList.php");
     break;
 
   case 'delete';
@@ -205,7 +186,7 @@ switch ($request) {
     // ------------------------------------- if DIM don't duplicated -------------------------------------
     if ($check_dim) {
 
-      $sql = "SELECT `TypeTH` FROM `db-pesttype` WHERE `PTID` = 1";
+      $sql = "SELECT `TypeTH` FROM `db-pesttype` WHERE `PTID` = 4";
 
       $myConDB = connectDB();
       $result = $myConDB->prepare($sql);
@@ -215,10 +196,8 @@ switch ($request) {
       }
       $last_id = last_id();
 
-      //echo $last_id;
-      //echo toString($ptid);
       $sql = "INSERT INTO `dim-pest` (`ID`,`dbpestLID`,`dbpestTID`,`Name`,`Alias`,`Charactor`,`Danger`,`TypeTH`) 
-                  VALUES ('','$last_id','1','$nameinsect','$alias','$charstyle','$dangerInsect','$ptid')";
+                  VALUES ('','$last_id','4','$nameinsect','$alias','$charstyle','$dangerInsect','$ptid')";
       echo "
         <script>
           alert($sql)
@@ -254,8 +233,20 @@ switch ($request) {
       $did = addinsertData($sql);
       echo $did;
     }
-    header("location:InsectList.php");
+    header("location:OtherPestList.php");
     break;
+}
+
+function getImg($img)
+{
+  if ($img != null) {
+    $data = $img;
+    $img_array = explode(';', $data);
+    $img_array2 = explode(",", $img_array[1]);
+    $dataI = base64_decode($img_array2[1]);
+
+    return $dataI;
+  } else return null;
 }
 
 function last_id()
@@ -270,6 +261,7 @@ function last_id()
   //$max = selectData($sql);
   return $max;
 }
+
 function select_dimPest()
 {
   $sql = "SELECT * FROM `dim-pest`";
@@ -277,6 +269,7 @@ function select_dimPest()
   $DATA = selectData($sql);
   return $DATA;
 }
+
 function getDIM($did, $o_name, $o_alias, $o_char, $o_dan, $o_ptid, $o_type)
 {
   $sql = "SELECT * FROM `dim-pest` WHERE `dbpestLID`='$did' AND `Name`='$o_name' AND `Alias`='$o_alias' 
@@ -285,6 +278,7 @@ function getDIM($did, $o_name, $o_alias, $o_char, $o_dan, $o_ptid, $o_type)
   $DATA = selectData($sql);
   return $DATA;
 }
+
 function getLog($dim_id)
 {
   $sql = "SELECT * FROM `log-pest` WHERE `DIMpestID`='$dim_id' AND `EndT` IS NULL";

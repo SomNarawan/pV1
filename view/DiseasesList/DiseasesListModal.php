@@ -4,7 +4,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header header-modal" style="background-color: #006664;">
-                    <h4 class="modal-title" id="largeModalLabel" style="color:white">เพิ่มชนิดแมลง</h4>
+                    <h4 class="modal-title" id="largeModalLabel" style="color:white">เพิ่มชนิดโรคพืช</h4>
                 </div>
                 <div class="modal-body" id="addModalBody">
                     <div class="main">
@@ -15,7 +15,7 @@
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
                                     <div class='form-line'>
-                                        <input type='text' id='name_insert' name='name_insert' class='form-control' placeholder="ชื่อแมลง" required="" oninput="setCustomValidity('')">
+                                        <input type='text' id='name_insert' name='name_insert' class='form-control' placeholder="ชื่อโรค" required="" oninput="setCustomValidity('')">
                                     </div>
                                 </div>
                             </div>
@@ -63,7 +63,7 @@
 
                         <div class='row clearfix'>
                             <div class='col-lg-3 col-md-3 col-sm-3 col-xs-6 form-control-label text-right'>
-                                <label>รูปแมลง <span class="text-danger"> *</span></label>
+                                <label>รูปโรคพืช <span class="text-danger"> *</span></label>
                             </div>
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
@@ -141,20 +141,18 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header header-modal" style="background-color: #006664;">
-                    <h4 class="modal-title" id="largeModalLabel" style="color:white">แก้ไขชนิดแมลง</h4>
+                    <h4 class="modal-title" id="largeModalLabel" style="color:white">แก้ไขชนิดโรคพืช</h4>
                 </div>
                 <div class="modal-body" id="addModalBody">
                     <div class="main">
                         <div class='row clearfix'>
                             <div class='col-lg-3 col-md-3 col-sm-3 col-xs-6 form-control-label text-right'>
-                                <label>ชื่อ <span class="text-danger"> *</span></label>
+                                <label>ชื่อ : </label>
                             </div>
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
                                     <div class='form-line'>
-                                        <input type="text" class="form-control" 
-                                        id="e_name" name="e_name" placeholder="" 
-                                        value="" required="" oninput="setCustomValidity('')">
+                                        <input type="text" class="form-control" id="e_name" name="e_name" placeholder="" value="" required="" oninput="setCustomValidity('')">
                                     </div>
                                 </div>
                             </div>
@@ -162,14 +160,12 @@
 
                         <div class='row clearfix'>
                             <div class='col-lg-3 col-md-3 col-sm-3 col-xs-6 form-control-label text-right'>
-                                <label>ชื่อทางการ <span class="text-danger"> *</span></label>
+                                <label>ชื่อทางการ : </label>
                             </div>
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
                                     <div class='form-line'>
-                                        <input type="text" class="form-control" 
-                                        id="e_alias" name="e_alias" placeholder="" 
-                                        value="" required="" oninput="setCustomValidity('')">
+                                        <input type="text" class="form-control" id="e_alias" name="e_alias" placeholder="" value="" required="" oninput="setCustomValidity('')">
                                     </div>
                                 </div>
                             </div>
@@ -177,14 +173,12 @@
 
                         <div class='row clearfix'>
                             <div class='col-lg-3 col-md-3 col-sm-3 col-xs-6 form-control-label text-right'>
-                                <label>ลักษณะ <span class="text-danger"> *</span></label>
+                                <label>ลักษณะ : </label>
                             </div>
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
                                     <div class='form-line'>
-                                        <textarea type="text" rows="2" class="form-control mb-2" 
-                                        name='e_charactor' id="e_charactor" placeholder="" 
-                                        value="" required="" oninput="setCustomValidity('')"></textarea>
+                                        <textarea type="text" rows="2" class="form-control mb-2" name='e_charactor' id="e_charactor" placeholder="" value="" required="" oninput="setCustomValidity('')"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -192,14 +186,12 @@
 
                         <div class='row clearfix'>
                             <div class='col-lg-3 col-md-3 col-sm-3 col-xs-6 form-control-label text-right'>
-                                <label>อันตราย <span class="text-danger"> *</span></label>
+                                <label>อันตราย : </label>
                             </div>
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
                                     <div class='form-line'>
-                                        <textarea type="text" rows="2" class="form-control mb-2" 
-                                        name='e_danger' id="e_danger" placeholder="" 
-                                        value="" required="" oninput="setCustomValidity('')"></textarea>
+                                        <textarea type="text" rows="2" class="form-control mb-2" name='e_danger' id="e_danger" placeholder="" value="" required="" oninput="setCustomValidity('')"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -207,22 +199,21 @@
 
                         <div class='row clearfix'>
                             <div class='col-lg-3 col-md-3 col-sm-3 col-xs-6 form-control-label text-right'>
-                                <label>รูปแมลง <span class="text-danger"> *</span></label>
+                                <label>รูปโรคพืช : </label>
                             </div>
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
 
                                     <div class="img-reletive">
                                         <img width="100px" height="100px" id="img-pic-logo-edit" src="https://ast.kaidee.com/blackpearl/v6.18.0/_next/static/images/gallery-filled-48x48-p30-6477f4477287e770745b82b7f1793745.svg" width="50px" height="50px" alt="">
-                                        <input type="file" id="pic-logo-edit" name="icon_insert-edit" 
-                                        accept=".jpg,.png">
+                                        <input type="file" id="pic-logo-edit" name="icon_insert-edit" accept=".jpg,.png">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class='row clearfix'>
                             <div class='col-lg-3 col-md-3 col-sm-3 col-xs-6 form-control-label text-right'>
-                                <label>รูปลักษณะ <span class="text-danger"> *</span></label>
+                                <label>รูปลักษณะ : </label>
                             </div>
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
@@ -236,7 +227,7 @@
 
                         <div class='row clearfix'>
                             <div class='col-lg-3 col-md-3 col-sm-3  col-xs-6 form-control-label text-right'>
-                                <label>รูปลักษณะการทำลาย <span class="text-danger"> *</span></label>
+                                <label>รูปลักษณะการทำลาย : </label>
                             </div>
                             <div class='col-lg-8 col-md-8 col-sm-9 col-xs-6'>
                                 <div class='form-group'>
@@ -268,6 +259,5 @@
         </div>
     </form>
 </div>
-
 
 <?php include_once("../../cropImage/cropImage.php"); ?>

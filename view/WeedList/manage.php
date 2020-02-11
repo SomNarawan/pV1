@@ -56,7 +56,7 @@ switch ($request) {
     $countfiles_danger = sizeof($dataPic3) - 1;
 
     $sql = "INSERT INTO `db-pestlist` (`PID`, `Name`, `Alias`, `PTID`, `Charactor`, `Danger`, `Icon` , `NumPicChar`, `NumPicDanger`)
-          VALUES ('','$Alias','$Name','1','$Charactor','$Danger','$nameImg1','$countfiles_style','$countfiles_danger')";
+          VALUES ('','$Alias','$Name','3','$Charactor','$Danger','$nameImg1','$countfiles_style','$countfiles_danger')";
     //echo $sql;
     $insertData = addinsertData($sql);
     echo $insertData;
@@ -71,8 +71,8 @@ switch ($request) {
     $path = "../../icon/pest/$id";
     if (!file_exists($path)) {
       mkdir("../../icon/pest/$id");
-      mkdir("../../picture/Pest/insect/style/$id");
-      mkdir("../../picture/Pest/insect/danger/$id");
+      mkdir("../../picture/Pest/weed/style/$id");
+      mkdir("../../picture/Pest/weed/danger/$id");
     }
     if ($dataLogo != null) {
       file_put_contents("../../icon/pest/$id/$nameImg1", $dataLogo);
@@ -83,7 +83,7 @@ switch ($request) {
           $nameImg2 = $nameImg1;
         else $nameImg2 = ($i - 1) . "_" . $nameImg1;
         $Pic2 = getImg($dataPic2[$i]);
-        file_put_contents("../../picture/Pest/insect/style/$id/$nameImg2", $Pic2);
+        file_put_contents("../../picture/Pest/weed/style/$id/$nameImg2", $Pic2);
       }
     }
 
@@ -93,7 +93,7 @@ switch ($request) {
           $nameImg3 = $nameImg1;
         else $nameImg3 = ($i - 1) . "_" . $nameImg1;
         $Pic3 = getImg($dataPic3[$i]);
-        file_put_contents("../../picture/Pest/insect/danger/$id/$nameImg3", $Pic3);
+        file_put_contents("../../picture/Pest/weed/danger/$id/$nameImg3", $Pic3);
       }
     }
     $did = addinsertData($sql);
@@ -113,7 +113,7 @@ switch ($request) {
                             </script>";
     if ($check_dim) {
 
-      $sql = "SELECT `TypeTH` FROM `db-pesttype` WHERE `PTID` = 1";
+      $sql = "SELECT `TypeTH` FROM `db-pesttype` WHERE `PTID` = 3";
 
       $myConDB = connectDB();
       $result = $myConDB->prepare($sql);
@@ -126,7 +126,7 @@ switch ($request) {
       //echo $last_id;
       //echo toString($ptid);
       $sql = "INSERT INTO `dim-pest` (`ID`,`dbpestLID`,`dbpestTID`,`Name`,`Alias`,`Charactor`,`Danger`,`TypeTH`) 
-                  VALUES ('','$last_id','1','$Name','$Alias','$Charactor','$Danger','$ptid')";
+                  VALUES ('','$last_id','3','$Name','$Alias','$Charactor','$Danger','$ptid')";
       echo "
       <script>
         alert($sql)
@@ -151,7 +151,7 @@ switch ($request) {
       echo $did;
     }
 
-    header("location:InsectList.php");
+    header("location:WeedList.php");
     break;
 
   case 'delete';
@@ -205,7 +205,7 @@ switch ($request) {
     // ------------------------------------- if DIM don't duplicated -------------------------------------
     if ($check_dim) {
 
-      $sql = "SELECT `TypeTH` FROM `db-pesttype` WHERE `PTID` = 1";
+      $sql = "SELECT `TypeTH` FROM `db-pesttype` WHERE `PTID` = 3";
 
       $myConDB = connectDB();
       $result = $myConDB->prepare($sql);
@@ -218,7 +218,7 @@ switch ($request) {
       //echo $last_id;
       //echo toString($ptid);
       $sql = "INSERT INTO `dim-pest` (`ID`,`dbpestLID`,`dbpestTID`,`Name`,`Alias`,`Charactor`,`Danger`,`TypeTH`) 
-                  VALUES ('','$last_id','1','$nameinsect','$alias','$charstyle','$dangerInsect','$ptid')";
+                  VALUES ('','$last_id','3','$nameinsect','$alias','$charstyle','$dangerInsect','$ptid')";
       echo "
         <script>
           alert($sql)
@@ -254,7 +254,7 @@ switch ($request) {
       $did = addinsertData($sql);
       echo $did;
     }
-    header("location:InsectList.php");
+    header("location:WeedList.php");
     break;
 }
 
