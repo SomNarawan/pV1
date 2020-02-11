@@ -144,7 +144,7 @@ input.gj-textbox-md {
 
         <?php 
         creatCard( "card-color-one",   "จำนวนสวน",  getCountFarm()." สวน ".getCountSubfarm()." แปลง", "group" );
-        creatCard( "card-color-two",   "พื้นที่ทั้งหมด", getCountAreaRai()." ไร่", "dashboard" );
+        creatCard( "card-color-two",   "พื้นที่ทั้งหมด", getCountArea()." ไร่", "dashboard" );
         creatCard( "card-color-three", "จำนวนต้น",  getCountTree()." ต้น", "format_size" );
     ?>
         <div class="col-xl-3 col-12 mb-4">

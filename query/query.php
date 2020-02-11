@@ -212,9 +212,19 @@ function getFarmer()
 }
 //-----------------------FarmerListDetail--------------------------
 
+function getFarmerByUFID($ufid){
+    $sql = "SELECT * , CASE WHEN `Title` IN ('1') THEN 'นาย'
+    WHEN `Title` IN ('2') THEN 'นาง' 
+    WHEN `Title` IN ('3') THEN 'นางสาว' END AS Title                   
+    FROM `db-farmer` JOIN `db-subdistrinct` ON `db-subdistrinct`.`AD3ID` = `db-farmer`.`AD3ID` 
+    JOIN `db-distrinct` ON `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID`
+    JOIN `db-province` ON `db-province`.`AD1ID` = `db-distrinct`.`AD1ID` WHERE `UFID` =$ufid ";
+    return selectData($sql);
+}
+
 function getCountOwnerFarm($ufid)
 {
-    $sql = "SELECT COUNT(*) AS countFarm 
+    $sql = "SELECT COUNT(*) AS countownerFarm 
     FROM (SELECT `dim-user`.`dbID`, `DIMownerID`, `DIMfarmID`, `NumSubFarm`,`NumTree`,`AreaRai`, `AreaNgan`FROM `log-farm`
     INNER JOIN `dim-user` ON `dim-user`.`ID` = `log-farm`.`DIMownerID` AND `dim-user`.`Type` = 'F'
     WHERE `DIMSubfID` IS NULL AND `EndT` IS NULL AND `dim-user`.`dbID` = $ufid) AS farm";
@@ -224,31 +234,37 @@ function getCountOwnerFarm($ufid)
 
 function getCountOwnerSubFarm($ufid)
 {
-    $sql = "SELECT SUM(`AreaRai`) AS countsubFarm 
+    $sql = "SELECT SUM(`AreaRai`) AS countownersubFarm 
     FROM (SELECT `dim-user`.`dbID`, `DIMownerID`, `DIMfarmID`, `NumSubFarm`,`NumTree`,`AreaRai`, `AreaNgan`FROM `log-farm`
     INNER JOIN `dim-user` ON `dim-user`.`ID` = `log-farm`.`DIMownerID` AND `dim-user`.`Type` = 'F'
     WHERE `DIMSubfID` IS NULL AND `EndT` IS NULL AND `dim-user`.`dbID` = $ufid) AS farm";
-    $countownerFarm = selectData($sql)[1]['countownerFarm'];
+    $countownerFarm = selectData($sql)[1]['countownersubFarm'];
+    if($countownerFarm == NULL)
+        return 0;
     return $countownerFarm;
 }
 
 function getCountOwnerAreaRai($ufid)
 {
-    $sql = "SELECT SUM(`AreaRai`) AS countAreaRai
+    $sql = "SELECT SUM(`AreaRai`) AS countownerAreaRai
     FROM (SELECT `dim-user`.`dbID`, `DIMownerID`, `DIMfarmID`, `NumSubFarm`,`NumTree`,`AreaRai`, `AreaNgan`FROM `log-farm`
     INNER JOIN `dim-user` ON `dim-user`.`ID` = `log-farm`.`DIMownerID` AND `dim-user`.`Type` = 'F'
     WHERE `DIMSubfID` IS NULL AND `EndT` IS NULL AND `dim-user`.`dbID` = $ufid) AS farm";
     $countownerAreaRai = selectData($sql)[1]['countownerAreaRai'];
+    if($countownerAreaRai == NULL)
+        return 0;
     return $countownerAreaRai;
 }
 
 function getCountOwnerTree($ufid)
 {
-    $sql = "SELECT SUM(`NumTree`) AS countTree
+    $sql = "SELECT SUM(`NumTree`) AS countownerTree
     FROM (SELECT `dim-user`.`dbID`, `DIMownerID`, `DIMfarmID`, `NumSubFarm`,`NumTree`,`AreaRai`, `AreaNgan`FROM `log-farm`
     INNER JOIN `dim-user` ON `dim-user`.`ID` = `log-farm`.`DIMownerID` AND `dim-user`.`Type` = 'F'
     WHERE `DIMSubfID` IS NULL AND `EndT` IS NULL AND `dim-user`.`dbID` = $ufid) AS farm";
     $countownerTree = selectData($sql)[1]['countownerTree'];
+    if($countownerTree == NULL)
+        return 0;
     return $countownerTree;
 }
 
@@ -436,7 +452,7 @@ function getCoorsFarm($fmid)
 }
 
 // sql ค่าของ Numcoor มีการรับค่า ID ของ logfarmID
-function getNumcoor($fmid)
+function getCountCoor($fmid)
 {
     $sql = "SELECT`db-subfarm`.`FSID`,COUNT(*) as count FROM `db-coorfarm` 
     INNER JOIN `db-subfarm` ON `db-coorfarm`.`FSID`=`db-subfarm`.`FSID` 
@@ -738,7 +754,18 @@ function getLogPlanting()
     $PLANTING = selectData($sql);
     return $PLANTING;
 }
-
+//getfarm หน้า OilPalmAreaVolDetail.php
+function getFarmByFMID($farmID){
+    $sql = "SELECT * FROM `db-farm` WHERE `FMID` = $farmID";
+    return selectData($sql);
+}
+//ใช้ดึง icon หน้า OilPalmAreaVolDetail.php
+function getIcon($farmID){
+    $sql = "SELECT * FROM `dim-farm` 
+    JOIN `db-farm` ON `dim-farm`.`dbID` = `db-farm`.`FMID` 
+    WHERE `dim-farm`.`dbID` = $farmID AND `isFarm` = 1";
+    return selectdata($sql);
+}
 //จำนวนต้นไม้ของฟาร์มนั้นๆ และ การ์ดจำนวนต้น หน้า OilPalmAreaVolDetail.php
 function getTreeID($farmID)
 {
@@ -758,7 +785,7 @@ function getTreeID($farmID)
 }
 
 //นับจำนวนแปลงของสวนนั้นๆ และ ใช้กับการ์ดจำนวนแปลง หน้า OilPalmAreaVolDetail.php
-function getCountFarmByFMID($farmID)
+function getCountSubFarmByFMID($farmID)
 {
     $sql = "SELECT count(*) AS countFarm FROM `db-subfarm` WHERE `FMID` = $farmID";
     $countFarm = selectData($sql)[1]['countFarm'];
@@ -973,13 +1000,13 @@ function getTableAllHarvest()
         $countWeight = (int)getHarvestID($FMID);
         $ownerName = (string)getOwnerName($FMID)[1]["FirstName"];
         $farmName = (string)getFarmFMID($FMID)[1]["Alias"];
-        $ALLHARVEST["$FARM[$i]"]["farmID"] = (int)$FMID;
-        $ALLHARVEST["$FARM[$i]"]["ownerName"] = (string)$ownerName;
-        $ALLHARVEST["$FARM[$i]"]["farmName"] = (string)$farmName;
-        $ALLHARVEST["$FARM[$i]"]["subFarm"] = (int)$countSubFarm;
-        $ALLHARVEST["$FARM[$i]"]["area"] = (int)$countArea;
-        $ALLHARVEST["$FARM[$i]"]["tree"] = (int)$countTree;
-        $ALLHARVEST["$FARM[$i]"]["weight"] = (int)$countWeight;
+        $ALLHARVEST[$i]["farmID"] = $FMID;
+        $ALLHARVEST[$i]["ownerName"] = $ownerName;
+        $ALLHARVEST[$i]["farmName"] = (string)$farmName;
+        $ALLHARVEST[$i]["subFarm"] = (int)$countSubFarm;
+        $ALLHARVEST[$i]["area"] = (int)$countArea;
+        $ALLHARVEST[$i]["tree"] = (int)$countTree;
+        $ALLHARVEST[$i]["weight"] = (int)$countWeight;
     }
 
     return $ALLHARVEST;
