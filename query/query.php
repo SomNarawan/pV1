@@ -452,7 +452,7 @@ function getCoorsFarm($fmid)
 }
 
 // sql ค่าของ Numcoor มีการรับค่า ID ของ logfarmID
-function getNumcoor($fmid)
+function getCountCoor($fmid)
 {
     $sql = "SELECT`db-subfarm`.`FSID`,COUNT(*) as count FROM `db-coorfarm` 
     INNER JOIN `db-subfarm` ON `db-coorfarm`.`FSID`=`db-subfarm`.`FSID` 

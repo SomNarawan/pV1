@@ -23,6 +23,7 @@ $COORSFARM = getCoorsFarm($fmid);
 
 $countCoor = getCountCoor($fmid);
 
+print_r($ADDRESS);
 }
 ?>
 <style>

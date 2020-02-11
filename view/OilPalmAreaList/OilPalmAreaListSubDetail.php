@@ -3,10 +3,12 @@ session_start();
 
 $idUT = $_SESSION[md5('typeid')];
 $CurrentMenu = "OilPalmAreaList";
+
+include_once("../layout/LayoutHeader.php");
+include_once("./../../query/query.php");
+
 ?>
-
-
-<?php include_once("../layout/LayoutHeader.php");
+<?php 
 // if (isset($_GET[('nfarm')]) && isset($_GET[('nsubfarm')]) && isset($_GET[('farmer')]) && isset($_GET[('logid')]) && isset($_GET[('numtree')])) {
 //     $nfarm = $_SESSION[('nfarm')] = $_GET[('nfarm')];
 //     $nsubfarm = $_SESSION[('nsubfarm')] = $_GET[('nsubfarm')];
