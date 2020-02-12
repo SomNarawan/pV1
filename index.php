@@ -1,17 +1,17 @@
 <?php
 
-//header("location:.././view/index/index.php");
-$error = 0;
-$username = "";
-$password = "";
+    //header("location:.././view/index/index.php");
+    $error = 0;
+    $username = "";
+    $password = "";
 
-if (isset($_GET['error'])) {
-    $error = $_GET['error'];
-}
-if (isset($_COOKIE['username']) and isset($_COOKIE['password'])) {
-    $username = $_COOKIE['username'];
-    $password = $_COOKIE['password'];
-}
+    if (isset($_GET['error'])) {
+        $error = $_GET['error'];
+    }
+    if (isset($_COOKIE['username']) and isset($_COOKIE['password'])) {
+        $username = $_COOKIE['username'];
+        $password = $_COOKIE['password'];
+    }
 ?>
 
 <!DOCTYPE html>
@@ -22,27 +22,20 @@ if (isset($_COOKIE['username']) and isset($_COOKIE['password'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-
-    <!-- Custom fonts for this template-->
+    <!-- ใหม่ -->
+    <!-- fonts AND Icon CSS -->
     <link href="./lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="./css/font-googleapis/family_Nunito.css" rel="stylesheet" type="text/css">
+    <link href="./css/font-googleapis/family_Material_Icon.css" rel="stylesheet" type="text/css">
 
-    <!-- Custom styles for this template-->
-    <link href="./css/sb-admin-2.min.css" rel="stylesheet">
+    <!-- styles template CSS -->
+    <link href="./css/styles-template/sb-admin-2.min.css" rel="stylesheet" type="text/css">
 
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+    <!-- bootstrap-sweetalert Css [Som , ....]-->
+    <link href="./css/bootstrap-sweetalert 1.0.1/sweetalert.css" rel="stylesheet" type="text/css">
 
-    <link href="./css/customize.css" rel="stylesheet">
-
-    <link href="./lib/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-
-    <!-- Range Slider Css -->
-    <link href="./lib/ion-rangeslider/css/ion.rangeSlider.css" rel="stylesheet" />
-    <link href="./lib/ion-rangeslider/css/ion.rangeSlider.skinFlat.css" rel="stylesheet" />
-
-    <link href='./lib/calendar/css/fullcalendar.css' rel='stylesheet' />
-    <link href='./lib/calendar/css/fullcalendar.print.css' rel='stylesheet' media='print' />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
+    <!-- Setting General CSS -->
+    <link href="./css/customize.css" rel="stylesheet" type="text/css">
 
 </head>
 <style>
@@ -204,18 +197,24 @@ if (isset($_COOKIE['username']) and isset($_COOKIE['password'])) {
     </form>
 
 </div>
-<script src="lib/jquery/jquery.min.js">
-</script>
-<script src="lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Bootstrap core JavaScript-->
+<script src="./js/jquery/jquery.min.js"></script>
+<script src="./js/bootstrap/bootstrap.bundle.min.js"></script>
 
 <!-- Core plugin JavaScript-->
-<script src="lib/jquery-easing/jquery.easing.min.js"></script>
+<script src="./js/jquery-easing/jquery.easing.min.js"></script>
 
-<!-- Custom scripts for all pages-->
-<script src="js/sb-admin-2.min.js"></script>
+<!-- scripts template Js-->
+<script src="./js/styles-template/sb-admin-2.min.js"></script>
 
-<script src="lib/datatables/jquery.dataTables.min.js"></script>
-<script src="lib/datatables/dataTables.bootstrap4.min.js"></script>
+<!-- sweetalert Js -->
+<script src="./js/unpkg.com-sweetalert/sweetalert.min.js"></script>
+
+<!-- bootstrap-sweetalert Js [Som , ....]-->
+<script src="./js/bootstrap-sweetalert 1.0.1/sweetalert.js"></script>
+<script src="./js/bootstrap-sweetalert 1.0.1/sweetalert.min.js"></script>
+
 
 <script type="text/javascript">
     var h1 = document.getElementById('hide1');

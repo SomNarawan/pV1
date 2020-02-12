@@ -1,0 +1,13 @@
+input.gj-textbox-md {
+    border: 1px solid #d1d3e2;
+    border-radius: .35rem;
+    height: calc(1.5em + .75rem + 2px);
+    padding: .375rem .9rem;
+    color: #6e707e;
+    font-family: 'Kanit', sans-serif;
+}
+
+.gj-datepicker-md [role=right-icon] {
+    padding-top: 6.5px;
+    padding-right: 6.5px;
+}
