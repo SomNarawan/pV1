@@ -1229,9 +1229,13 @@ function getInsect()
     else $selectedID = 0;
 
     $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=1 AND PID=" . $selectedID;
-    $INFOINSECT = selectData($sql);
+    $INFO = selectData($sql);
 
-    return $INFOINSECT;
+    $INSECT['info'] = $INFO;
+    $INSECT['data'] = $DATA;
+    $INSECT['selectedID'] = $selectedID;
+
+    return $INSECT;
 }
 
 //  DISESASESLIST.php

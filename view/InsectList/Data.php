@@ -21,4 +21,5 @@
     if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         $INFO = $row;
     }
+    
 ?>

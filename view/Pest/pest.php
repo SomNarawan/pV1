@@ -1,18 +1,20 @@
 <?php
-session_start();
-$idUT = $_SESSION[md5('typeid')];
-$CurrentMenu = "Pest";
-// $idUTLOG = $_SESSION[md5('LOG_LOGIN')];
+    session_start();
+    $idUT = $_SESSION[md5('typeid')];
+    $CurrentMenu = "Pest";
+
+    include_once("../layout/LayoutHeader.php");
+    require_once("../../dbConnect.php");
+
+    $totalFarm = selectDataOne("SELECT COUNT(`db-farm`.`FMID`) AS totalFarm FROM `db-farm` ");
+    $totalSubFarm = selectDataOne("SELECT COUNT(`db-subfarm`.`FSID`) AS totalSubFarm FROM `db-subfarm` ");
+    $totalAreaRai = selectDataOne("SELECT SUM(`db-subfarm`.`AreaRai`) AS totalAreaRai FROM `db-subfarm` ");
+    $totalPalm = selectDataOne("SELECT (SUM(`log-planting`.`NumGrowth1`)+SUM(`log-planting`.`NumGrowth2`))-SUM(`log-planting`.`NumDead`) AS totalPalm FROM `log-planting` WHERE `log-planting`.`isDelete` = 0");
+    $totalPestAlarm = selectDataOne("SELECT COUNT(lp.isDelete) AS totalPestAlarm FROM `log-pestalarm` AS lp WHERE lp.isDelete = 0");
+
+
 ?>
 
-<?php include_once("../layout/LayoutHeader.php");
-require_once("../../dbConnect.php");
-$totalFarm = selectDataOne("SELECT COUNT(`db-farm`.`FMID`) AS totalFarm FROM `db-farm` ");
-$totalSubFarm = selectDataOne("SELECT COUNT(`db-subfarm`.`FSID`) AS totalSubFarm FROM `db-subfarm` ");
-$totalAreaRai = selectDataOne("SELECT SUM(`db-subfarm`.`AreaRai`) AS totalAreaRai FROM `db-subfarm` ");
-$totalPalm = selectDataOne("SELECT (SUM(`log-planting`.`NumGrowth1`)+SUM(`log-planting`.`NumGrowth2`))-SUM(`log-planting`.`NumDead`) AS totalPalm FROM `log-planting` WHERE `log-planting`.`isDelete` = 0");
-$totalPestAlarm = selectDataOne("SELECT COUNT(lp.isDelete) AS totalPestAlarm FROM `log-pestalarm` AS lp WHERE lp.isDelete = 0");
-?>
 
 <style>
     .img_scan {}
