@@ -121,6 +121,11 @@ function getCountArea(){
 function getFarmer()
 {
     $myConDB = connectDB();
+
+    $idformal = '';
+    $fpro = '';
+    $fdist = '';
+    $fullname = '';
     if (isset($_POST['s_formalid']))  $idformal = rtrim($_POST['s_formalid']);
     if (isset($_POST['s_province']))  $fpro     = $_POST['s_province'];
     if (isset($_POST['s_distrinct'])) $fdist    = $_POST['s_distrinct'];
@@ -234,7 +239,7 @@ function getCountOwnerFarm($ufid)
 
 function getCountOwnerSubFarm($ufid)
 {
-    $sql = "SELECT SUM(`AreaRai`) AS countownersubFarm 
+    $sql = "SELECT SUM(`NumSubFarm`) AS countownersubFarm 
     FROM (SELECT `dim-user`.`dbID`, `DIMownerID`, `DIMfarmID`, `NumSubFarm`,`NumTree`,`AreaRai`, `AreaNgan`FROM `log-farm`
     INNER JOIN `dim-user` ON `dim-user`.`ID` = `log-farm`.`DIMownerID` AND `dim-user`.`Type` = 'F'
     WHERE `DIMSubfID` IS NULL AND `EndT` IS NULL AND `dim-user`.`dbID` = $ufid) AS farm";

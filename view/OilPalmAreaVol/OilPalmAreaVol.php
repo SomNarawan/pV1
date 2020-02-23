@@ -45,8 +45,7 @@ $OILPALMAREAVOL = getTableAllHarvest();
             creatCard( "card-color-one",   "ผลผลิตปี ".$currentYear, number_format(getHarvestCurrentYear(), 0, '.', ',')." ก.ก.", "waves" ); 
             creatCard( "card-color-two",   "ผลผลิตปี".$backYear, number_format(getHarvestBackYear(),0,'.',',')." ก.ก.", "dashboard" ); 
             creatCard( "card-color-three",   "พื้นที่ทั้งหมด", getCountArea()." ไร่", "format_size" ); 
-            creatCard( "card-color-four",   "ต้นไม้ทั้งหมด", getCountTree()." ต้น", "format_size" ); 
-        ?>
+แ        ?>
 
         </div>
 
