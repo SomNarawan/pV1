@@ -10,14 +10,20 @@
     include_once("../../dbConnect.php"); 
     include_once("import_Js.php");
     include_once("./../../query/query.php");
-
     
     if(isset($_POST['farmID'])){
         $farmID = $_POST['farmID'];
     }
-    $ICON = getIcon($farmID);
+    $OWNERDATA = getOwnerData($farmID);
     $FARM= getFarmByFMID($farmID);
-    ?>
+    $HAVESTYEAR = getHarvestYearID($farmID,$currentYear-1);
+    $YEAROFHARVEST = getYearOfHarvet($farmID);
+    $HARVESTPERYEAR = getHarvestPerYear($farmID);
+    $FERPERTREE = getFerPerTree($farmID);
+    $SUMMARIZEHARVEST = getSummarizeHarvest($farmID,$currentYear);
+    print_r($YEAROFHARVEST);
+    print_r($HARVESTPERYEAR);
+?>
 
 <div class="container">
     <div class="row">
@@ -48,7 +54,8 @@
             <div class="card">
                 <div class="card-body" id="for_card">
                     <div class="row">
-                        <img class="img-radius" width="200" height="200" src="../../icon/farm/<?php echo $farmID; ?>/<?php echo $ICON[1]['Icon']; ?>" />
+                        <img class="img-radius" width="200" height="200" 
+                        src="../../icon/farm/<?php echo $farmID; ?>/<?php echo $OWNERDATA[1]['farmIcon']; ?>" />
                        
                     </div>
                     <div class="row mt-3 justify-content-center">
@@ -57,8 +64,8 @@
                         </div>
                         <div class="col-xl-6 col-3">
                             <span>
-                            <?php 
-                                echo $FARM[1]["Name"];                           
+                            <?php
+                                echo $OWNERDATA[1]["farmAlias"];                           
                             ?></span>
                         </div>
                     </div>
@@ -69,7 +76,8 @@
             <div class="card">
                 <div class="card-body" id="card_height">
                     <div class="row">                       
-                        <img class="img-radius" width="200" height="200"  src="../../icon/user/<?php echo $userId; ?>/<?php echo $icon; ?>" />
+                        <img class="img-radius" width="200" height="200"  
+                        src="../../icon/farmer/<?php if($OWNERDATA[1]['ownerIcon'] != "man.jpg" && $OWNERDATA[1]['ownerIcon'] != "woman.jpg") echo $OWNERDATA[1]['ownerID']."/"; ?><?php echo $OWNERDATA[1]['ownerIcon']; ?>" />
                                 
                     </div>
                     <div class="row mt-3 justify-content-center">
@@ -79,13 +87,7 @@
                         <div class="col-xl-6 col-3">
                             <span>
                             <?php 
-                            $sql = "SELECT * FROM `dim-user` WHERE `ID` = $DIMownerID";
-                            $myConDB = connectDB();
-                            $result = $myConDB->prepare( $sql ); 
-                            $result->execute();        
-                            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                                echo $row["FullName"];
-                            }      
+                                echo $OWNERDATA[1]["FullName"];   
                             ?>
                             </span>
                         </div>
@@ -95,93 +97,11 @@
         </div>
     </div>
     <div class="row mt-4">
-        <div class="col-xl-4 col-12 mb-4">
-            <div class="card border-left-primary card-color-one shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <?php
-                                $sql = "SELECT count(`FMID`) as count FROM `db-subfarm`
-                                WHERE `FMID` = $farmID";
-                                $myConDB = connectDB();
-                                $result = $myConDB->prepare( $sql ); 
-                                $result->execute(); 
-                                $subFarm = 0;
-                                while ($row = $result->fetch(PDO::FETCH_ASSOC)){
-                                    $subFarm = $row['count'];
-                                }
-                            ?>
-                            <div class="font-weight-bold  text-uppercase mb-1">จำนวนแปลง</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $subFarm; ?></div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">waves</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-12 mb-4">
-            <div class="card border-left-primary card-color-two shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <?php
-                                $sql = "SELECT * FROM `log-planting`
-                                    JOIN `dim-farm` ON `dim-farm`.`ID` = `log-planting`.`DIMfarmID`
-                                    JOIN `dim-user` ON `dim-user`.`ID` = `log-planting`.`DIMownerID`
-                                    WHERE `dim-user`.`dbID` = $ownerID  AND `dim-farm`.`dbID` = $farmID AND `isDelete`= 0  AND `isFarm`= 1";
-                                $myConDB = connectDB();
-                                $result = $myConDB->prepare( $sql ); 
-                                $result->execute(); 
-                                $numTree = 0;
-                                while ($row = $result->fetch(PDO::FETCH_ASSOC)){
-                                    
-                                        $numTree = $numTree + $row['NumGrowth1'] + $row['NumGrowth2'] - $row['NumDead'];
-                                }
-                            ?>
-                            <div class="font-weight-bold  text-uppercase mb-1">จำนวนต้น</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $numTree; ?></div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">format_size</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-12 mb-4">
-            <div class="card border-left-primary card-color-three shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                                <?php
-                                    $sql = "SELECT * FROM `db-subfarm` 
-                                    WHERE `FMID` = $farmID
-                                    ";
-                                $myConDB = connectDB();
-                                $result = $myConDB->prepare( $sql ); 
-                                $result->execute();
-                                $Rai = 0;
-                                $Ngan = 0;
-                                $Wa = 0;
-                                while ($row = $result->fetch(PDO::FETCH_ASSOC)){ 
-                                    $Rai = $Rai + $row['AreaRai'];
-                                    $Ngan = $Ngan + $row['AreaNgan'];
-                                    $Wa = $Wa + $row['AreaWa'];
-                                }
-                                ?>
-                            <div class="font-weight-bold  text-uppercase mb-1">พื้นที่ทั้งหมด</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $Rai; ?> ไร่ <?php echo $Ngan ?> งาน <?php echo $Wa; ?> วา</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">dashboard</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <?php   
+            creatCard( "card-color-one",   "จำนวนแปลง", getCountSubFarmByFMID($farmID)." แปลง", "waves" ); 
+            creatCard( "card-color-two",   "จำนวนต้น", getTreeID($farmID)." คน", "dashboard" ); 
+            creatCard( "card-color-three",   "พื้นที่ทั้งหมด", getCountAreaRaiByFMID($farmID)." ไร่ ".getCountAreaNgan($farmID)." งาน ".getCountAreaWa($farmID)." วา", "format_size" ); 
+        ?> 
     <div class="row mt-4">
         <div class="col-xl-12 col-12">
             <div class="card">
@@ -209,26 +129,9 @@
                         </div>  
                         <div class="col-6">
                             <select id="productPerYear" name="productPerYear" class="form-control">
-                                <?php
-                                            $num = 0;
-                                            $selectYear=$currentYear;
-                                            $sql = "SELECT * FROM `log-harvest`  
-                                                    JOIN `dim-user` ON `dim-user`.`ID` = `log-harvest`.`DIMownerID`
-                                                    WHERE `dbID` = $ownerID AND `isDelete`= 0 ";
-                                            $myConDB = connectDB();
-                                            $result = $myConDB->prepare( $sql ); 
-                                            $result->execute();        
-                                            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                                                    $PerYear[$num] = (date("Y",$row["Modify"])+543);
-                                                    $num += 1;
-                                            }
-                                            $CountYear = array_unique($PerYear);
-                                            rsort($CountYear);
-                                            $x=count($CountYear);
-                                ?>
                                 <?php 
-                                    for($i=0;$i<$x;$i++){
-                                        $year =$CountYear[$i];
+                                    for($i=0;$i<sizeof($YEAROFHARVEST);$i++){
+                                        $year =$YEAROFHARVEST[$i];
                                         if($i==0){?>
                                         <option value ="<?php echo $year; ?>" selected><?php echo $year; ?></option>
                                         <?php 
@@ -313,7 +216,36 @@
                                                     </tfoot>
                                                     <tbody id="table">
 
-                                                        
+                                                    <?php 
+                                                        for($i=0;$i<sizeof($HAVESTYEAR);$i++){ 
+                                                        ?>
+                                                            <tr>
+                                                                <td><?php echo $HAVESTYEAR[$i]['alias']; ?></td>
+                                                                <td><?php echo $HAVESTYEAR[$i]['modifyday']; ?> /
+                                                                   <?php echo $HAVESTYEAR[$i]['modifymonth']; ?> /
+                                                                   <?php echo $HAVESTYEAR[$i]['modifyyear']; ?></td>
+                                                                <td style="text-align:right;"> <?php echo $HAVESTYEAR[$i]['weight']; ?></td>
+                                                                <td style="text-align:right;"> <?php echo $HAVESTYEAR[$i]['price']; ?></td>
+                                                                <td style="text-align:right;"> <?php echo $HAVESTYEAR[$i]['totalprice']; ?>
+                                                                </td>
+                                                                <td style="text-align:center;">
+                                                                    <button type="button"
+                                                                        class="btn btn-info btn-sm picture"
+                                                                        data-fid="${result[i].ID}" data-toggle="tooltip"
+                                                                        title="รูปภาพ"><i
+                                                                            class="fas fa-images"></i></button>
+                                                                    <button type="button"
+                                                                        class="btn btn-danger btn-sm delete"
+                                                                        data-fid="${result[i].ID}"
+                                                                        data-alias="${result[i].alias}"
+                                                                        data-toggle="tooltip" title="ลบ"><i
+                                                                            class="far fa-trash-alt"></i></button>
+                                                                </td>
+                                                            </tr>
+
+                                                            <?php
+                                                            }
+                                                            ?>
 
 
                                                     </tbody>
@@ -369,17 +301,11 @@
                             <option value="" selected>เลือกแปลง</option>
                             
                                 <?php
-                                $sql = "SELECT * FROM `dim-farm`
-                                        JOIN `db-subfarm` ON `dim-farm`.`dbID` = `db-subfarm`.`FSID`
-                                        WHERE `isFarm` = 0 AND `FMID` = $farmID 
-                                        ";
-                                $myConDB = connectDB();
-                                $result = $myConDB->prepare( $sql ); 
-                                $result->execute();        
-                                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                               $SUBFARMID = getAllSubFarmById($farmID);
+                                for($i=1;$i<sizeof($SUBFARMID);$i++) {
                                     
                                     ?>
-                                        <option value="<?php echo $row['ID']; ?>"> <?php echo $row['Alias']; ?> </option>   
+                                        <option value="<?php echo $SUBFARMID[$i]['ID']; ?>"> <?php echo $SUBFARMID[$i]['Alias']; ?> </option>   
                                 <?php    
                                     }
                                 
@@ -445,49 +371,11 @@
 <script src="OilPalmAreaVolModal.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>  
-
 <script>
 
     $("#card_height").css('height', $("#for_card").css('height'));
                      
     //กราฟผลผลิตต่อปี
-    <?php
-       $sql = "SELECT * FROM `log-harvest` 
-                JOIN `dim-user` ON `dim-user`.`ID` = `log-harvest`.`DIMownerID`
-                JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
-                WHERE `dim-user`.`dbID` = $ownerID AND `dim-farm`.`dbID` = $farmID AND `isDelete`= 0";
-       $myConDB = connectDB();
-       $result = $myConDB->prepare( $sql ); 
-       $result->execute(); 
-       $num = 0;        
-       while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-
-              $A[$num] = (date("Y",$row["Modify"]));
-              $num += 1;
- 
-      }
-      $Year= array_unique($A);
-      rsort($Year);
-      $x= count($Year);
-      ?> 
-      <?php
-            $sql="SELECT * FROM `log-harvest` 
-                JOIN `dim-user` ON `dim-user`.`ID` = `log-harvest`.`DIMownerID`
-                JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
-                WHERE `dim-user`.`dbID` = $ownerID AND `dim-farm`.`dbID` = $farmID AND `isDelete`= 0";
-      $myConDB = connectDB();
-       $result = $myConDB->prepare( $sql ); 
-       $result->execute(); 
-            for ($i=0; $i < $x; $i++) { 
-              $Area["$Year[$i]"] = 0;
-            }
-                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-
-                    $Area[(date("Y",$row["Modify"]))] = $Area[(date("Y",$row["Modify"]))] + $row["Weight"];
-                }
-            
-      ?>
-
     var chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -523,7 +411,7 @@
   var speedData = {
           labels: [<?php 
                  for ($i=0 ; $i < $x  ; $i++ ) { 
-                      echo (array_pop($Year)+543).",";
+                      echo (array_pop($YEAROFHARVEST)+543).",";
                  }
            ?>,""],
           datasets: [
@@ -531,7 +419,7 @@
             label: "ผลผลิตสวนปาร์มน้ำมัน",
             data: [<?php
              for ($i=0 ; $i < $x  ; $i++ ) { 
-              echo array_pop($Area).",";
+              echo array_pop($HARVESTPERYEAR).",";
             }
             ?>,0],
             backgroundColor: '#00ce68'
@@ -544,108 +432,6 @@
         data: speedData,
         options: chartOptions
     });
-
-    <?php
-    //กราฟผลผลิตกับปุ๋ย
-    
-    
-    $sql = "SELECT * FROM `log-harvest` 
-            JOIN `dim-user` ON `dim-user`.`ID` = `log-harvest`.`DIMownerID`
-            JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
-            WHERE `dim-user`.`dbID` = $ownerID AND `dim-farm`.`dbID` = $farmID AND `isDelete`= 0";
-    $myConDB = connectDB();
-    $result = $myConDB->prepare( $sql ); 
-    $result->execute(); 
-    $num = 0;        
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-
-           $A[$num] = (date("Y",$row["Modify"]));
-           $num += 1;
-
-   }
-   $Year= array_unique($A);
-   rsort($Year);
-   $x= count($Year);
-    for ($i=0; $i < $x; $i++) { 
-        $Area["$Year[$i]"] = 0;
-        $fer["$Year[$i]"] = 0;
-        $treePerYear["$Year[$i]"]=0;
-    }
-   //ผลผลิต
-    $sql = "SELECT * FROM `log-harvest` 
-            JOIN `dim-user` ON `dim-user`.`ID` = `log-harvest`.`DIMownerID`
-            JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
-            WHERE `dim-user`.`dbID` = $ownerID AND `dim-farm`.`dbID` = $farmID AND `isDelete`= 0";
-    $myConDB = connectDB();
-    $result = $myConDB->prepare( $sql ); 
-    $result->execute(); 
-    
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $Area[(date("Y",$row["Modify"]))] = $Area[(date("Y",$row["Modify"]))] + $row["Weight"];
-    }
-
-    //ปุ๋ยต่อต้น
-    
-    for ($i=0; $i  <$x; $i++) {
-
-        $requireYear=(int)$Year[$i];
-        if($requireYear==$currentYear-543){
-            $sql="SELECT * FROM `log-fertilising` 
-                JOIN `dim-user` ON `dim-user`.`ID` = `log-fertilising`.`DIMownerID`
-                JOIN `dim-farm` ON `dim-farm`.`ID` = `log-fertilising`.`DIMfarmID`
-                WHERE `dim-user`.`dbID` = $ownerID AND `dim-farm`.`dbID` = $farmID AND `log-fertilising`.`isDelete`= 0  AND `Usage`= 1
-                ";
-            $myConDB = connectDB();
-            $result = $myConDB->prepare( $sql ); 
-            $result->execute(); 
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                echo (int)date('Y',$row["Modify"]);
-                if((int)date('Y',$row["Modify"]) ==(int)$requireYear)
-                {
-                    $fer[(date("Y",$row["Modify"]))] = $fer[(date("Y",$row["Modify"]))] + $row["Vol"];
-                }
-            }
-        }
-        else{
-            $sql="SELECT * FROM `fact-fertilizer`
-                JOIN `log-fertilising` ON `log-fertilising`.`ID` = `fact-fertilizer`.`LOGferID`
-                JOIN `dim-user` ON `dim-user`.`ID` = `log-fertilising`.`DIMownerID`
-                JOIN `dim-farm` ON `dim-farm`.`ID` = `log-fertilising`.`DIMfarmID`
-                WHERE `dim-user`.`dbID` = $ownerID AND `dim-farm`.`dbID` = $farmID AND `fact-fertilizer`.`isDelete`= 0  AND `fact-fertilizer`.`Unit`= 1
-                ";
-            $myConDB = connectDB();
-            $result = $myConDB->prepare( $sql ); 
-            $result->execute(); 
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                if((int)date('Y',$row["Modify1"]) ==(int)$requireYear){
-                      $fer[(date("Y",$row["Modify1"]))] = $fer[(date("Y",$row["Modify1"]))] + $row["Vol2"]; 
-                }
-            }
-            $sql = "SELECT * FROM `log-planting`
-                JOIN `dim-farm` ON `dim-farm`.`ID` = `log-planting`.`DIMfarmID`
-                JOIN `dim-user` ON `dim-user`.`ID` = `log-planting`.`DIMownerID`
-                WHERE `dim-user`.`dbID` = $ownerID  AND `dim-farm`.`dbID` = $farmID AND `isDelete`= 0  AND `isFarm`= 1";
-            $myConDB = connectDB();
-            $result = $myConDB->prepare( $sql ); 
-            $result->execute(); 
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)){
-                if((int)date('Y',$row["Modify"]) ==(int)$requireYear)   {  
-                    $treePerYear[(date("Y",$row["Modify"]))] = $treePerYear[(date("Y",$row["Modify"]))] + $row['NumGrowth1'] + $row['NumGrowth2'] - $row['NumDead'];
-                }
-            }
-        }
-    }
-                    
-    for ($i=0; $i  <$x; $i++) {
-        $requireYear=(int)$Year[$i];
-            if($treePerYear[$requireYear]==0){
-                $fer[$requireYear]=$fer[$requireYear];
-            }
-            else{
-                $fer[$requireYear]=(int)$fer[$requireYear] / (int)$treePerYear[$requireYear];
-            }
-    } 
-   ?>
 
     var chartOptions = {
             responsive: true,
@@ -693,11 +479,80 @@
             }],
             }
         };
+        var speedData = {
+          labels: [<?php 
+                 for ($i=0 ; $i < $x  ; $i++ ) { 
+                      echo (array_pop($Year)+543).",";
+                 }
+           ?>,""],
+          datasets: [
+          {
+            label: "ผลผลิตสวนปาร์มน้ำมัน",
+            data: [<?php
+             for ($i=0 ; $i < $x  ; $i++ ) { 
+              echo array_pop($Area).",";
+            }
+            ?>,0],
+            backgroundColor: '#00ce68'
+          }]
+  };
 
+    var ctx = $("#productYear");
+    var plantPie = new Chart(ctx, {
+        type: 'bar',
+        data: speedData,
+        options: chartOptions
+    });
+    var chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+            display: true,
+            position: 'top',
+            labels: {
+                boxWidth: 80,
+                fontColor: 'black'
+                }
+            },
+            scales: {
+            yAxes: [{
+                id : 'left-y',
+                scaleLabel: {
+                display: true,
+                labelString: 'ผลผลิต (ก.ก./ปี) '
+                },
+                gridLines: {
+                    display:true
+                },
+                position: 'left'
+            },
+            {
+                id : 'right-y',
+                scaleLabel: {
+                display: true,
+                labelString: 'ปริมาณปุ๋ยที่ใส่ (ก.ก./ต้น)'
+                },
+                gridLines: {
+                    display:false
+                } ,
+                position: 'right'
+            }
+            ],
+            xAxes: [{
+                scaleLabel: {
+                display: true,
+                labelString: 'รายปี'
+                },
+                gridLines: {
+                    display:false
+                }
+            }],
+            }
+        };
   var speedData = {
             labels: [<?php 
                  for ($i=0 ; $i < $x  ; $i++ ) { 
-                      echo (array_pop($Year)+543).",";
+                      echo (array_pop($YEAROFHARVEST)+543).",";
                  }
             ?>],
             datasets: [
@@ -706,7 +561,7 @@
             label: "ผลผลิต",
             data: [<?php
              for ($i=0 ; $i < $x  ; $i++ ) { 
-              echo array_pop($Area).",";
+              echo array_pop($SUMMARIZEHARVEST).",";
             }
             ?>],
             backgroundColor: 'transparent',
@@ -718,7 +573,7 @@
             label: "ปุ๋ย",
             data: [<?php
              for ($i=0 ; $i < $x  ; $i++ ) { 
-              echo array_pop($fer).",";
+              echo array_pop($FERPERTREE).",";
             }
             ?>],
             backgroundColor: 'transparent',

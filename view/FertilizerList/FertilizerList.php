@@ -2,6 +2,7 @@
     session_start();
     $idUT = $_SESSION[md5('typeid')];
     $CurrentMenu = "FertilizerList";
+    include_once("./../../query/query.php");
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">

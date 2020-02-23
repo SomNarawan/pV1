@@ -4,7 +4,7 @@
             <div class="card-header card-bg">
                 <div class="row">
                     <div class="col-12">
-                        <span class="link-active font-weight-bold" style="color:<?=$color?>;">รายการชนิดปุ๋ย</span>
+                        <span class="link-active head-link">รายการชนิดปุ๋ย</span>
                         <span style="float:right;">
                             <i class="fas fa-bookmark"></i>
                             <a class="link-path" href="#">หน้าแรก</a>
@@ -18,21 +18,9 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-xl-3 col-12 mb-4">
-        <div class="card border-left-primary card-color-one shadow  py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="font-weight-bold  text-uppercase mb-1">จำนวนชนิดปุ๋ย</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800 amount-fer"></div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-bug fa-3x"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php   
+            creatCard( "card-color-one",   "จำนวนชนิดปุ๋ย", getcountFertilizer()." ชนิด", "waves" );
+    ?>
     <div class="col-xl-3 col-12 mb-4">
         <div class="card border-left-primary card-color-four shadow  py-2" id="addFertilizer" style="cursor:pointer;">
             <div class="card-body">

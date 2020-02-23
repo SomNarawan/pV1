@@ -12,6 +12,10 @@ include_once("./../../query/query.php");
 
 $FARMER = getFarmerByUFID($ufid);
 $OWNERFARM = getOwnerFarm($ufid);
+//map
+$FARMEROWNER = getFarmOwnerID($ufid);
+
+// print_r($FARMEROWNER);
 
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
@@ -266,10 +270,7 @@ $OWNERFARM = getOwnerFarm($ufid);
         </div>
 
 
-
-
-        <?php include_once("../layout/LayoutFooter.php"); ?>
-
+<?php include_once("../layout/LayoutFooter.php"); ?>
 
         <script
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMLhtSzox02ZCq2p9IIuihhMv5WS2isyo&callback=initMap&language=th"
@@ -279,25 +280,11 @@ $OWNERFARM = getOwnerFarm($ufid);
 
         <script>
         function initMap() {
-
-            <
-            ?
-            php
-            //INFO FARM
-            $sql = "SELECT * FROM `db-farm` WHERE `UFID` = $ufid";
-            $myConDB = connectDB();
-            $result = $myConDB - > prepare($sql);
-            $result - > execute();
-            $row = $result - > fetch(PDO::FETCH_ASSOC) ?
-                >
-
-                var startLatLng = new google.maps.LatLng( < ? php
-                    if ($row["Latitude"] != NULL) echo $row["Latitude"];
-                    else echo "13.7244416" ? > , <
-                        ?
-                        php
-                    if ($row["Longitude"] != NULL) echo $row["Longitude"];
-                    else echo "100.3529157" ? > );
+                var startLatLng = new google.maps.LatLng( <?php
+                    if ($FARMEROWNER[1]["Latitude"] != NULL) echo $FARMEROWNER[1]["Latitude"];
+                    else echo "13.7244416" ?> , <?php
+                    if ($FARMEROWNER[1]["Longitude"] != NULL) echo $FARMEROWNER[1]["Longitude"];
+                    else echo "100.3529157" ?> );
 
             mapdetail = new google.maps.Map(document.getElementById('map'), {
                 // center: { lat: 13.7244416, lng: 100.3529157 },
@@ -305,40 +292,13 @@ $OWNERFARM = getOwnerFarm($ufid);
                 zoom: 8,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             });
-
-
-
             mapdetail.markers = [];
-            // marker = new google.maps.Marker({
-            //     position: new google.maps.LatLng(13.736717, 100.523186),
-            //     //icon: "http://maps.google.com/mapfiles/kml/paddle/grn-circle.png",
-            //     map: mapdetail,
-            //     title: "test"
-            // });
-
-            <
-            ?
-            php
-            $sql = "SELECT * FROM `db-farm` WHERE `UFID` = $ufid";
-            $myConDB = connectDB();
-            $result = $myConDB - > prepare($sql);
-            $result - > execute();
-            while ($row = $result - > fetch(PDO::FETCH_ASSOC)) {
-                ?
-                >
+            
                 marker = new google.maps.Marker({
-                    position: new google.maps.LatLng( < ? php echo $row["Latitude"] ? > , < ? php echo $row[
-                        "Longitude"] ? > ),
+                    position: new google.maps.LatLng( <?php echo $FARMEROWNER[1]["Latitude"] ?> , <?php echo $FARMEROWNER[1]["Longitude"] ?> ),
                     map: mapdetail,
-                    title: "<?php echo $row["
-                    Name "]?>"
+                    title: "<?php echo $FARMEROWNER[1]["Name"]?>"
                 });
                 mapdetail.markers.push(marker);
-
-                <
-                ?
-                php
-            } ?
-            >
         }
         </script>
