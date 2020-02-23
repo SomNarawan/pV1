@@ -902,6 +902,12 @@ function getFerPerTree($farmID)
     return $FER;
 }
 
+//LogFertilising
+function getLogfertilising(){
+    $sql = "SELECT * FROM `log-fertilising` WHERE `isDelete` = 0 ";
+    $FERTILISING = selectData($sql);
+    return $FERTILISING;
+}
 
 //การ์ด - ผลผลิตปาล์มปีนี้
 function getHarvestCurrentYear()
@@ -961,6 +967,30 @@ function getAllArea()
         $allArea = $allArea + (int)$AREA[$i]["AreaRai"];
     }
     return $allArea;
+}
+
+//การ์ด - ปริมาณที่ใส่ปุ๋ย
+function getVolumeFertilising()
+{
+    $FERTILISING = getLogfertilising();
+    $x = count($FERTILISING);
+    $volumeFer = 0;
+    for($i=1;$i<$x;$i++)
+    {
+        $volumeFer = $volumeFer + (float)$FERTILISING[$i]["Vol"];
+    }
+    return $volumeFer;
+}
+
+//ใช้ตอนค้นหา ปีที่มีการให้ปุ๋ย
+function getYearFer(){
+    $sql = "SELECT `dim-time`.`Year2` FROM `log-fertilising`
+    INNER JOIN `dim-time`ON `dim-time`.`ID` = `log-fertilising`.`DIMdateID`
+    WHERE `log-fertilising`.`isDelete`= 0 
+    GROUP BY `dim-time`.`Year2` 
+    ORDER BY `dim-time`.`Year2` DESC";
+    $YearFer = selectData($sql);
+    return $YearFer;
 }
 
 //ตารางผลผลิตสวนปาล์มน้ำมันในระบบ หน้า OilPalmAreaVol.php
@@ -1023,9 +1053,23 @@ function getCountInsect()
 
 function getInsect()
 {
-    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID` = 1";
-    $INSECT = selectData($sql);
-    return $INSECT;
+    $sql = "SELECT `PID`,`Alias`,`Icon` FROM `db-pestlist` WHERE `PTID` = 1";
+    $ALLINSECT = selectData($sql);
+    $countInsect = count($ALLINSECT);
+    $num = 0;
+    for ($i = 0; $i < $countInsect; $i++) {
+        $DATA[$num] = $ALLINSECT[$i];
+        $num++;
+    }
+
+    if (isset($_GET['id'])) $selectedID = $_GET['id'];
+    else if ($num > 0) $selectedID = $DATA[1]["PID"];
+    else $selectedID = 0;
+
+    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=1 AND PID=" . $selectedID;
+    $INFOINSECT = selectData($sql);
+
+    return $INFOINSECT;
 }
 
 //  DISESASESLIST.php
@@ -1038,9 +1082,23 @@ function getCountDiseases()
 
 function getDiseases()
 {
-    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID` = 2";
-    $DISEASES = selectData($sql);
-    return $DISEASES;
+    $sql = "SELECT `PID`,`Alias`,`Icon` FROM `db-pestlist` WHERE `PTID` = 2";
+    $ALLDISESASES = selectData($sql);
+    $countDiseases = count($ALLDISESASES);
+    $num = 0;
+    for ($i = 0; $i < $countDiseases; $i++) {
+        $DATA[$num] = $ALLDISESASES[$i];
+        $num++;
+    }
+
+    if (isset($_GET['id'])) $selectedID = $_GET['id'];
+    else if ($num > 0) $selectedID = $DATA[1]["PID"];
+    else $selectedID = 0;
+
+    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=1 AND PID=" . $selectedID;
+    $INFODISESASES = selectData($sql);
+
+    return $INFODISESASES;
 }
 
 //  WEEDLIST.php
@@ -1053,9 +1111,23 @@ function getCountWeed()
 
 function getWeed()
 {
-    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID` = 3";
-    $WEED = selectData($sql);
-    return $WEED;
+    $sql = "SELECT `PID`,`Alias`,`Icon` FROM `db-pestlist` WHERE `PTID` = 3";
+    $ALLWEED = selectData($sql);
+    $countWeed = count($ALLWEED);
+    $num = 0;
+    for ($i = 0; $i < $countWeed; $i++) {
+        $DATA[$num] = $ALLWEED[$i];
+        $num++;
+    }
+
+    if (isset($_GET['id'])) $selectedID = $_GET['id'];
+    else if ($num > 0) $selectedID = $DATA[1]["PID"];
+    else $selectedID = 0;
+
+    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=1 AND PID=" . $selectedID;
+    $INFOWEED = selectData($sql);
+
+    return $INFOWEED;
 }
 
 // OTHER-PESTLIST.php
@@ -1068,9 +1140,23 @@ function getCountOhterPest()
 
 function getOhterPest()
 {
-    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID` = 4";
-    $OTHERPEST = selectData($sql);
-    return $OTHERPEST;
+    $sql = "SELECT `PID`,`Alias`,`Icon` FROM `db-pestlist` WHERE `PTID` = 3";
+    $ALLOTHER = selectData($sql);
+    $countOther = count($ALLOTHER);
+    $num = 0;
+    for ($i = 0; $i < $countOther; $i++) {
+        $DATA[$num] = $ALLOTHER[$i];
+        $num++;
+    }
+
+    if (isset($_GET['id'])) $selectedID = $_GET['id'];
+    else if ($num > 0) $selectedID = $DATA[1]["PID"];
+    else $selectedID = 0;
+
+    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=1 AND PID=" . $selectedID;
+    $INFOOTHER = selectData($sql);
+
+    return $INFOOTHER;
 }
 
 

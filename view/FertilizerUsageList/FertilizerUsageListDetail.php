@@ -9,45 +9,35 @@ $backYear = date("Y") + 543 - 1;
 <?php
     include_once("../layout/LayoutHeader.php");
     require_once("../../dbConnect.php");
+    $name = $_GET['name'];
+    $nfarm = $_GET['nfarm'];
+    $NumTree = $_GET['NumTree'];
+    $AreaRai = $_GET['AreaRai'];
+    $AreaNgan = $_GET['AreaNgan'];
+    $AreaWa = $_GET['AreaWa'];
+    $HarvestVol = $_GET['HarvestVol'];
+
+    $sql1 = "SELECT DISTINCT `dim-time`.`Year2` 
+            FROM `log-fertilising`
+            INNER JOIN `dim-time` ON `dim-time`.`ID` = `log-fertilising`.`DIMdateID`
+            INNER JOIN `dim-farm` ON `dim-farm`.`ID` = `log-fertilising`.`DIMfarmID`
+            WHERE `log-fertilising`.`isDelete` = 0  AND `dim-farm`.`Name` = '$nfarm'
+            ORDER BY `dim-time`.`Year2` DESC";
+    $year = selectData($sql1);
+    $FerVal = selectData("SELECT SUM(`log-fertilising`.`Vol`)
+        FROM `log-fertilising` 
+        WHERE `log-fertilising`.`isDelete` = 0 AND `log-fertilising`.`DIMfarmID` = '$'
+        GROUP BY `log-fertilising`.`DIMfarmID` ");
+    
     $farmerID = $_GET['farmerID'];
     $farmID = $_GET['farmID'];
     $subfarmID = $_GET['subfarmID'];
     $year = $_GET['year'];
-    $LFID = $_GET['LFID'];
-    $FFID = $_GET['FFID'];
-    $DFID = $_GET['DFID'];
+    $LAID = $_GET['LAID'];
 
-    $farmer = selectData("SELECT * FROM `db-farmer` WHERE `db-farmer`.`UFID` = '$farmerID'");
-    $farm = selectData("SELECT * FROM `db-farm` WHERE `db-farm`.`FMID` = '$farmID'");
-    $subfarm = selectDataOne("SELECT COUNT(`db-subfarm`.`FSID`) AS subfarm FROM `db-subfarm`WHERE `db-subfarm`.`FMID` = '$farmID' ");
-    $totalArea = selectData("SELECT SUM(`db-subfarm`.`AreaRai`) AS RAI ,SUM(`db-subfarm`.`AreaNgan`) AS NGAN,SUM(`db-subfarm`.`AreaWa`) AS WA FROM `db-subfarm` WHERE `db-subfarm`.`FMID` = '$farmerID' ");
-    $getVolFer = selectData("SELECT SUM(`log-fertilising`.`Vol`) AS sum
-        FROM `log-fertilising`
-        INNER JOIN `dim-time`ON `dim-time`.`ID` = `log-fertilising`.`DIMdateID`
-        INNER JOIN `dim-fertilizer` ON `dim-fertilizer`.`ID` = `log-fertilising`.`DIMferID`
-        WHERE `log-fertilising`.`isDelete`=0 AND `log-fertilising`.`DIMferID` = '$DFID'
-        GROUP BY `dim-time`.`Year2`, `log-fertilising`.`DIMferID` ,`log-fertilising`.`DIMfarmID`
-        ORDER BY `dim-time`.`Year2` DESC"
-    );
-    $NumTree = selectData("SELECT (SUM(IF( lpt.`NumGrowth1` IS NULL , 0, lpt.`NumGrowth1`))
-        +SUM(IF( lpt.`NumGrowth2` IS NULL , 0, lpt.`NumGrowth2`))-SUM(IF( lpt.`NumDead` IS NULL , 0, lpt.`NumDead`))) AS NumTree
-        FROM `log-planting` AS lpt
-        INNER JOIN `dim-farm` ON `dim-farm`.`ID` = lpt.`DIMfarmID`
-        WHERE lpt.`isDelete` = 0 AND `dim-farm`.`IsFarm` = 1 AND `dim-farm`.`dbID` = '$farmID'"
-    );
-    $HarvestVol = selectData("SELECT `dim-time`.`Year2`,SUM(`log-harvest`.`Weight`)/(IF(`db-subfarm`.`AreaRai`= 0,1,`db-subfarm`.`AreaRai`)) AS HarvestVol
-        FROM `log-harvest` 
-        INNER JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMsubFID`
-        INNER JOIN `dim-time` ON `dim-time`.`ID` = `log-harvest`.`DIMdateID`
-        INNER JOIN `db-subfarm` ON `db-subfarm`.`FSID` = `dim-farm`.`dbID`
-        WHERE  `log-harvest`.`isDelete`=0 AND `dim-time`.`Year2` = '$year'
-        GROUP BY `dim-time`.`Year2`"
-    );
-    $year2 = selectData("SELECT DISTINCT `dim-time`.`Year2` FROM `log-fertilising` 
-        INNER JOIN `dim-time` ON `dim-time`.`ID` = `log-fertilising`.`DIMdateID`
-        ORDER BY `dim-time`.`Year2` DESC"
-    );
-    $dimfer = selectData("SELECT * FROM `dim-fertilizer` WHERE `dim-fertilizer`.`ID` = $DFID");
+    // $farmer = selectData("SELECT * FROM `db-farmer` WHERE `db-farmer`.`UFID` = '$farmerID'");
+    // $farm = selectData("SELECT * FROM `db-farm` WHERE `db-farm`.`FMID` = '$farmID'");
+    // $logActivity = selectData("SELECT * FROM `log-activity` WHERE `log-activity`.`ID` = '$LAID'");
 
 ?>
 
@@ -181,7 +171,7 @@ $backYear = date("Y") + 543 - 1;
             <div class="card">
                 <div class="card-body" id="for_card">
                     <div class="row">
-                        <img class="img-radius img-profile" src="../../icon/farm/1/<?php echo $farm[1]['Icon']; ?>" /> 
+
                         <!-- <img class="img-radius img-profile" src="../../icon/farm/1/FM1.png"> -->
                         <!-- <img class="img-radius" style="box-shadow: 2px 4px 10px #888888;" width="125px" height="125px" src="../../picture/palm1.jpg" /> -->
                     </div>
@@ -189,8 +179,8 @@ $backYear = date("Y") + 543 - 1;
                         <div class="col-xl-2 col-3 text-right">
                             <span>ชื่อสวน : </span>
                         </div>
-                        <div class="col-xl-3 col-3">
-                            <span><?php echo $farm[1]['Name'] ?></span>
+                        <div class="">
+                            <span></span>
                         </div>
                     </div>
                 </div>
@@ -200,7 +190,7 @@ $backYear = date("Y") + 543 - 1;
             <div class="card">
                 <div class="card-body" id="card_height">
                     <div class="row">
-                        <img class="img-radius img-profile" src="../../icon/farmer/1/<?php echo $farmer[1]['Icon']; ?>" />
+
                         <!-- <img class="img-radius img-profile" src="../../icon/farmer/1/F1.png"> -->
                         <!-- <img class="img-radius" style="box-shadow: 2px 4px 10px #888888;" width="125px" height="125px" src="../../picture/default.jpg" /> -->
                     </div>
@@ -208,8 +198,8 @@ $backYear = date("Y") + 543 - 1;
                         <div class="col-xl-3 col-3 text-right">
                             <span>เกษตรกร : </span>
                         </div>
-                        <div class="col-xl-4 col-3">
-                            <span><?php echo $farmer[1]['FirstName']." ".$farmer[1]['LastName'] ?></span>
+                        <div class="">
+                            <span></span>
                         </div>
                     </div>
                 </div>
@@ -225,7 +215,7 @@ $backYear = date("Y") + 543 - 1;
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="font-weight-bold  text-uppercase mb-1">จำนวนแปลง</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $totalArea[1]['RAI'] ?> แปลง</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $AreaRai ?> แปลง</div>
                             <br>
                         </div>
                         <div class="col-auto">
@@ -241,7 +231,7 @@ $backYear = date("Y") + 543 - 1;
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="font-weight-bold  text-uppercase mb-1">จำนวนต้น</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $NumTree[1]['NumTree'] ?> ต้น</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $NumTree ?> ต้น</div>
                             <br>
                         </div>
                         <div class="col-auto">
@@ -258,7 +248,7 @@ $backYear = date("Y") + 543 - 1;
                         <div class="col mr-2">
                             <div class="font-weight-bold  text-uppercase mb-1">พื้นที่ทั้งหมด</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php echo ($totalArea[1]['RAI'] . " ไร่ " . $totalArea[1]['NGAN'] . " งาน" . "<br>" . $totalArea[1]['WA'] . " วา") ?>
+                                <?php echo ($AreaRai . " ไร่ " . $AreaNgan . " งาน" . "<br>" . $AreaWa . " วา") ?>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -274,7 +264,7 @@ $backYear = date("Y") + 543 - 1;
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="font-weight-bold  text-uppercase mb-1">ผลผลิตปี <?= $backYear ?></div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= number_format($HarvestVol[1]['HarvestVol'],2) ?> (ก.ก.)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $HarvestVol ?> (ก.ก.)</div>
                             <br>
                         </div>
                         <div class="col-auto">
@@ -286,6 +276,84 @@ $backYear = date("Y") + 543 - 1;
         </div>
     </div>
 
+    <!-- <div class="row mt-4">
+
+        <div class="col-xl-3 col-12 mb-4">
+            <div class="card border-left-primary card-color-two shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row">
+                        <canvas id="FerPie1"></canvas>
+                    </div>
+                    <div class="row">
+                        <span style="margin: auto; color: black;">ปูนขาว</span>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        <div class="col-xl-3 col-12 mb-4">
+            <div class="card border-left-primary card-color-three shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row">
+                        <canvas id="FerPie2"></canvas>
+                    </div>
+                    <div class="row">
+                        <span style="margin: auto; color: black;">ปุ๋ยสูตร 1</span>
+                    </div>
+                </div>
+            </div>
+        </div> 
+         <div class="col-xl-3 col-12 mb-4">
+            <div class="card border-left-primary card-color-four shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row">
+                        <canvas id="FerPie3"></canvas>
+                    </div>
+                    <div class="row">
+                        <span style="margin: auto; color: black;">ปุ๋ยสูตร 2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- <div class="row mt-4">
+        <div class="col-xl-12 col-12">
+            <div class="card">
+                <div class="card-header card-bg">
+                    <div class="row">
+                        <div class="col-10">
+                            <h4>โดโลไมท์ </h4>
+                        </div>
+                        <div class="col-2">
+                            <select id="year" class="form-control">
+                                <option selected>2562</option>
+                                <option>2561</option>
+                                <option>2560</option>
+                                <option>2559</option>
+                                <option>2558</option>
+                                <option>2557</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-12 col-12">
+                            <div class="row mb-2">
+                                <div class="col-xl-6 col-12">
+                                    <canvas id="ferVol1" style="height:200px;"></canvas>
+                                </div>
+                                <div class="col-xl-6 col-12">
+                                    <canvas id="FerPie1"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
     <!--------------------- Graps --------------------->
     <div class="row mt-4">
         <div class="col-xl-12 col-12">
@@ -293,13 +361,13 @@ $backYear = date("Y") + 543 - 1;
                 <div class="card-header card-bg">
                     <div class="row">
                         <div class="col-10">
-                            <h4><?= $dimfer[1]['Name'] ?></h4>
+                            <h4>ปุ๋ยทั่วไป </h4>
                         </div>
                         <div class="col-2">
-                            <select id="year2" class="form-control">
+                            <select id="year" class="form-control">
                                 <?php
-                                for ($i = 1; $i <= $year2[0]['numrow']; $i++) {
-                                    echo "<option value='{$year2[$i]['Year2']}'>{$year2[$i]['Year2']}</option>";
+                                for ($i = 1; $i <= $year[0]['numrow']; $i++) {
+                                    echo "<option value='{$year[$i]['Year2']}'>{$year[$i]['Year2']}</option>";
                                 }
                                 ?>
                             </select>
@@ -365,7 +433,7 @@ $backYear = date("Y") + 543 - 1;
                             </tfoot>
                             <tbody>
                                 <tr>
-                                    <!-- <td>แปลง1</td>
+                                    <td>แปลง1</td>
                                     <td>06/06/2562</td>
                                     <td>โดโลไมท์</td>
                                     <td>20</td>
@@ -373,7 +441,9 @@ $backYear = date("Y") + 543 - 1;
                                         <button type="button" id='btn_edit' Pid='' class="btn btn-warning btn-sm btn-edit" data-toggle="modal" data-target="#modal-4"><i class="fas fa-edit"></i></button>
                                         <button type="button" id='btn_pic' Pid='' class="btn btn-info btn-sm btn-photo" data-toggle="modal" data-target="#modal-2"><i class="far fa-images"></i></button>
                                         <button type="button" id='btn_delete' Pid='' class="btn btn-danger btn-sm btn-delete"><i class="far fa-trash-alt"></i></button>
-                                    </td> -->
+                                        <!-- <button type="button" id="btn_pic" class="btn btn-info btn-sm"><i class="fas fa-images"></i></button> -->
+                                        <!-- <button type="button" id="btn_delete" class="btn btn-danger btn-sm"><i class="far fa-trash-alt"></i></button> -->
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -402,6 +472,16 @@ $backYear = date("Y") + 543 - 1;
                                     <input class="form-control" width="auto" id="p_date" name="p_date" />
                                 </div>
                             </div>
+                            <!-- <div class="row mb-4">
+                                <div class="col-xl-3 col-12 text-right">
+                                    <span>จากสวน</span>
+                                </div>
+                                <div class="col-xl-9 col-12">
+                                    <select class="js-example-basic-single" id="p_farm" name="p_farm">
+
+                                    </select>
+                                </div>
+                            </div> -->
                             <div class="row mb-4">
                                 <div class="col-xl-3 col-12 text-right">
                                     <span>จากแปลง</span>
@@ -437,6 +517,19 @@ $backYear = date("Y") + 543 - 1;
                                     </input>
                                 </div>
                             </div>
+
+                            <div class="row mb-4">
+                                <div class="col-xl-3 col-12 text-right">
+                                    <span>จำนวนต้น</span>
+                                    <span class="text-danger"> *</span>
+                                </div>
+                                <div class="col-xl-8 col-12">
+                                    <input placeholder="จำนวนต้น" type="text" class="form-control" id="p_tree" name="p_tree" onblur="check_num();" value="">
+
+                                    </input>
+                                </div>
+                            </div>
+
                             <div class="row mb-4">
                                 <div class="col-xl-3 col-12 text-right">
                                     <span>รูปภาพ</span>
@@ -505,6 +598,9 @@ $backYear = date("Y") + 543 - 1;
         </div>
     </div>
 
+
+
+
 </div>
 
 </div>
@@ -528,12 +624,6 @@ $backYear = date("Y") + 543 - 1;
 <script src="../../croppie/croppie.js"></script>
 
 <script>
-    var txt1 = document.getElementById('year2');
-    var arr = new Array();
-    for (var i=0; i<txt1.length; i++) {
-        arr[i] = (txt1)[i].value;
-    }
-
     document.getElementById("btn-modal4").addEventListener("load", loadFarm());
 
     $(document).ready(function() {
@@ -583,14 +673,6 @@ $backYear = date("Y") + 543 - 1;
 
     });
 
-    pdfMake.fonts = {
-        THSarabun: {
-            normal: 'THSarabun.ttf',
-            bold: 'THSarabun-Bold.ttf',
-            italics: 'THSarabun-Italic.ttf',
-            bolditalics: 'THSarabun-BoldItalic.ttf'
-        }
-    }
 
     // Start Event Select_สวน
     $("#p_farm").on('change', function() {
@@ -648,12 +730,57 @@ $backYear = date("Y") + 543 - 1;
         $('#p_subfarm').html("<option disabled selected>เลือกแปลง</option>");
         $('#p_fertilizer').html("<option disabled selected>เลือกชนิดปุ๋ย</option>");
         $('#p_vol').html("<input>เลือกแปลง</input>");
+        //document.getElementById("p_note").value = "";
         $('#p_insert_img').html(`<div class="img-reletive">
                                     <img src="https://ast.kaidee.com/blackpearl/v6.18.0/_next/static/images/gallery-filled-48x48-p30-6477f4477287e770745b82b7f1793745.svg" width="50px" height="50px" alt="">
                                     <input type="file" class="form-control" id="p_photo" name="p_photo[]" accept=".jpg,.png" multiple>
                                 </div>`);
         $('#hidden_id').attr('value', "insert");
     });
+
+    //  // Start Edit Botton
+    // $(document).on('click', '.btn-edit', function() {
+    //     let id = $(this).attr('id');
+    //     let text = "";
+
+    //     // $('#setText-edit').html("แก้ไขการใส่ปุ๋ย");
+
+    //     $('#p_date').val(data[id].Date);
+
+    //     for (i in dataFarm)
+    //         text += ` <option value="${dataFarm[i].FMID}">${dataFarm[i].Name}</option> `;
+    //     $("#p_farm").html(text);
+    //     $('#p_farm').val(data[id].FID).trigger('change');
+
+    //     let xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function() {
+    //         if (this.readyState == 4 && this.status == 200) {
+    //             dataSubFarm = JSON.parse(this.responseText);
+    //             let text = "";
+    //             for (i in dataSubFarm)
+    //                 text += ` <option value="${dataSubFarm[i].FSID}">${dataSubFarm[i].Name}</option> `
+    //             $("#p_subfarm").html(text);
+    //             $('#p_subfarm').val(data[id].SFID).trigger('change');
+    //         }
+    //     };
+    //     xhttp.open("GET", "./loadSubFarm.php?farm=" + data[id].FID, true);
+    //     xhttp.send();
+
+    //     $('#p_rank').html(`<option value="1">แมลงศัตรูพืช</option>
+    //                         <option value="2">โรคพืช</option>
+    //                         <option value="3">วัชพืช</option>
+    //                         <option value="4">ศัตรูพืชอื่นๆ</option>`);
+    //     $('#p_rank').val(data[id].dbpestTID).trigger('change');
+
+    //     loadPest(data[id].dbpestTID, id, "#p_pest", "edit");
+
+    //     document.getElementById("p_note").value = data[id].Note;
+
+    //     loadPhoto_LogPestAlarm2(data[id].PICS, "#p_insert_img");
+
+    //     $('#hidden_id').attr('value', "edit");
+    //     $('#pestAlarmID').attr('value', data[id].ID);
+    // });
 
     // Start Submit Create Modal
     $(document).on('click', '#m_success', function() {
@@ -679,66 +806,6 @@ $backYear = date("Y") + 543 - 1;
                 // console.log(result);
             }
         });
-    });
-
-
-    // Start Delete Botton
-    $(document).on('click', '.btn-delete', function() {
-        let id = $(this).attr('id');
-        let pid = $(this).attr('Pid');
-        swal({
-                title: "ยืนยันการลบข้อมูล",
-                // text: `Id_diary : ${id} ?`,
-                icon: "warning",
-                buttons: {
-                    confirm: "ยืนยัน",
-                    cancel: "ยกเลิก"
-                },
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    swal("ดำเนินการลบสำเร็จ !!", {
-                        icon: "success",
-                    }).then((willDelete) => {
-                        let xhttp = new XMLHttpRequest();
-                        xhttp.onreadystatechange = function() {
-                            if (this.readyState == 4 && this.status == 200) {
-                                let count = 0;
-                                data.splice(id, 1);
-                                let text = "";
-                                for (i in data) {
-                                    text += `<tr>
-                                                <td class="text-left">${data[i].Name}</td>
-                                                <td class="text-left">${data[i].FName}</td>
-                                                <td class="text-left">${data[i].subFName}</td>
-                                                <td class="text-right">${data[i].SumArea}</td>
-                                                <td class="text-right">${data[i].SumNumTree}</td>
-                                                <td style="text-align:center;">${data[i].TypeTH}</td>
-                                                <td class="text-right">${data[i].Date}</td>
-                                                <td style="text-align:center;">
-                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-warning btn-sm btn-edit" data-toggle="modal" data-target="#modal-4"><i class="fas fa-edit"></i></button>
-                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-success btn-sm btn-Pest" data-toggle="modal" data-target="#modal-1"><i class="fas fa-bars"></i></button>
-                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-info btn-sm btn-photo" data-toggle="modal" data-target="#modal-2"><i class="far fa-images"></i></button>
-                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-primary btn-sm btn-note" data-toggle="modal" data-target="#modal-3"><i class="far fa-sticky-note"></i></button>
-                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-danger btn-sm btn-delete"><i class="far fa-trash-alt"></i></button>
-                                                </td>
-                                            </tr>`;
-                                    count++;
-                                }
-                                $("#fetchDataTable").html(text);
-                                document.getElementById("cardPestAlarm").textContent = count + " ครั้ง";
-                            }
-                        };
-                        xhttp.open("POST", "./deletePest.php", true);
-                        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                        xhttp.send(`ID=${pid}`);
-                    });
-                }
-                // else {
-                //     swal("ยกเลิกการดำเนินการลบ !!");
-                // }
-            });
     });
 
     /*<! ----------------------------------------------------- Function && Event All Photo ----------------------------------------------------------- !>*/
@@ -829,13 +896,17 @@ $backYear = date("Y") + 543 - 1;
         $('.crop-button').hide();
         $('#upload-demo').croppie('destroy');
     });
-
-    $('#btn_pic').click(function() {
-        $('body').append(imageModal)
-        console.log('xxx')
-        $('#imageModal').modal('show')
-    })
     /*<! ----------------------------------------------------- Function && Event All Photo ----------------------------------------------------------- !>*/
+
+
+    pdfMake.fonts = {
+        THSarabun: {
+            normal: 'THSarabun.ttf',
+            bold: 'THSarabun-Bold.ttf',
+            italics: 'THSarabun-Italic.ttf',
+            bolditalics: 'THSarabun-BoldItalic.ttf'
+        }
+    }
 
     $("#card_height").css('height', $("#for_card").css('height'));
     var chartOptions = {
@@ -851,17 +922,16 @@ $backYear = date("Y") + 543 - 1;
         },
     };
 
-    // ---------------------- grap -------------------------------
     //pie chart
     var speedData = {
         labels: ["ปริมาณที่ใส่แล้ว", "ปริมาณที่ควรใส่เพิ่ม"],
         datasets: [{
             label: "Demo Data 1",
-            data: [1, 4],
+            data: [0, 0],
             backgroundColor: ["#00ce68", "#F32C24"]
         }]
-    }; 
-        
+    };
+
     var ctx = $("#FerPie1");
     var plantPie = new Chart(ctx, {
         type: 'pie',
@@ -869,12 +939,30 @@ $backYear = date("Y") + 543 - 1;
         options: chartOptions
     });
 
+    // var speedData = {
+    // labels: ["ปริมาณที่ใส่", "ปริมาณที่ควรใส่"],
+    // datasets: [{
+    //     label: "Demo Data 1",
+    //     data: [30,70],
+    //     backgroundColor: ["#00ce68", "#f6c23e"]
+    // }]
+    // };
+
     var ctx = $("#FerPie2");
     var plantPie = new Chart(ctx, {
         type: 'pie',
         data: speedData,
         options: chartOptions
     });
+
+    // var speedData = {
+    // labels: ["ปริมาณที่ใส่", "ปริมาณที่ควรใส่"],
+    // datasets: [{
+    //     label: "Demo Data 1",
+    //     data: [80,20],
+    //     backgroundColor: ["#00ce68", "#f6c23e"]
+    // }]
+    // };
 
     var ctx = $("#FerPie3");
     var plantPie = new Chart(ctx, {
@@ -924,7 +1012,7 @@ $backYear = date("Y") + 543 - 1;
 
     //graps 
     var speedData1 = {
-        labels: arr,
+        labels: ["2560", "2561", "2562"],
         datasets: [{
                 // label: "ใส่แล้ว",
                 // data: [300, 70, 50],
@@ -970,6 +1058,77 @@ $backYear = date("Y") + 543 - 1;
         }]
     };
 
-    
+    $('#btn_pic').click(function() {
+        $('body').append(imageModal)
+        console.log('xxx')
+        $('#imageModal').modal('show')
+    })
 
+    // Start Delete Botton
+    $(document).on('click', '.btn-delete', function() {
+        let id = $(this).attr('id');
+        let pid = $(this).attr('Pid');
+        swal({
+                title: "ยืนยันการลบข้อมูล",
+                // text: `Id_diary : ${id} ?`,
+                icon: "warning",
+                buttons: {
+                    confirm: "ยืนยัน",
+                    cancel: "ยกเลิก"
+                },
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    swal("ดำเนินการลบสำเร็จ !!", {
+                        icon: "success",
+                    }).then((willDelete) => {
+                        let xhttp = new XMLHttpRequest();
+                        xhttp.onreadystatechange = function() {
+                            if (this.readyState == 4 && this.status == 200) {
+                                let count = 0;
+                                data.splice(id, 1);
+                                let text = "";
+                                for (i in data) {
+                                    text += `<tr>
+                                                <td class="text-left">${data[i].Name}</td>
+                                                <td class="text-left">${data[i].FName}</td>
+                                                <td class="text-left">${data[i].subFName}</td>
+                                                <td class="text-right">${data[i].SumArea}</td>
+                                                <td class="text-right">${data[i].SumNumTree}</td>
+                                                <td style="text-align:center;">${data[i].TypeTH}</td>
+                                                <td class="text-right">${data[i].Date}</td>
+                                                <td style="text-align:center;">
+                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-warning btn-sm btn-edit" data-toggle="modal" data-target="#modal-4"><i class="fas fa-edit"></i></button>
+                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-success btn-sm btn-Pest" data-toggle="modal" data-target="#modal-1"><i class="fas fa-bars"></i></button>
+                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-info btn-sm btn-photo" data-toggle="modal" data-target="#modal-2"><i class="far fa-images"></i></button>
+                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-primary btn-sm btn-note" data-toggle="modal" data-target="#modal-3"><i class="far fa-sticky-note"></i></button>
+                                                    <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-danger btn-sm btn-delete"><i class="far fa-trash-alt"></i></button>
+                                                </td>
+                                            </tr>`;
+                                    count++;
+                                }
+                                $("#fetchDataTable").html(text);
+                                document.getElementById("cardPestAlarm").textContent = count + " ครั้ง";
+                            }
+                        };
+                        xhttp.open("POST", "./deletePest.php", true);
+                        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        xhttp.send(`ID=${pid}`);
+                    });
+                }
+                // else {
+                //     swal("ยกเลิกการดำเนินการลบ !!");
+                // }
+            });
+    });
+
+    // ---- delete ---- 
+
+
+
+    //ing
+
+
+    //ing
 </script>

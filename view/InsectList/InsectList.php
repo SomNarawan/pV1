@@ -1,16 +1,13 @@
 <?php
-
-session_start();
-
-$idUT = $_SESSION[md5('typeid')];
-$CurrentMenu = "InsectList";
-
+    session_start();
+    $idUT = $_SESSION[md5('typeid')];
+    $CurrentMenu = "InsectList";
+    include_once("../layout/LayoutHeader.php"); 
+    include_once("./Data.php");
+    include_once("./../../query/query.php");
+    //print_r(getInsect());
 ?>
 
-<?php 
-include_once("../layout/LayoutHeader.php"); 
-include_once("./Data.php");
-?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
 <link rel="stylesheet" href="../../croppie/croppie.css">
 

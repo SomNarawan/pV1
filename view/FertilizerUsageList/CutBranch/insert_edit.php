@@ -6,9 +6,6 @@ $dim_date;
 $dim_farm;
 $dim_subfarm;
 $dim_owner;
-
-
-$dim_pest;
 function getImg($img)
 {
   if ($img != null) {
@@ -19,7 +16,7 @@ function getImg($img)
     return $dataI;
   } else return null;
 }
-function searchDIMAll($p_date, $p_farm, $p_subfarm, $p_rank, $p_pest)
+function searchDIMAll($p_date, $p_farm, $p_subfarm) //$p_rank, $p_pest
 {
   $sql_DimDate = "SELECT ID FROM `dim-time` AS dt WHERE dt.Date = '$p_date'";
   $data1 = selectData($sql_DimDate);
@@ -37,34 +34,37 @@ function searchDIMAll($p_date, $p_farm, $p_subfarm, $p_rank, $p_pest)
   $data4 = selectData($sql_DimOwner);
   $GLOBALS['dim_owner'] = $data4[1]['ID'];
 
-  $sql_DimPest = "SELECT ID FROM `dim-pest` AS dp WHERE dp.dbpestTID = $p_rank AND dp.dbpestLID = $p_pest";
-  $data5 = selectData($sql_DimPest);
-  $GLOBALS['dim_pest'] = $data5[1]['ID'];
+  // $sql_DimPest = "SELECT ID FROM `dim-pest` AS dp WHERE dp.dbpestTID = $p_rank AND dp.dbpestLID = $p_pest";
+  // $data5 = selectData($sql_DimPest);
+  // $GLOBALS['dim_pest'] = $data5[1]['ID'];
 }
 switch ($request) {
   case 'insert':
     $p_date =  $_POST['p_date'];
     $p_farm =  $_POST['p_farm'];
     $p_subfarm =  $_POST['p_subfarm'];
-    $p_rank =  $_POST['p_rank'];
-    $p_pest =  $_POST['p_pest'];
+    // $p_rank =  $_POST['p_rank'];
+    // $p_pest =  $_POST['p_pest'];
     $p_note =  $_POST['p_note'];
     $t = time();
 
-    searchDIMAll($p_date, $p_farm, $p_subfarm, $p_rank, $p_pest);
+    searchDIMAll($p_date, $p_farm, $p_subfarm); //, $p_rank, $p_pest
 
-    $sql_Insert = "INSERT INTO `log-pestalarm`(`ID`, `isDelete`, `Modify`, `LOGloginID`, `DIMdateID`, `DIMownerID`, `DIMfarmID`, `DIMsubFID`, `DIMpestID`, `Note`, `PICs`) VALUES 
-                                              (NULL,0,$t,-1,$dim_date,$dim_owner,$dim_farm,$dim_subfarm,$dim_pest,'$p_note','')";
+    // $sql_Insert = "INSERT INTO `log-pestalarm`(`ID`, `isDelete`, `Modify`, `LOGloginID`, `DIMdateID`, `DIMownerID`, `DIMfarmID`, `DIMsubFID`, `DIMpestID`, `Note`, `PICs`) VALUES 
+    //                                           (NULL,0,$t,-1,$dim_date,$dim_owner,$dim_farm,$dim_subfarm,$dim_pest,'$p_note','')";
+
+    $sql_Insert = "INSERT INTO `log-activity`(`ID`, `isDelete`, `Modify`, `LOGloginID`, `DIMdateID`, `DIMownerID`, `DIMfarmID`, `DIMsubFID`,`DBactID`, `Note`, `PICs`) VALUES 
+                                              (NULL,0,$t,-1,$dim_date,$dim_owner,$dim_farm,$dim_subfarm,1,'$p_note','')";
+
     $idCurrent = addinsertData($sql_Insert);
     echo "Success";
-    $path = "../../picture/activities/pest/$idCurrent";
-    $update = "UPDATE `log-pestalarm` SET `PICS` = '$path'  WHERE ID = $idCurrent";
+    $path = "../../picture/activities/others/$idCurrent";
+    $update = "UPDATE `log-activity` SET `PICS` = '$path'  WHERE ID = $idCurrent";
     $x = updateData($update);
 
     $dataPic = explode('manu20', $_POST['pic']);
     $countNumpic = sizeof($dataPic) - 1;
     echo $countNumpic . "+++++++++++++++++++";
-
     if (!file_exists($path)) {
       mkdir($path, 777, true);
       echo "\n\n Insert" . $path . "\n\n";
@@ -81,18 +81,19 @@ switch ($request) {
     $p_date =  $_POST['p_date'];
     $p_farm =  $_POST['p_farm'];
     $p_subfarm =  $_POST['p_subfarm'];
-    $p_rank =  $_POST['p_rank'];
-    $p_pest =  $_POST['p_pest'];
+    // $p_rank =  $_POST['p_rank'];
+    // $p_pest =  $_POST['p_pest'];
     $p_note =  $_POST['p_note'];
-    $pestAlarmID = $_POST['pestAlarmID'];
+    // $pestAlarmID = $_POST['pestAlarmID'];
+    $activityID = $_POST['activityID'];
     $t = time();
 
-    searchDIMAll($p_date, $p_farm, $p_subfarm, $p_rank, $p_pest);
+    searchDIMAll($p_date, $p_farm, $p_subfarm); //, $p_rank, $p_pest
 
-    $sql_edit = "UPDATE `log-pestalarm` SET `Modify`=$t,`DIMdateID`=$dim_date,`DIMownerID`=$dim_owner,`DIMfarmID`=$dim_farm,`DIMsubFID`=$dim_subfarm,`DIMpestID`=$dim_pest,`Note`='$p_note' WHERE `ID`=$pestAlarmID";
+    $sql_edit = "UPDATE `log-pestalarm` SET `Modify`=$t,`DIMdateID`=$dim_date,`DIMownerID`=$dim_owner,`DIMfarmID`=$dim_farm,`DIMsubFID`=$dim_subfarm,`Note`='$p_note' WHERE `ID`=$activityID";
     updateData($sql_edit);
 
-    $path = "../../picture/activities/pest/$pestAlarmID";
+    $path = "../../picture/activities/others/$activityID";
     $dataPic = explode('manu20', $_POST['pic']);
     $countNumpic = sizeof($dataPic) - 1;
     echo $countNumpic . "+++++++++++++++++++";

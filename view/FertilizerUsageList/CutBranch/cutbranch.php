@@ -1,15 +1,31 @@
 <?php
     session_start();
     $idUT = $_SESSION[md5('typeid')];
-    $CurrentMenu = "FertilizerUsageList";
-    include_once("../layout/LayoutHeader.php");
-    include_once("./../../query/query.php");
-
-    $YearFer = getYearFer();
+    $CurrentMenu = "CutBranch";
     $currentYear = date("Y") + 543;
-    $backYear = date("Y") + 543 - 1;
 ?>
 
+<?php
+    include_once("../layout/LayoutHeader.php");
+    require_once("../../dbConnect.php");
+
+    $totalYear = selectData("SELECT `dim-time`.`Year2` FROM `log-activity`
+            INNER JOIN `dim-time`ON `dim-time`.`ID` = `log-activity`.`DIMdateID`
+            WHERE `log-activity`.`isDelete`= 0 
+            GROUP BY `dim-time`.`Year2` 
+            ORDER BY `dim-time`.`Year2` DESC");
+    $sumCutBranch = selectDataOne("SELECT COUNT(`log-activity`.`ID`) AS sumCutBranch
+            FROM `log-activity` WHERE `log-activity`.`isDelete` = 0 ");
+    $sumFarmLog = selectDataOne("SELECT COUNT(DISTINCT (`log-activity`.`DIMfarmID`)) AS sumFarm
+            FROM `log-activity` WHERE `log-activity`.`isDelete` = 0 ");
+    $avg = ($sumCutBranch['sumCutBranch']) / ($sumFarmLog['sumFarm']);
+    $totalFarm = selectDataOne("SELECT COUNT(`db-farm`.`FMID`) AS totalFarm FROM `db-farm` ");
+    $totalSubFarm = selectDataOne("SELECT COUNT(`db-subfarm`.`FSID`) AS totalSubFarm FROM `db-subfarm` ");
+    $totalAreaRai = selectDataOne("SELECT SUM(`db-subfarm`.`AreaRai`) AS totalAreaRai FROM `db-subfarm` ");
+    $totalPalm = selectDataOne("SELECT (SUM(`log-planting`.`NumGrowth1`)+SUM(`log-planting`.`NumGrowth2`))-SUM(`log-planting`.`NumDead`) AS totalPalm FROM `log-planting`
+            WHERE `log-planting`.`isDelete` = 0");
+
+?>
 
 <style>
     .img_scan {}
@@ -106,27 +122,25 @@
     }
 </style>
 
+<link rel="stylesheet" href="style.css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
 <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="../../croppie/croppie.css">
 
 <div class="container">
-    <!--------------------- Head Link --------------------->
+    <!------------------------- Head Link ------------------------->
     <div class="row">
         <div class="col-xl-12 col-12 mb-4">
             <div class="card">
                 <div class="card-header card-bg">
                     <div class="row">
                         <div class="col-12">
-                            <span class="link-active" style="color: #006664;" >การใส่ปุ๋ย</span>
+                            <span class="link-active">ล้างคอขวด</span>
                             <span style="float:right;">
                                 <i class="fas fa-bookmark"></i>
-                                <!-- เข้าหน้า home page -->
-                                <a class="link-path" href="#">หน้าแรก</a> 
+                                <a class="link-path" href="#">หน้าแรก</a>
                                 <span> > </span>
-                                <!-- เข้าหน้า Fertilizer -->
-                                <a class="link-path link-active" style="color: #006664;" href="#">การใส่ปุ๋ย</a>
+                                <a class="link-path link-active" href="#">ล้างคอขวด</a>
                             </span>
                         </div>
                     </div>
@@ -135,15 +149,15 @@
         </div>
     </div>
 
-    <!--------------------- cards --------------------->
+    <!------------------------- cards ------------------------->
     <div class="row">
         <div class="col-xl-3 col-12 mb-4">
             <div class="card border-left-primary card-color-one shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">ปริมาณที่ใส่ปุ๋ยรวม</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php print(getVolumeFertilising()); ?> ก.ก</div>
+                            <div class="font-weight-bold  text-uppercase mb-1">การล้างคอขวดเฉลี่ย</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $avg; ?> ครั้ง</div>
                         </div>
                         <div class="col-auto">
                             <i class="material-icons icon-big">panorama_vertical</i>
@@ -157,8 +171,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">ผลผลิตรวม ปี<?=$backYear?></div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php print(number_format(getHarvestBackYear())); ?> ก.ก</div>
+                            <div class="font-weight-bold  text-uppercase mb-1">จำนวนสวน/แปลง</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalFarm['totalFarm'] . " สวน / " . $totalSubFarm['totalSubFarm'] . " แปลง"; ?></div>
                         </div>
                         <div class="col-auto">
                             <i class="material-icons icon-big">filter_vintage</i>
@@ -173,7 +187,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="font-weight-bold  text-uppercase mb-1">พื้นที่ทั้งหมด</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php print(number_format(getAllArea())); ?> ไร่</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalAreaRai['totalAreaRai']; ?> ไร่</div>
                         </div>
                         <div class="col-auto">
                             <i class="material-icons icon-big">dashboard</i>
@@ -187,8 +201,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">ต้นปาล์มทั้งหมด</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"> <?php print(number_format(getAllTree())); ?> ต้น</div>
+                            <div class="font-weight-bold  text-uppercase mb-1">จำนวนต้นไม้ทั้งหมด</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalPalm['totalPalm']; ?> ต้น</div>
                         </div>
                         <div class="col-auto">
                             <i class="material-icons icon-big">format_size</i>
@@ -199,12 +213,12 @@
         </div>
     </div>
 
-    <!--------------------- Searching --------------------->
+    <!------------------------- Searching ------------------------->
     <div class="row">
         <div class="col-xl-12 col-12">
             <div id="accordion">
                 <div class="card">
-                    <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="cursor:pointer; background-color: #006664; color: white;">
+                    <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="cursor:pointer; background-color: #E91E63; color: white;">
                         <div class="row">
                             <div class="col-3">
                                 <i class="fas fa-search"> ค้นหาขั้นสูง</i>
@@ -215,7 +229,7 @@
             </div>
             <div id="collapseOne" class="card collapse" aria-labelledby="headingOne" data-parent="#accordion">
                 <div class="card-header card-bg">
-                    ตำแหน่งการใส่ปุ๋ยสวนปาล์มน้ำมัน
+                    ตำแหน่งการล้างคอขวดสวนปาล์มน้ำมัน
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -223,7 +237,6 @@
                             <div id="map" style="width:auto; height:75vh;"></div>
                         </div>
                         <div class="col-xl-6 col-12" id="forMap">
-
                             <div class="row">
                                 <div class="col-12">
                                     <span>ปี</span>
@@ -233,8 +246,8 @@
                                 <div class="col-12">
                                     <select id="year" class="form-control">
                                         <?php
-                                        for ($i = 1; $i <= $YearFer[0]['numrow']; $i++) {
-                                            echo "<option value='{$YearFer[$i]['Year2']}'>{$YearFer[$i]['Year2']}</option>";
+                                        for ($i = 1; $i <= $totalYear[0]['numrow']; $i++) {
+                                            echo "<option value='{$totalYear[$i]['Year2']}'>{$totalYear[$i]['Year2']}</option>";
                                         }
                                         ?>
                                     </select>
@@ -243,12 +256,11 @@
                             <div class="row">
                                 <div class="col-xl-12 col-12">
                                     <div class="irs-demo">
-                                        <b>ปริมาณการใส่ปุ๋ย (%)</b>
+                                        <b>จำนวนครั้งล้างคอขวด</b>
                                         <input type="text" id="palmvolsilder" value="" />
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-12">
                                     <span>จังหวัด</span>
@@ -273,7 +285,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-12">
                                     <span>ชื่อเกษตรกร</span>
@@ -291,7 +302,7 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-12">
-                                    <input type="password" class="form-control input-setting" id="idcard">
+                                    <input type="password" class="form-control input-setting" id="passport">
                                     <i class="far fa-eye-slash eye-setting"></i>
                                 </div>
                             </div>
@@ -308,15 +319,15 @@
         </div>
     </div>
 
-    <!--------------------- Resault Searched --------------------->
-    <div class="row mt-4 mb-4">
+    <!------------------------- Resault Searched ------------------------->
+    <div class="row mt-4">
         <div class="col-xl-12 col-12">
             <div class="card">
                 <div class="card-header card-bg">
                     <div>
-                        <span class="getSelectYear">การใส่ปุ๋ยสวนปาล์มน้ำมันในระบบปี <?=$currentYear;?></span>
-                        <!-- <span style="float:right;" class="getSelectYear">ปี </span> -->
-                        <button type="button" id="btn-modal4" style="float:right;" class="btn btn-success" data-toggle="modal" data-target="#modal-4"><i class="fas fa-plus"></i> เพิ่มการใส่ปุ๋ย</button>
+                        <span class="getSelectYear">การล้างคอขวดสวนปาล์มน้ำมันในระบบปี <?php echo $currentYear; ?></span>
+                        <!-- <span style="float:right;" class="getSelectYear">ปี <?php echo $currentYear; ?></span> -->
+                        <button type="button" id="btn-modal4" style="float:right;" class="btn btn-success" data-toggle="modal" data-target="#modal-4"><i class="fas fa-plus"></i> เพิ่มการล้างคอขวด</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -327,64 +338,49 @@
                         </div>
                     </div> -->
                     <div class="table-responsive">
-                        <table id="example" class="table table-bordered table-striped table-hover table-data" width="100%">
-
-                            <thead style="text-align:center;">
+                        <table id="example" class="table table-bordered table-striped table-hover table-data" width="100%" cellspacing="0">
+                            <thead>
                                 <tr>
-                                    <th rowspan="2">ชื่อเกษตรกร</th>
-                                    <th rowspan="2">ชื่อสวน</th>
-                                    <th rowspan="2">จำนวนแปลง</th>
-                                    <th rowspan="2">พื้นที่ปลูก (ไร่)</th>
-                                    <th rowspan="2">จำนวนต้น</th>
-                                    <th rowspan="2">ชนิดปุ๋ย</th>
-                                    <th class="getYear">ผลผลิตปี <?=backYear;?></th> <!-- พ.ศ.ปีที่ผ่านมา  -->
-                                    <th colspan="3">ปริมาณปุ๋ย(ก.ก.)</th>
-                                    <th rowspan="2">รายละเอียด</th>
-                                </tr>
-                                <tr>
-                                    <th>(ก.ก./ไร่)</th>
-                                    <th>ที่ควรใส่</th>
-                                    <th>ที่ใส่</th>
-                                    <th>ที่ควรใส่เพิ่ม</th>
+                                    <th>ชื่อเกษตรกร</th>
+                                    <th>ชื่อสวน</th>
+                                    <th>ชื่อแปลง</th>
+                                    <th>พื้นที่ปลูก<?php echo "<br>" ?>(ไร่)</th>
+                                    <th>จำนวนต้น</th>
+                                    <th>วันล่าสุด</th>
+                                    <!-- <th>วันว่าง</th> -->
+                                    <th>จัดการ</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
                                     <th>ชื่อเกษตรกร</th>
                                     <th>ชื่อสวน</th>
-                                    <th>จำนวนแปลง</th>
+                                    <th>ชื่อแปลง</th>
                                     <th>พื้นที่ปลูก<?php echo "<br>" ?>(ไร่)</th>
                                     <th>จำนวนต้น</th>
-                                    <th>ชนิดปุ๋ย</th>
-                                    <th class="getYear">ผลผลิตปี <?=$backYear;?></th>
-                                    <th>ปริมาณปุ๋ยที่ควรใส่</th>
-                                    <th>ปริมาณปุ๋ยที่ใส่</th>
-                                    <th>ปริมาณที่ควรใส่เพิ่ม</th>
-                                    <th>รายละเอียด</th>
+                                    <th>วันล่าสุด</th>
+                                    <!-- <th>วันว่าง</th> -->
+                                    <th>จัดการ</th>
                                 </tr>
                             </tfoot>
-
                             <!-- Loop fet data -->
                             <tbody id="fetchDatatable1">
-
                             </tbody>
                             <!-- Loop fet data -->
-
                         </table>
-                        <!-- <button onclick="update_factFertilizer()">Try it</button> -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!---------------------  Modal ADD --------------------->
+    
+    <!--------------  Modal ADD ------------->
     <div class="modal fade" id="modal-4" role="dialog">
         <form method="post" enctype="multipart/form-data" id="form">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header header-modal">
-                        <h4 class="modal-title setTextEdit">เพิ่มการใส่ปุ๋ย</h4>
+                        <h4 class="modal-title">เพิ่มการล้างคอขวด</h4>
                     </div>
                     <div class="modal-body">
                         <div class="main">
@@ -404,7 +400,6 @@
                                 </div>
                                 <div class="col-xl-8 col-12">
                                     <select class="js-example-basic-single" id="p_farm" name="p_farm">
-
                                     </select>
                                 </div>
                             </div>
@@ -415,47 +410,18 @@
                                 </div>
                                 <div class="col-xl-8 col-12">
                                     <select class="js-example-basic-single" id="p_subfarm" name="p_subfarm">
-
                                     </select>
                                 </div>
                             </div>
-
                             <div class="row mb-4">
                                 <div class="col-xl-3 col-12 text-right">
-                                    <span>ชนิดปุ๋ย</span>
-                                    <span class="text-danger"> *</span>
-                                </div>
+                                    <span>หมายเหตุ</span>
+                                </div>     
                                 <div class="col-xl-8 col-12">
-                                    <select class="js-example-basic-single" id="p_fertilizer" name="p_fertilizer">
-
-                                    </select>
+                                    <!-- <input name="note" id="note" class="form-control"  cols="" rows=""></input> -->
+                                    <textarea name="p_note" class="form-control" id="p_note" cols="30" rows="5"></textarea>
                                 </div>
                             </div>
-
-                            <div class="row mb-4">
-                                <div class="col-xl-3 col-12 text-right">
-                                    <span>ปริมาณปุ๋ยที่ใส่ (ก.ก.)</span>
-                                    <span class="text-danger"> *</span>
-                                </div>
-                                <div class="col-xl-8 col-12">
-                                    <input placeholder="ปริมาณปุ๋ยที่ใส่" type="text" class="form-control" id="p_vol" name="p_vol" onblur="check_num();" value="">
-
-                                    </input>
-                                </div>
-                            </div>
-
-                            <div class="row mb-4">
-                                <div class="col-xl-3 col-12 text-right">
-                                    <span>จำนวนต้น</span>
-                                    <span class="text-danger"> *</span>
-                                </div>
-                                <div class="col-xl-8 col-12">
-                                    <input placeholder="จำนวนต้น" type="text" class="form-control" id="p_tree" name="p_tree" onblur="check_num();" value="">
-
-                                    </input>
-                                </div>
-                            </div>
-
                             <div class="row mb-4">
                                 <div class="col-xl-3 col-12 text-right">
                                     <span>รูปภาพ</span>
@@ -466,7 +432,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" name="pestAlarmID" id="pestAlarmID" value="0" />
+                            <input type="hidden" name="activityID" id="activityID" value="0" />
                         </div>
                         <div class="crop-img">
                             <center>
@@ -488,9 +454,7 @@
         </form>
     </div>
 
-
-
-    <!---------------------  Modal Button --------------------->
+    <!--------------  Modal Button ------------->
     <div class="modal fade" id="modal-3" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -506,7 +470,6 @@
             </div>
         </div>
     </div>
-
 
 </div>
 
@@ -531,6 +494,7 @@
 <script src="../../croppie/croppie.js"></script>
 
 <script>
+
     $(document).ready(function() {
         $('.js-example-basic-single').select2();
         $('.js-example-basic-single').on('select2:open', function(e) {
@@ -540,39 +504,10 @@
             $(this).next().removeClass("border-from-control");
         });
 
+        //date for modal
         $('#p_date').datepicker({
             showOtherMonths: true,
             format: 'yyyy-mm-dd'
-        });
-        
-        $('#e_p_date').datepicker({
-            showOtherMonths: true,
-            format: 'yyyy-mm-dd'
-        });
-
-        $('#example').DataTable({
-            dom: '<"row"<"col-sm-6"B>>' +
-                '<"row"<"col-sm-6 mar"l><"col-sm-6 mar"f>>' +
-                '<"row"<"col-sm-12"tr>>' +
-                '<"row"<"col-sm-5"i><"col-sm-7"p>>',
-            buttons: [{
-                    extend: 'excel',
-                    text: '<i class="fas fa-file-excel"> <font> Excel</font> </i>',
-                    className: 'btn btn-outline-success btn-sm export-button'
-                },
-                {
-                    extend: 'pdf',
-                    text: '<i class="fas fa-file-pdf"> <font> PDF</font> </i>',
-                    className: 'btn btn-outline-danger btn-sm export-button',
-                    pageSize: 'A4',
-                    customize: function(doc) {
-                        doc.defaultStyle = {
-                            font: 'THSarabun',
-                            fontSize: 16
-                        };
-                    }
-                }
-            ]
         });
 
     });
@@ -635,24 +570,13 @@
     let year = null;
     let score_From = 0;
     let score_To = 0;
+
     let time = new Date();
     let currentYear = time.getFullYear() //ค.ศ. ปัจจุบัน
 
     document.getElementById("province").addEventListener("load", loadProvince());
     document.getElementById("btn-modal4").addEventListener("load", loadFarm());
 
-
-    function check_num()
-	{
-		var elem = document.getElementById('p_vol').value;
-		if(!elem.trim().match(/^([0-9])+$/i))
-		{
-            //elem.setCustomValidity('ความยาว 5 - 25 ตัวอักษรเท่านั้น');
-			alert("กรอกได้เฉพาะตัวเลขและตัวอักษรภาษาอังกฤษเท่านั้น");
-            document.getElementById('p_vol').value = "";
-           
-		}
-    }
     // -------------------------- functions --------------------------
     // โหลดจังหวัด
     function loadProvince() {
@@ -720,59 +644,79 @@
         xhttp.open("GET", "./loadSubFarm.php?farm=" + farm, true);
         xhttp.send();
     }
+     //default ข้อมูลในตาราง
     loadData((currentYear + 543))
+    //ข้อมูลในตาราง จากการค้นหา
     function loadData(year, data_search) {
+        $('#example').DataTable().destroy();
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 data = JSON.parse(this.responseText);
+                console.log(data)
+                // console.log(ID_Province)
+                // console.log(ID_Distrinct)
+                // console.log(name)
+                // console.log(passport)
                 // console.log(this.responseText)
-                // console.log(this.responseText);
                 let text = "";
-                var NumSubFarm = [],
-                    AreaRai = [],
+                var AreaRai = [],
                     NumTree = [],
-                    HarvestVol = [],
-                    Vol1 = [],
-                    Vol2 = [],
-                    Vol3 = []
+                    between = 0
                 var nf = new Intl.NumberFormat();
                 for (j in data) {
-                    NumSubFarm[j] = nf.format(data[j].NumSubFarm);
                     AreaRai[j] = nf.format(data[j].AreaRai);
                     NumTree[j] = nf.format(data[j].NumTree);
-                    HarvestVol[j] = nf.format(data[j].HarvestVol);
-                    Vol1[j] = nf.format(data[j].Vol1);
-                    Vol2[j] = nf.format(data[j].Vol2);
-                    Vol3[j] = nf.format(data[j].Vol3);
                 }
                 for (i in data) {
                     text += ` <tr>
-                            <th class="text-left">${data[i].Alias}</th>
-                            <th class="text-left">${data[i].Name}</th>
-                            <th class="text-right">${NumSubFarm[i]}</th>
-                            <th class="text-right">${AreaRai[i]}</th>
-                            <th class="text-right">${NumTree[i]}</th>
-                            <th class="text-right">${data[i].Name}</th>
-                            <th class="text-right">${HarvestVol[i]}</th>
-                            <th class="text-right">${Vol1[i]}</th>
-                            <th class="text-right">${Vol2[i]}</th>
-                            <th class="text-right">${Vol3[i]}</th>
-                            <th style="text-align:center;">
+                            <td class="text-left">${data[i].Alias}</td>
+                            <td class="text-left">${data[i].nfarm}</td>
+                            <td class="text-left">${data[i].nsf}</td>
+                            <td class="text-right">${data[i].AreaRai}</td>
+                            <td class="text-right">${data[i].NumTree}</td>
+                            <td class="text-right">${data[i].date2}</td>
+                            <td style="text-align:center;">
 
-                                <a href='FertilizerUsageListDetail.php?name=${data[i].Alias}&nfarm=${data[i].Name}&NumTree=${data[i].NumTree}&AreaRai=${data[i].AreaRai}&AreaNgan=${data[i].AreaNgan}&AreaWa=${data[i].AreaWa}&HarvestVol=${data[i].HarvestVol}'><button type="button" id="btn_info" class="btn btn-info btn-sm"><i class="fas fa-bars"></i></button></a>
-                            </th>
+                                <button type="button" id= '${i}' Pid='${data[i].ID}' class="btn btn-warning btn-sm btn-edit" data-toggle="modal" data-target="#modal-4"><i class="fas fa-edit"></i></button>          
+                                <button type="button" id='${i}' Pid='${data[i].ID}' class="btn btn-primary btn-sm btn-note" data-toggle="modal" data-target="#modal-3"><i class="far fa-sticky-note"></i></button>
+                                    
+                                <a href="CutBranchDetail.php?name=${data[i].Alias}&nfarm=${data[i].nfarm}&nsf=${data[i].nsf}&Year2=${data[i].Year2}"><button type="button" id="btn_info" class="btn btn-info btn-sm"><i class="fas fa-bars"></i></button></a>
+                            </td>
                         </tr>`
                 }
-                $("#fetchDatatable1").html(text)
+                $("#fetchDatatable1").html(text);
+                $('#example').DataTable({
+                    dom: '<"row"<"col-sm-6"B>>' +
+                        '<"row"<"col-sm-6 mar"l><"col-sm-6 mar"f>>' +
+                        '<"row"<"col-sm-12"tr>>' +
+                        '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+                    buttons: [{
+                            extend: 'excel',
+                            text: '<i class="fas fa-file-excel"> <font> Excel</font> </i>',
+                            className: 'btn btn-outline-success btn-sm export-button'
+                        },
+                        {
+                            extend: 'pdf',
+                            text: '<i class="fas fa-file-pdf"> <font> PDF</font> </i>',
+                            className: 'btn btn-outline-danger btn-sm export-button',
+                            pageSize: 'A4',
+                            customize: function(doc) {
+                                doc.defaultStyle = {
+                                    font: 'THSarabun',
+                                    fontSize: 16
+                                };
+                            }
+                        }
+                    ]
+                });
             }
         };
-
-        xhttp.open("POST", "./loadFertilizer.php", true);
+        xhttp.open("POST", "./loadcutbranch.php", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send(`year=${year}` + data_search);
+        xhttp.send(`year=${year}` + '&search=search' + data_search);
     }
-    // โหลด Photo Edit [log-pestAlarm] -> PICS
+     // โหลด Photo Edit [log-pestAlarm] -> PICS
     function loadPhoto_LogPestAlarm2(PICS, id) {
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -803,7 +747,6 @@
     }
     // -------------------------- functions --------------------------
 
-
     //Start Event Select_จังหวัด && Select_อำเภอ
     $("#province").on('change', function() {
         $("#amp").empty();
@@ -819,6 +762,7 @@
         let x = document.getElementById("amp").value;
         ID_Distrinct = x;
     });
+
     // Start Event Select_สวน
     $("#p_farm").on('change', function() {
         $("#p_subfarm").empty();
@@ -840,21 +784,16 @@
         loadFarm();
         $('#p_farm').val(-1).trigger('change').html("<option disabled selected>เลือกสวน</option>");
         $('#p_subfarm').html("<option disabled selected>เลือกแปลง</option>");
-        $('#p_fertilizer').html("<option disabled selected>เลือกชนิดปุ๋ย</option>");
-        $('#p_vol').html("<input disabled>ปริมาณปุ๋ย</input>");
-        $('#p_tree').html("<input disabled>จำนวนต้น</input>");
-        //document.getElementById("p_note").value = "";
+        document.getElementById("p_note").value = "";
         $('#p_insert_img').html(`<div class="img-reletive">
                                     <img src="https://ast.kaidee.com/blackpearl/v6.18.0/_next/static/images/gallery-filled-48x48-p30-6477f4477287e770745b82b7f1793745.svg" width="50px" height="50px" alt="">
                                     <input type="file" class="form-control" id="p_photo" name="p_photo[]" accept=".jpg,.png" multiple>
                                 </div>`);
         $('#hidden_id').attr('value', "insert");
     });
-    
-    // Start Submit Create Modal
-    $(document).on('click', '#m_success', function() {
-        check_num()
-        
+
+     // Start Submit Create Modal
+     $(document).on('click', '#m_success', function() {
         let form = new FormData($('#form')[0]);
         let pic_sc = new Array();
         $('.img_scan').each(function(i, obj) {
@@ -879,16 +818,15 @@
 
     // Start Edit Botton
     $(document).on('click', '.btn-edit', function() {
-        // $(".setTextEdit").html("แก้ไขการใส่ปุ๋ย")
         let id = $(this).attr('id');
         let text = "";
 
-        $('#p_date').val(data[id].Date);
+        $('#p_date').val(data[id].date2);
 
         for (i in dataFarm)
             text += ` <option value="${dataFarm[i].FMID}">${dataFarm[i].Name}</option> `;
         $("#p_farm").html(text);
-        $('#p_farm').val(data[id].FID).trigger('change');
+        $('#p_farm').val(data[id].FMID).trigger('change');
 
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -898,26 +836,38 @@
                 for (i in dataSubFarm)
                     text += ` <option value="${dataSubFarm[i].FSID}">${dataSubFarm[i].Name}</option> `
                 $("#p_subfarm").html(text);
-                $('#p_subfarm').val(data[id].SFID).trigger('change');
+                $('#p_subfarm').val(data[id].FSID).trigger('change');
             }
         };
-        xhttp.open("GET", "./loadSubFarm.php?farm=" + data[id].FID, true);
+        xhttp.open("GET", "./loadSubFarm.php?farm=" + data[id].FMID, true);
         xhttp.send();
 
-        $('#p_rank').html(`<option value="1">แมลงศัตรูพืช</option>
-                            <option value="2">โรคพืช</option>
-                            <option value="3">วัชพืช</option>
-                            <option value="4">ศัตรูพืชอื่นๆ</option>`);
-        $('#p_rank').val(data[id].dbpestTID).trigger('change');
+        // $('#p_rank').html(`<option value="1">แมลงศัตรูพืช</option>
+        //                     <option value="2">โรคพืช</option>
+        //                     <option value="3">วัชพืช</option>
+        //                     <option value="4">ศัตรูพืชอื่นๆ</option>`);
+        // $('#p_rank').val(data[id].dbpestTID).trigger('change');
 
-        loadPest(data[id].dbpestTID, id, "#p_pest", "edit");
+        // loadPest(data[id].dbpestTID, id, "#p_pest", "edit");
 
-        document.getElementById("p_note").value = data[id].Note;
+        document.getElementById("p_note").value = data[id].note ;
+        //console.log(data[id].note)
 
         loadPhoto_LogPestAlarm2(data[id].PICS, "#p_insert_img");
 
         $('#hidden_id').attr('value', "edit");
-        $('#pestAlarmID').attr('value', data[id].ID);
+        $('#activityID').attr('value', data[id].ID);
+    });
+
+    // Start Photo PestAlarm Botton
+    $(document).on('click', '.btn-photo', function() {
+        let id = $(this).attr('id');
+        loadPhoto_LogPestAlarm(data[id].PICS);
+    });
+    // Start Note Botton
+    $(document).on('click', '.btn-note', function() {
+        let id = $(this).attr('id');
+        document.getElementById("Note").innerHTML = data[id].Note;
     });
 
     $("#palmvolsilder").ionRangeSlider({
@@ -1027,24 +977,16 @@
         $('#upload-demo').croppie('destroy');
     });
     /*<! ----------------------------------------------------- Function && Event All Photo ----------------------------------------------------------- !>*/
-    
-    $(document).on('click', '.btn-detail', function() {
-        let id = $(this).attr('id');
-        localStorage.setItem("data", JSON.stringify(data[id]));
-        // let x = localStorage.getItem('data');
-        // console.log(x);
-        // console.log(JSON.parse(x).FullName);
-        window.location.href = "http://localhost/KU-PALM-master/view/Water/WaterDetail.php";
-    });
 
+
+    // ปุ่มค้นหา
     $("#btn_search").on('click', function() {
         year = document.getElementById("year").value;
         name = document.getElementById("name").value;
-        passport = document.getElementById("idcard").value;
-        $(".getYear").html("ผลผลิตปี " + (year - 1))
-        $(".getSelectYear").html("การใส่ปุ๋ยสวนปาล์มน้ำมันในระบบปี " + year)
-        console.log(" [ " + year + " " + score_From + " " + score_To +
-            " " + ID_Province + " " + ID_Distrinct + " " + name + " " + passport + " ] ");
+        passport = document.getElementById("passport").value;
+        $(".getSelectYear").html("การล้างคอขวดสวนปาล์มน้ำมันในระบบปี " + year)
+        // console.log(" [ " + year + " " + score_From + " " + score_To + " " + ID_Province + " " +
+        // ID_Distrinct + " " + name + " " + passport + " ] ");
         let data_search = "";
         if (ID_Province != null) {
             data_search += "&ID_Province=" + ID_Province;
@@ -1058,15 +1000,14 @@
         if (passport != "") {
             data_search += "&passport=" + passport;
         }
-
+        // console.log(data_search);
         loadData(year, data_search);
 
-         // +++
-         $("#collapseOne").children().children().addClass("collapsed");
+        // +++
+        $("#collapseOne").children().children().addClass("collapsed");
         document.getElementById("headingOne").setAttribute("aria-expanded", "false");
         $("#collapseOne").removeClass("show");
 
     });
-
 
 </script>
