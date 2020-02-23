@@ -10,44 +10,61 @@ include_once("./../../query/query.php");
 if ( isset($_GET[('fmid')]) ) {
     
         $fmid   = $_SESSION[('fmid')]   = $_GET[('fmid')];
+//postmodal
 $StartT = time();
 $LOGFARMIDPALM = getLogfarmIDpalm($fmid);
-$AREATOTAL = getAreatotal($fmid);
-$SUBFARM = getSubfarm($fmid);
+//ที่อยู่
 $ADDRESS = getAddress($fmid);
-$DATAFARM = getDataFarmByFMID($fmid);
-$LATLONG = getLatlong($fmid);
-$MANYCOOR = getManyCoor($fmid);
+//ข้อมูลสวน
 $IDFARM = getIdFarm($fmid);  
+$DATAFARM = getDataFarmByFMID($fmid);
+//ข้อมูลเกษตรกร
+$FARMER = getFarmerByUFID($fmid);
+//table
+$OILPALMAREALISTDETAIL = getOilPalmAreaListDetail($fmid);
+$logfarmid = $LOGFARMIDPALM[1]['ID'];
+//พื้นที่ทั้งหมด
+$AREATOTAL = getAreatotal($logfarmid);
+//map
+$SUBFARM = getSubfarm($fmid);
+$LATLONG = getLatlong($logfarmid);
+$MANYCOOR = getManyCoor($fmid);
 $COORSFARM = getCoorsFarm($fmid);
-
 $countCoor = getCountCoor($fmid);
 
-print_r($ADDRESS);
+
+// print_r($COORSFARM);
+// echo "<br>";
+// print_r($countCoor);
+// echo "<br>";
+// print_r($MANYCOOR);
+// echo "<br>";
+// print_r($LOGFARMIDPALM);
+// print_r($logfarmid);
 }
 ?>
 <style>
-    .text-left {
-        align: left;
+.text-left {
+    align: left;
 
-    }
+}
 
-    .text-right {
-        align: right;
-    }
+.text-right {
+    align: right;
+}
 
-    .text-center {
-        align: center;
-    }
+.text-center {
+    align: center;
+}
 
-    #map {
-        width: 100%;
-        height: 700px;
-    }
+#map {
+    width: 100%;
+    height: 700px;
+}
 
-    #find {
-        max-width: 500px;
-    }
+#find {
+    max-width: 500px;
+}
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
@@ -58,14 +75,16 @@ print_r($ADDRESS);
                 <div class="card-header card-bg">
                     <div class="row">
                         <div class="col-12">
-                            <span class="link-active font-weight-bold" style="color:<?=$color?>;">รายละเอียดสวนปาล์มน้ำมัน</span>
+                            <span class="link-active font-weight-bold"
+                                style="color:<?=$color?>;">รายละเอียดสวนปาล์มน้ำมัน</span>
                             <span style="float:right;">
                                 <i class="fas fa-bookmark"></i>
                                 <a class="link-path" href="#">หน้าแรก</a>
                                 <span> > </span>
                                 <a class="link-path" href="OilPalmAreaList.php">รายชื่อสวนปาล์มน้ำมัน</a>
                                 <span> > </span>
-                                <a class="link-path link-active" href="#" style="color:<?=$color?>;">รายละเอียดสวนปาล์มน้ำมัน</a>
+                                <a class="link-path link-active" href="#"
+                                    style="color:<?=$color?>;">รายละเอียดสวนปาล์มน้ำมัน</a>
                             </span>
                         </div>
                     </div>
@@ -84,22 +103,18 @@ print_r($ADDRESS);
                         </div>
                         <div class="col-xl-8 col-8">
                             <span><?php echo "".$DATAFARM[1]['Name']."" ?></span>
-                            <button type="button" id="edit_photo" 
-                            class="btn btn-warning btn-sm tt" style="float:right;"
-                            title='เปลี่ยนรูปโปรไฟล์สวน'
-                            uid="<?php echo $fmid; ?>">
-                            <i class="fas fa-image"></i></button>
+                            <button type="button" id="edit_photo" class="btn btn-warning btn-sm tt" style="float:right;"
+                                title='เปลี่ยนรูปโปรไฟล์สวน' uid="<?php echo $fmid; ?>">
+                                <i class="fas fa-image"></i></button>
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <img class="img-radius img-profile" 
-                        <?php 
+                        <img class="img-radius img-profile" <?php 
                             if($IDFARM[1]['FileName']!='')
                                 echo "src=\"../../".$IDFARM[1]['Path']."/".$IDFARM[1]['FileName']."\"  ";
                             else 
                                 echo "src=\"../../icon/farm/farm.png\"  ";
-                        ?>
-                        \>
+                        ?> \>
                     </div>
                 </div>
             </div>
@@ -114,36 +129,22 @@ print_r($ADDRESS);
                         <div class="col-xl-8 col-8">
                             <span>
                                 <a href='../FarmerList/FarmerListDetail.php?farmerID=<?php echo $fmid;?>'>
-                                <?php echo "".$LOGFARMIDPALM[1]['FirstName']."" ?>
-                                <?php echo "".$LOGFARMIDPALM[1]['LastName']."" ?>
+                                    <?php echo "".$LOGFARMIDPALM[1]['FullName']."" ?>
                                 </a>
                             </span>
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <img class="img-radius img-profile" 
-                        <?php 
-                        $sql = "SELECT * , CASE WHEN `Title` IN ('1') THEN 'นาย'
-                        WHEN `Title` IN ('2') THEN 'นาง' 
-                        WHEN `Title` IN ('3') THEN 'นางสาว' END AS Title                   
-                        FROM `db-farmer` JOIN `db-subdistrinct` ON `db-subdistrinct`.`AD3ID` = `db-farmer`.`AD3ID` 
-                        JOIN `db-distrinct` ON `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID`
-                        JOIN `db-province` ON `db-province`.`AD1ID` = `db-distrinct`.`AD1ID` WHERE `UFID` =$fmid";
-                        $myConDB = connectDB();
-                        $result = $myConDB->prepare($sql);
-                        $result->execute();
-                        if ($row = $result->fetch(PDO::FETCH_ASSOC)){
-                            //echo "src=\"../../".$idfarmer[1]['Path']."/".$idfarmer[1]['FileName']."\" ";
+                        <img class="img-radius img-profile" <?php 
                             
-                        if ($row["Icon"] != NULL)
-                            echo $src = "src=\"../../icon/farmer/".$fmid."/".$row["Icon"]."\""; 
-                        else if($row['Title']=='นาย') 
+                        if ($FARMER[1]["Icon"] != NULL)
+                            echo $src = "src=\"../../icon/farmer/".$fmid."/".$FARMER[1]["Icon"]."\""; 
+                        else if($FARMER[1]['Title']=='นาย') 
                             echo $src = "src=\"../../icon/farmer/man.jpg\"" ;
                         else 
                             echo $src = "src=\"../../icon/farmer/woman.jpg\"" ; 
-                        }
-                        ?>
-                        \>
+                        
+                        ?> \>
                     </div>
                     <!--div  class="row mt-3"><div>&nbsp;</div></div-->
                 </div>
@@ -159,7 +160,9 @@ print_r($ADDRESS);
                             <span>ที่อยู่ : </span>
                         </div>
                         <div class="col-xl-10 col-10">
-                            <span><?php echo $ADDRESS[1]['Address']; ?> ต.<?php echo $ADDRESS[1]['subDistrinct']; ?> อ.<?php echo $ADDRESS[1]['Distrinct']; ?> จ.<?php echo $ADDRESS[1]['Province']; ?></span>
+                            <span><?php echo $ADDRESS[1]['Address']; ?> ต.<?php echo $ADDRESS[1]['subDistrinct']; ?>
+                                อ.<?php echo $ADDRESS[1]['Distrinct']; ?>
+                                จ.<?php echo $ADDRESS[1]['Province']; ?></span>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -167,19 +170,16 @@ print_r($ADDRESS);
                             <span>พื้นที่ทั้งหมด : </span>
                         </div>
                         <div class="col-xl-8 col-8">
-                            <span><?php echo $AREATOTAL[1]['AreaRai']; ?> ไร่ <?php echo $AREATOTAL[1]['AreaNgan']; ?> งาน <?php echo $AREATOTAL[1]['AreaWa']; ?> วา</span>
+                            <span><?php echo $AREATOTAL[1]['AreaRai']; ?> ไร่ <?php echo $AREATOTAL[1]['AreaNgan']; ?>
+                                งาน <?php echo $AREATOTAL[1]['AreaWa']; ?> วา</span>
                         </div>
                         <div class="col-xl-2 col-2">
-                            <button type="button" id="btn_edit_map" 
-                                class="btn btn-warning btn-sm btn_edit tt"
-                                data-toggle="tooltip" title="แก้ไขตำแหน่งสวน"
-                                style="float:right;" >
+                            <button type="button" id="btn_edit_map" class="btn btn-warning btn-sm btn_edit tt"
+                                data-toggle="tooltip" title="แก้ไขตำแหน่งสวน" style="float:right;">
                                 <i class="fas fa-map-marker"></i>
                             </button>
-                            <button type="button" id="btn_edit_detail1" 
-                                class="btn btn-warning btn-sm btn_edit tt"
-                                data-toggle="tooltip" title="แก้ไขข้อมูลสวน"
-                                style="float:right; margin-right:10px;" >
+                            <button type="button" id="btn_edit_detail1" class="btn btn-warning btn-sm btn_edit tt"
+                                data-toggle="tooltip" title="แก้ไขข้อมูลสวน" style="float:right; margin-right:10px;">
                                 <i class="fas fa-edit"></i>
                             </button>
                         </div>
@@ -208,21 +208,17 @@ print_r($ADDRESS);
                 <div class="card-header card-bg">
                     <div>
                         <span>รายการแปลงปลูกปาล์มน้ำมัน</span>
-                        <button type="button" id="btn_add_subgarden1" 
-                            class="btn btn-success btn-sm btn_edit tt"
-                            data-toggle="tooltip" title="เพิ่มแปลงปลูก"
-                            style="float:right; margin-right:10px;" >
+                        <button type="button" id="btn_add_subgarden1" class="btn btn-success btn-sm btn_edit tt"
+                            data-toggle="tooltip" title="เพิ่มแปลงปลูก" style="float:right; margin-right:10px;">
                             <i class="fas fa-plus"></i> เพิ่มแปลง</button>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-xl-3 col-12">
-                            <button type="button" id="btn_comfirm" 
-                                class="btn btn-outline-success btn-sm">
+                            <button type="button" id="btn_comfirm" class="btn btn-outline-success btn-sm">
                                 <i class="fas fa-file-excel"></i> Excel</button>
-                            <button type="button" id="btn_comfirm" 
-                                class="btn btn-outline-danger btn-sm">
+                            <button type="button" id="btn_comfirm" class="btn btn-outline-danger btn-sm">
                                 <i class="fas fa-file-pdf"></i> PDF</button>
 
                         </div>
@@ -249,7 +245,40 @@ print_r($ADDRESS);
                                 </tr>
                             </tfoot>
                             <tbody id="getData">
+                                <?php
+                                for($i=1;$i<sizeof($OILPALMAREALISTDETAIL);$i++){
+                            ?>
+                                <tr>
+                                    <td class="text-left"><?php echo $OILPALMAREALISTDETAIL[$i]['Name']; ?></td>
+                                    <td class="text-right">
+                                        <?php echo $OILPALMAREALISTDETAIL[$i]['AreaRai']." ไร่ ".$OILPALMAREALISTDETAIL[$i]['AreaNgan']." งาน"; ?>
+                                    </td>
+                                    <td class="text-right"><?php echo $OILPALMAREALISTDETAIL[$i]['NumTree'];?> ต้น</td>
+                                    <td class="text-right">
+                                        <?php echo $OILPALMAREALISTDETAIL[$i]['year']." ปี ".$OILPALMAREALISTDETAIL[$i]['month']." เดือน ".$OILPALMAREALISTDETAIL[$i]['day']." วัน"; ?>
+                                    </td>
+                                    <td style='text-align:center;'>
 
+                                        <form method="post" id="fsid" name="fsid" action="OilPalmAreaListSubDetail.php">
+                                            <input type="text" hidden class="form-control" name="fsid" id="fsid"
+                                                value="<?php echo $OILPALMAREALISTDETAIL[$i]['FSID']; ?>">
+                                            <button type='submit' id='btn_info' class="btn btn-info btn-sm btn_edit tt"
+                                                data-toggle="tooltip" title="รายละเอียดข้อมูลแปลง">
+                                                <i class='fas fa-bars'></i>
+                                            </button>
+
+                                            <button type='button' id='btn_delete'
+                                                class="btn btn-danger btn-sm btn_edit tt" data-toggle="tooltip"
+                                                title="ลบแปลง" style="margin-right:10px;"
+                                                onclick="delfunction('g','1')">
+                                                <i class='far fa-trash-alt'></i>
+                                            </button>
+                                            </button>
+                                    </td>
+                                </tr>
+                                <?php
+                                }
+                                ?>
 
                             </tbody>
                         </table>
@@ -271,7 +300,8 @@ print_r($ADDRESS);
                                 <span>ชื่อสวนปาล์ม</span>
                             </div>
                             <div class="col-xl-9 col-12">
-                                <input type="text" class="form-control" name="namefarm2" id="rank32" value="<?= $DATAFARM['1']['Name'] ?>">
+                                <input type="text" class="form-control" name="namefarm2" id="rank32"
+                                    value="<?= $DATAFARM['1']['Name'] ?>">
                             </div>
                         </div>
                         <div class="row mb-4">
@@ -279,7 +309,8 @@ print_r($ADDRESS);
                                 <span>ชื่อย่อสวนปาล์ม</span>
                             </div>
                             <div class="col-xl-9 col-12">
-                                <input type="text" class="form-control" name="aliasfarm2" id="rank42" value="<?= $DATAFARM['1']['Alias'] ?>">
+                                <input type="text" class="form-control" name="aliasfarm2" id="rank42"
+                                    value="<?= $DATAFARM['1']['Alias'] ?>">
                             </div>
                         </div>
                         <div class="row mb-4">
@@ -287,7 +318,8 @@ print_r($ADDRESS);
                                 <span>ที่อยู่</span>
                             </div>
                             <div class="col-xl-9 col-12">
-                                <input type="text" class="form-control" name="addfarm2" id="rrrr" value="<?= $DATAFARM['1']['Address'] ?>">
+                                <input type="text" class="form-control" name="addfarm2" id="rrrr"
+                                    value="<?= $DATAFARM['1']['Address'] ?>">
                             </div>
                         </div>
                         <div class="row mb-4">
@@ -476,8 +508,10 @@ print_r($ADDRESS);
                         <div class="form-group divHolder">
                             <div class="form-inline">
                                 <div class="UI" center>
-                                    <input id='pic-logo' type='file' class='item-img file center-block' name='icon_insert' />
-                                    <img id="img-insert" src="https://via.placeholder.com/200x200.png" alt="" width="200" height="200">
+                                    <input id='pic-logo' type='file' class='item-img file center-block'
+                                        name='icon_insert' />
+                                    <img id="img-insert" src="https://via.placeholder.com/200x200.png" alt=""
+                                        width="200" height="200">
                                     <!-- <div id="upload-demo" class="center-block"></div> -->
                                 </div>
                             </div>
@@ -495,8 +529,10 @@ print_r($ADDRESS);
                     <!-- end  body---------------------------------------------- -->
                     <div class="modal-footer footer-insert">
                         <div class="buttonSubmit">
-                            <button type="submit" class="btn btn-success waves-effect insertSubmit" id="add-data">ยืนยัน</button>
-                            <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-success waves-effect insertSubmit"
+                                id="add-data">ยืนยัน</button>
+                            <button type="button" class="btn btn-danger waves-effect"
+                                data-dismiss="modal">ยกเลิก</button>
                         </div>
                         <div class="buttonCrop">
                             <button type="button" id="cropImageBtn" class="btn btn-primary">Crop</button>
@@ -512,7 +548,9 @@ print_r($ADDRESS);
 <?php include_once("../layout/LayoutFooter.php"); ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMLhtSzox02ZCq2p9IIuihhMv5WS2isyo&callback=initMap&language=th" async defer></script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMLhtSzox02ZCq2p9IIuihhMv5WS2isyo&callback=initMap&language=th"
+    async defer></script>
 
 <script src="OilPalmAreaList.js"></script>
 <script src="OilPalmAreaListModal.js"></script>
@@ -523,544 +561,465 @@ print_r($ADDRESS);
 
 
 <script>
-    var mapdetail, mapcolor;
+var mapdetail, mapcolor;
 
 
-    $("#card_height").css('height', $("#for_card").css('height'));
+$("#card_height").css('height', $("#for_card").css('height'));
 
-    $("#btn_edit_detail1").click(function() {
-        $("body").append(editDetailModal);
-        $("#editDetailModal").modal('show');
+$("#btn_edit_detail1").click(function() {
+    $("body").append(editDetailModal);
+    $("#editDetailModal").modal('show');
+});
+$("#edit_photo").click(function() {
+    console.log("photo");
+    $("#photoModal").modal();
+    var uid = $(this).attr('uid');
+    $('#p_uid').val(uid);
+
+});
+
+$("#btn_edit_map").click(function() {
+    $("body").append(editMapModalFun(mapdetail, mapcolor));
+    $("#editMapModal").modal('show');
+
+    var startLatLng = new google.maps.LatLng(13.736717, 100.523186);
+    console.log(mapcolor);
+    console.log(mapdetail.markers[0].getPosition().lng());
+
+    var startLatLng = new google.maps.LatLng( <?= $LATLONG[1]['Latitude'] ?> , <?= $LATLONG[1]['Longitude'] ?> );
+
+    var mapedit = new google.maps.Map(document.getElementById('map_area_edit'), {
+        // center: { lat: 13.7244416, lng: 100.3529157 },
+        center: startLatLng,
+        zoom: 17,
+        mapTypeId: 'satellite'
     });
-    $("#edit_photo").click(function() {
-        console.log("photo");
-        $("#photoModal").modal();
-        var uid = $(this).attr('uid');
-        $('#p_uid').val(uid);
 
-    });
+    mapedit.markers = [];
+    for (let i = 0; i < mapdetail.markers.length; i++) {
+        let marker;
+        if (i == 0) {
 
-    $("#btn_edit_map").click(function() {
-        $("body").append(editMapModalFun(mapdetail, mapcolor));
-        $("#editMapModal").modal('show');
-
-        var startLatLng = new google.maps.LatLng(13.736717, 100.523186);
-        console.log(mapcolor);
-        console.log(mapdetail.markers[0].getPosition().lng());
-
-        var startLatLng = new google.maps.LatLng(<?= $LATLONG[1]['Latitude'] ?>, <?= $LATLONG[1]['Longitude'] ?>);
-
-        var mapedit = new google.maps.Map(document.getElementById('map_area_edit'), {
-            // center: { lat: 13.7244416, lng: 100.3529157 },
-            center: startLatLng,
-            zoom: 17,
-            mapTypeId: 'satellite'
-        });
-
-        mapedit.markers = [];
-        for (let i = 0; i < mapdetail.markers.length; i++) {
-            let marker;
-            if (i == 0) {
-
-            } else {
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(mapdetail.markers[i].getPosition().lat(), mapdetail.markers[i].getPosition().lng()),
-                    map: mapedit,
-                    title: "test",
-                    draggable: true,
-                });
-            }
-            mapedit.markers.push(marker);
-        }
-
-        var latlng = [];
-        var sumcoorlat = 0;
-        var sumcoorlng = 0;
-        var sumlat = 0;
-        var sumlng = 0;
-        var x = 0;
-        google.maps.event.addListener(mapedit, 'click', function(event) {
-            latlng.push(event.latLng.lat(), event.latLng.lng());
-
-            placeMarker(event.latLng);
-            sumlat = sumlat + event.latLng.lat();
-            sumlng = sumlng + event.latLng.lng();
-            x = x + 1;
-            sumcoorlat = sumlat / x;
-            sumcoorlng = sumlng / x;
-            //console.table(sumcoorlat, sumcoorlng);
-        });
-
-        function placeMarker(location) {
-            var marker = new google.maps.Marker({
-                position: location,
+        } else {
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(mapdetail.markers[i].getPosition().lat(), mapdetail.markers[i].getPosition().lng()),
                 map: mapedit,
+                title: "test",
                 draggable: true,
             });
-            mapedit.markers.push(marker);
-
         }
+        mapedit.markers.push(marker);
+    }
 
-        $("#btn_remove_mark").click(function() {
-            for (let i = 0; i < mapedit.markers.length; i++) {
-                if (i != 0) {
-                    mapedit.markers[i].setMap(null);
-                    for (let i = 0; i < latlng.length; i++) {
-                        latlng[i] = 0;
-                    }
-                    sumlat = 0;
-                    sumlng = 0;
-                    x = 0;
-                }
-            }
+    var latlng = [];
+    var sumcoorlat = 0;
+    var sumcoorlng = 0;
+    var sumlat = 0;
+    var sumlng = 0;
+    var x = 0;
+    google.maps.event.addListener(mapedit, 'click', function(event) {
+        latlng.push(event.latLng.lat(), event.latLng.lng());
+
+        placeMarker(event.latLng);
+        sumlat = sumlat + event.latLng.lat();
+        sumlng = sumlng + event.latLng.lng();
+        x = x + 1;
+        sumcoorlat = sumlat / x;
+        sumcoorlng = sumlng / x;
+        //console.table(sumcoorlat, sumcoorlng);
+    });
+
+    function placeMarker(location) {
+        var marker = new google.maps.Marker({
+            position: location,
+            map: mapedit,
+            draggable: true,
         });
+        mapedit.markers.push(marker);
 
+    }
+
+    $("#btn_remove_mark").click(function() {
+        for (let i = 0; i < mapedit.markers.length; i++) {
+            if (i != 0) {
+                mapedit.markers[i].setMap(null);
+                for (let i = 0; i < latlng.length; i++) {
+                    latlng[i] = 0;
+                }
+                sumlat = 0;
+                sumlng = 0;
+                x = 0;
+            }
+        }
     });
 
-    $("#btn_add_subgarden1").click(function() {
-        $("body").append(addSubGardenModal);
-        $("#addSubGardenModal").modal('show');
-    });
+});
 
-    $("#btn_info").click(function() {
-        console.log("testefe");
-    });
-    $(document).on('click', '.insertSubmit', function(e) { // insert submit
-        console.log('sss');
+$("#btn_add_subgarden1").click(function() {
+    $("body").append(addSubGardenModal);
+    $("#addSubGardenModal").modal('show');
+});
 
-        let icon = $("#pic-logo");
+$("#btn_info").click(function() {
+    console.log("testefe");
+});
+$(document).on('click', '.insertSubmit', function(e) { // insert submit
+    console.log('sss');
 
-        if (!checkNull(icon)) return;
+    let icon = $("#pic-logo");
 
-        // let form = new FormData($('#formPhoto')[0]);
-        // form.append('imagebase64', $('#img-insert').attr('src'))
-        // insertPh(form); // insert data
-    })
-    $(document).on('click', '#cropImageBtn', function(ev) {
+    if (!checkNull(icon)) return;
 
-        $('#upload-demo').croppie('result', {
-                type: 'canvas',
-                size: 'viewport'
-            })
-            .then(function(r) {
-                $('.buttonSubmit').show()
-                $('.divName').show()
-                $('.buttonCrop').hide()
-                $('.divHolder').show()
-                $('#img-insert').attr('src', r);
-                $('#imagebase64').val(r);
-                $('.divCrop').hide()
-            });
-        $('#upload-demo').croppie('destroy')
+    // let form = new FormData($('#formPhoto')[0]);
+    // form.append('imagebase64', $('#img-insert').attr('src'))
+    // insertPh(form); // insert data
+})
+$(document).on('click', '#cropImageBtn', function(ev) {
 
-    });
-    $(document).on('click', '#cancelCrop', function() {
-        $('#upload-demo').croppie('destroy')
-        $('.divName').show()
-        $('.divHolder').show()
-        $('.divCrop').hide()
-        $('.buttonCrop').hide()
-        $('.buttonSubmit').show()
-        // $('#img-insert').attr('src', "https://via.placeholder.com/200x200.png");
-    })
+    $('#upload-demo').croppie('result', {
+            type: 'canvas',
+            size: 'viewport'
+        })
+        .then(function(r) {
+            $('.buttonSubmit').show()
+            $('.divName').show()
+            $('.buttonCrop').hide()
+            $('.divHolder').show()
+            $('#img-insert').attr('src', r);
+            $('#imagebase64').val(r);
+            $('.divCrop').hide()
+        });
+    $('#upload-demo').croppie('destroy')
+
+});
+$(document).on('click', '#cancelCrop', function() {
+    $('#upload-demo').croppie('destroy')
+    $('.divName').show()
+    $('.divHolder').show()
+    $('.divCrop').hide()
+    $('.buttonCrop').hide()
+    $('.buttonSubmit').show()
+    // $('#img-insert').attr('src', "https://via.placeholder.com/200x200.png");
+})
 
 
-    //  <!-- ส่วนที่ต้องเอาไปแทนในของอิง -->
-    document.getElementById("province1").addEventListener("load", loadProvince1());
+//  <!-- ส่วนที่ต้องเอาไปแทนในของอิง -->
+document.getElementById("province1").addEventListener("load", loadProvince1());
 
+let data;
+
+// โหลดจังหวัด
+function loadProvince1() {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            data = JSON.parse(this.responseText);
+            let text = "";
+            for (i in data) {
+                text += ` <option value='${data[i].AD1ID}'>${data[i].Province}</option> `
+
+            }
+            $("#province1").append(text);
+
+        }
+    };
+    xhttp.open("GET", "./loadProvince.php", true);
+    xhttp.send();
+}
+// โหลดอำเภอ
+
+$("#province1").on('change', function() {
+    $("#amp1").empty();
+    let x = document.getElementById("province1").value;
+    let y = document.getElementById("province1");
+    if (y.length == 78)
+        y.remove(0);
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+
+        if (this.readyState == 4 && this.status == 200) {
+            data = JSON.parse(this.responseText);
+            let text = "";
+            for (i in data) {
+                text += ` <option value ='${data[i].AD2ID}'>${data[i].Distrinct}</option> `
+            }
+            $("#amp1").append(text);
+        }
+    };
+    xhttp.open("GET", "./loadDistrinct.php?id=" + x, true);
+    xhttp.send();
+});
+// โหลดตำบล
+$("#amp1").on('change', function() {
+    $("#subamp").empty();
+    let x = document.getElementById("amp1").value;
+    let y = document.getElementById("amp1");
+    if (y.length == 78)
+        y.remove(0);
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+
+            data = JSON.parse(this.responseText);
+            let text = "";
+            for (i in data) {
+                text += ` <option value ='${data[i].AD3ID}'>${data[i].subDistrinct}</option> `
+            }
+
+            $("#subamp").append(text);
+        }
+    };
+    xhttp.open("GET", "./loadSubDistrinct.php?id=" + x, true);
+    xhttp.send();
+});
+//  <!-- ส่วนที่ต้องเอาไปแทนในของอิง -->
+//<!-- ส่วนแก้ไขสวน -->
+document.getElementById("province2").addEventListener("load", loadProvince2());
+
+
+
+// โหลดจังหวัด
+function loadProvince2() {
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            data = JSON.parse(this.responseText);
+            let text = "<option value='0'>เลือกจังหวัด</option> ";
+            for (i in data) {
+                if (data[i].AD1ID == '<?= $DATAFARM[1]['AD1ID '] ?>') {
+                    text += ` <option value='${data[i].AD1ID}' selected>${data[i].Province}</option> `;
+                } else {
+                    text += ` <option value='${data[i].AD1ID}'>${data[i].Province}</option> `;
+                }
+            }
+            $("#province2").append(text);
+            loadDistrinct2();
+
+
+        }
+    };
+    xhttp.open("GET", "./loadProvince.php", true);
+    xhttp.send();
+}
+
+function loadDistrinct2() {
+    $("#amp2").empty();
+    let x = document.getElementById("province2").value;
+    let y = document.getElementById("province2");
+    if (y.length == 78)
+        y.remove(0);
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+
+        if (this.readyState == 4 && this.status == 200) {
+            data = JSON.parse(this.responseText);
+            let text = "<option value='0'>เลือกอำเภอ</option>";
+            for (i in data) {
+                if (data[i].AD2ID == '<?= $DATAFARM[1]['AD2ID '] ?>') {
+                    text += ` <option value ='${data[i].AD2ID}' selected>${data[i].Distrinct}</option> `
+                } else {
+                    text += ` <option value ='${data[i].AD2ID}'>${data[i].Distrinct}</option> `
+                }
+            }
+            $("#amp2").append(text);
+            loadSubDistrinct2();
+
+        }
+    };
+    xhttp.open("GET", "./loadDistrinct.php?id=" + x, true);
+    xhttp.send();
+}
+
+function loadSubDistrinct2() {
+    $("#subamp2").empty();
+    let x = document.getElementById("amp2").value;
+    let y = document.getElementById("amp2");
+    if (y.length == 78)
+        y.remove(0);
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+
+            data = JSON.parse(this.responseText);
+            let text = "<option value='0'>เลือกตำบล</option>";
+            for (i in data) {
+                if (data[i].AD3ID == '<?= $DATAFARM[1]['AD3ID '] ?>') {
+                    text += ` <option value ='${data[i].AD3ID}' selected>${data[i].subDistrinct}</option> `
+                } else {
+                    text += ` <option value ='${data[i].AD3ID}'>${data[i].subDistrinct}</option> `
+                }
+            }
+
+            $("#subamp2").append(text);
+        }
+    };
+    xhttp.open("GET", "./loadSubDistrinct.php?id=" + x, true);
+    xhttp.send();
+}
+// โหลดอำเภอ
+
+$("#province2").on('change', function() {
+    $("#amp2").empty();
+    let x = document.getElementById("province2").value;
+    let y = document.getElementById("province2");
+    if (y.length == 78)
+        y.remove(0);
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+
+        if (this.readyState == 4 && this.status == 200) {
+            data = JSON.parse(this.responseText);
+            let text = "<option value='0'>เลือกอำเภอ</option>";
+            for (i in data) {
+                text += ` <option value ='${data[i].AD2ID}'>${data[i].Distrinct}</option> `
+            }
+            $("#amp2").append(text);
+        }
+    };
+    xhttp.open("GET", "./loadDistrinct.php?id=" + x, true);
+    xhttp.send();
+});
+// โหลดตำบล
+$("#amp2").on('change', function() {
+    $("#subamp2").empty();
+    let x = document.getElementById("amp2").value;
+    let y = document.getElementById("amp2");
+    if (y.length == 78)
+        y.remove(0);
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+
+            data = JSON.parse(this.responseText);
+            let text = "<option value='0'>เลือกตำบล</option>";
+            for (i in data) {
+                text += ` <option value ='${data[i].AD3ID}'>${data[i].subDistrinct}</option> `
+            }
+
+            $("#subamp2").append(text);
+        }
+    };
+    xhttp.open("GET", "./loadSubDistrinct.php?id=" + x, true);
+    xhttp.send();
+});
+//  <!--แก้ไขฟาร์ม -->
+
+$(document).ready(function() {
     let data;
+    loadFarmer();
 
-    // โหลดจังหวัด
-    function loadProvince1() {
+    function loadFarmer() {
+        $("#farmer2").empty;
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 data = JSON.parse(this.responseText);
                 let text = "";
                 for (i in data) {
-                    text += ` <option value='${data[i].AD1ID}'>${data[i].Province}</option> `
-
-                }
-                $("#province1").append(text);
-
-            }
-        };
-        xhttp.open("GET", "./loadProvince.php", true);
-        xhttp.send();
-    }
-    // โหลดอำเภอ
-
-    $("#province1").on('change', function() {
-        $("#amp1").empty();
-        let x = document.getElementById("province1").value;
-        let y = document.getElementById("province1");
-        if (y.length == 78)
-            y.remove(0);
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-
-            if (this.readyState == 4 && this.status == 200) {
-                data = JSON.parse(this.responseText);
-                let text = "";
-                for (i in data) {
-                    text += ` <option value ='${data[i].AD2ID}'>${data[i].Distrinct}</option> `
-                }
-                $("#amp1").append(text);
-            }
-        };
-        xhttp.open("GET", "./loadDistrinct.php?id=" + x, true);
-        xhttp.send();
-    });
-    // โหลดตำบล
-    $("#amp1").on('change', function() {
-        $("#subamp").empty();
-        let x = document.getElementById("amp1").value;
-        let y = document.getElementById("amp1");
-        if (y.length == 78)
-            y.remove(0);
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-
-                data = JSON.parse(this.responseText);
-                let text = "";
-                for (i in data) {
-                    text += ` <option value ='${data[i].AD3ID}'>${data[i].subDistrinct}</option> `
-                }
-
-                $("#subamp").append(text);
-            }
-        };
-        xhttp.open("GET", "./loadSubDistrinct.php?id=" + x, true);
-        xhttp.send();
-    });
-    //  <!-- ส่วนที่ต้องเอาไปแทนในของอิง -->
-    //<!-- ส่วนแก้ไขสวน -->
-    document.getElementById("province2").addEventListener("load", loadProvince2());
-
-
-
-    // โหลดจังหวัด
-    function loadProvince2() {
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                data = JSON.parse(this.responseText);
-                let text = "<option value='0'>เลือกจังหวัด</option> ";
-                for (i in data) {
-                    if (data[i].AD1ID == '<?= $DATAFARM[1]['AD1ID'] ?>') {
-                        text += ` <option value='${data[i].AD1ID}' selected>${data[i].Province}</option> `;
+                    if (data[i].UFID == '<?= $DATAFARM[1]['UFID '] ?>') {
+                        text += ` <option value="${data[i].UFID}" selected>${data[i].FirstName}</option> `;
                     } else {
-                        text += ` <option value='${data[i].AD1ID}'>${data[i].Province}</option> `;
+                        text += ` <option value="${data[i].UFID}" >${data[i].FirstName}</option> `;
                     }
                 }
-                $("#province2").append(text);
-                loadDistrinct2();
 
-
+                $("#farmer2").append(text);
             }
         };
-        xhttp.open("GET", "./loadProvince.php", true);
+        xhttp.open("GET", "./loadFarmer.php", true);
         xhttp.send();
     }
 
-    function loadDistrinct2() {
-        $("#amp2").empty();
-        let x = document.getElementById("province2").value;
-        let y = document.getElementById("province2");
-        if (y.length == 78)
-            y.remove(0);
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
+});
 
-            if (this.readyState == 4 && this.status == 200) {
-                data = JSON.parse(this.responseText);
-                let text = "<option value='0'>เลือกอำเภอ</option>";
-                for (i in data) {
-                    if (data[i].AD2ID == '<?= $DATAFARM[1]['AD2ID'] ?>') {
-                        text += ` <option value ='${data[i].AD2ID}' selected>${data[i].Distrinct}</option> `
-                    } else {
-                        text += ` <option value ='${data[i].AD2ID}'>${data[i].Distrinct}</option> `
-                    }
-                }
-                $("#amp2").append(text);
-                loadSubDistrinct2();
+function setAddr() {
 
-            }
-        };
-        xhttp.open("GET", "./loadDistrinct.php?id=" + x, true);
-        xhttp.send();
-    }
-
-    function loadSubDistrinct2() {
-        $("#subamp2").empty();
-        let x = document.getElementById("amp2").value;
-        let y = document.getElementById("amp2");
-        if (y.length == 78)
-            y.remove(0);
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-
-                data = JSON.parse(this.responseText);
-                let text = "<option value='0'>เลือกตำบล</option>";
-                for (i in data) {
-                    if (data[i].AD3ID == '<?= $DATAFARM[1]['AD3ID'] ?>') {
-                        text += ` <option value ='${data[i].AD3ID}' selected>${data[i].subDistrinct}</option> `
-                    } else {
-                        text += ` <option value ='${data[i].AD3ID}'>${data[i].subDistrinct}</option> `
-                    }
-                }
-
-                $("#subamp2").append(text);
-            }
-        };
-        xhttp.open("GET", "./loadSubDistrinct.php?id=" + x, true);
-        xhttp.send();
-    }
-    // โหลดอำเภอ
-
-    $("#province2").on('change', function() {
-        $("#amp2").empty();
-        let x = document.getElementById("province2").value;
-        let y = document.getElementById("province2");
-        if (y.length == 78)
-            y.remove(0);
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-
-            if (this.readyState == 4 && this.status == 200) {
-                data = JSON.parse(this.responseText);
-                let text = "<option value='0'>เลือกอำเภอ</option>";
-                for (i in data) {
-                    text += ` <option value ='${data[i].AD2ID}'>${data[i].Distrinct}</option> `
-                }
-                $("#amp2").append(text);
-            }
-        };
-        xhttp.open("GET", "./loadDistrinct.php?id=" + x, true);
-        xhttp.send();
-    });
-    // โหลดตำบล
-    $("#amp2").on('change', function() {
-        $("#subamp2").empty();
-        let x = document.getElementById("amp2").value;
-        let y = document.getElementById("amp2");
-        if (y.length == 78)
-            y.remove(0);
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-
-                data = JSON.parse(this.responseText);
-                let text = "<option value='0'>เลือกตำบล</option>";
-                for (i in data) {
-                    text += ` <option value ='${data[i].AD3ID}'>${data[i].subDistrinct}</option> `
-                }
-
-                $("#subamp2").append(text);
-            }
-        };
-        xhttp.open("GET", "./loadSubDistrinct.php?id=" + x, true);
-        xhttp.send();
-    });
-    //  <!--แก้ไขฟาร์ม -->
-
-    $(document).ready(function() {
-        let data;
-        loadData();
-        loadFarmer();
-
-        function loadData() {
-
-            $("#example1").DataTable().destroy();
-            let logid = "<?php echo "".$LOGFARMIDPALM[1]['ID'].""; ?>"
-            let xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    data = JSON.parse(this.responseText);
-                    //console.table(data)
-                    let i;
-                    let text = "";
-                    for (i = 1; i <= data[0].numrow; i++) {
-                        
-                        let tmpURL = "OilPalmAreaListSubDetail.php";
-                        tmpURL += "?fmid=<?= $fmid ?>";
-                        tmpURL += "&SFID="+data[i].dbID;
-                        // tmpURL += "&DIMfarmID="+data[i].DIMfarmID;
-                        // tmpURL += "&DIMSubfID="+data[i].DIMSubfID;
-                        // tmpURL += "&nfarm="+data[i].nFarm;
-                        // tmpURL += "&nsubfarm="+data[i].Name;
-                        // tmpURL += "&ffullname="+data[i].FullName;
-                        // tmpURL += "&farmer="+data[i].Alias;
-                        // tmpURL += "&logid="+data[i].ID;
-                        // tmpURL += "&numtree="+data[i].NumTree;
-
-                        text += `<tr>
-                            <td class="text-left">${data[i].Name}</td>
-                            <td class="text-right">${data[i].AreaRai} ไร่ ${data[i].AreaNgan} งาน</td>
-                            <td class="text-right">${data[i].NumTree} ต้น</td>
-                            <td class="text-right">${data[i].year} ปี ${data[i].month} เดือน ${data[i].day} วัน</td>
-                            <td style='text-align:center;'>
-                                
-
-                                <form method="post" id="fsid" name = "fsid" action="OilPalmAreaListSubDetail.php">
-                                        <input type="text" hidden class="form-control" name="fsid" id="fsid" value="${data[i].dbID}">
-                                        ${data[i].dbID}
-                                        <button type='submit' id='btn_info' 
-                                            class="btn btn-info btn-sm btn_edit tt"
-                                            data-toggle="tooltip" title="รายละเอียดข้อมูลแปลง" >
-                                            <i class='fas fa-bars'></i>
-                                        </button>
-
-                            <button type='button' id='btn_delete' 
-                                class="btn btn-danger btn-sm btn_edit tt"
-                                data-toggle="tooltip" title="ลบแปลง"
-                                style="margin-right:10px;"  
-                                onclick="delfunction('${data[i].namesub}' , '${data[i].dbID}')">
-                                <i class='far fa-trash-alt'></i>
-                            </button>   
-                            </button>
-                            </td>
-                        </tr> `;
-
-                    }
-
-                    $("#getData").html(text);
-                    $('#example1').DataTable();
-                }
-            };
-            xhttp.open("GET", "./getData2.php?id=" + logid, true);
-            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhttp.send();
-        }
-
-        function loadFarmer() {
-            $("#farmer2").empty;
-            let xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    data = JSON.parse(this.responseText);
-                    let text = "";
-                    for (i in data) {
-                        if (data[i].UFID == '<?= $DATAFARM[1]['UFID'] ?>') {
-                            text += ` <option value="${data[i].UFID}" selected>${data[i].FirstName}</option> `;
-                        } else {
-                            text += ` <option value="${data[i].UFID}" >${data[i].FirstName}</option> `;
-                        }
-                    }
-
-                    $("#farmer2").append(text);
-                }
-            };
-            xhttp.open("GET", "./loadFarmer.php", true);
-            xhttp.send();
-        }
-
-    });
-
-    function setAddr() {
-
-    }
+}
 </script>
 <script>
-    function initMap() {
-        var startLatLng = new google.maps.LatLng(<?= $LATLONG[1]['Latitude'] ?>, <?= $LATLONG[1]['Longitude'] ?>);
+function initMap() {
+    var startLatLng = new google.maps.LatLng( < ? = $LATLONG[1]['Latitude'] ? > , < ? = $LATLONG[1]['Longitude'] ? > );
 
-        mapdetail = new google.maps.Map(document.getElementById('map'), {
-            // center: { lat: 13.7244416, lng: 100.3529157 },
-            center: startLatLng,
-            zoom: 13,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        });
+    mapdetail = new google.maps.Map(document.getElementById('map'), {
+        // center: { lat: 13.7244416, lng: 100.3529157 },
+        center: startLatLng,
+        zoom: 13,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
 
-        mapdetail.markers = [];
-        <?php
-        for ($i = 1; $i < count($MANYCOOR); $i++) {
-            echo "marker = new google.maps.Marker({
-                position: new google.maps.LatLng(" . $MANYCOOR[$i]['Latitude'] . "," . $MANYCOOR[$i]['Longitude'] . "),
-                map: mapdetail,
-                title: \"test\"
-                });
-                
-                //alert(marker.position);
+    mapdetail.markers = [];
+    <?php
+    for ($i = 1; $i < count($MANYCOOR); $i++) {
+        echo "marker = new google.maps.Marker({
+        position: new google.maps.LatLng(" . $MANYCOOR[$i]['Latitude'] . ", " . $MANYCOOR[$i]['Longitude'] . "),
+            map: mapdetail,
+            title: \"test\"
+    });
 
-                mapdetail.markers.push(marker);";
-        }
+//alert(marker.position);
 
-        ?>
+mapdetail.markers.push(marker);
+";
+}
 
+?>
 
+// new map ///////////////////////////////////////////////////////////////////
 
-        // new map ///////////////////////////////////////////////////////////////////
-        
-        <?php
-        $lat =0;
-        $long = 0;
-        for ($i = 1; $i < count($COORSFARM); $i++) {
-            $lat = $lat+$COORSFARM[$i]['Latitude'];
-            $long = $long+$COORSFARM[$i]['Longitude'];
-        } ?>
-        var startLatLng = new google.maps.LatLng(<?= $lat/(count($COORSFARM)-1) ?>, <?= $long/(count($COORSFARM)-1) ?>);
+<?php
+$lat = 0;
+$long = 0;
+for ($i = 1; $i < count($COORSFARM); $i++) {
+    $lat = $lat + $COORSFARM[$i]['Latitude'];
+    $long = $long + $COORSFARM[$i]['Longitude'];
+} 
+?>
+var startLatLng = new google.maps.LatLng( <?= $lat / (count($COORSFARM) - 1) ?> , <?= $long / (count($COORSFARM)-1) ?> );
 
-        mapcolor = new google.maps.Map(document.getElementById('map2'), {
-            // center: { lat: 13.7244416, lng: 100.3529157 },
-            center: startLatLng,
-            zoom: 16,
-            mapTypeId: 'satellite'
-        });
+mapcolor = new google.maps.Map(document.getElementById('map2'), {
+    // center: { lat: 13.7244416, lng: 100.3529157 },
+    center: startLatLng,
+    zoom: 16,
+    mapTypeId: 'satellite'
+});
 
-        mapcolor.markers = [];
+mapcolor.markers = [];
 
-
-
-
-
-
-        var triangleCoords = [
-
-            <?php
-            for ($i = 1; $i <= $countCoor; $i++)
-                echo "
-            {
-                lat:  " . $COORSFARM[$i]['Latitude'] . "   ,
-                lng: " . $COORSFARM[$i]['Longitude'] . "
-            },";
-            ?>
-
-
-        ];
-        <?php
-        $k = 5;
-        for ($i = 1; $i <= count($SUBFARM) - 2; $i++) {
-            echo "
-            var triangleCoords$i = [";
-
-            for ($j = 1; $j <= $countCoor; $j++) {
-
-                echo "
-                    {
-                        lat: " . $COORSFARM[$k]['Latitude'] . " ,
-                        lng: " . $COORSFARM[$k]['Longitude'] . "
-                    },";
-                $k++;
-            }
-
-
-
-            echo "];
-            ";
-        }
-        ?>
-
-
-
-        console.log(triangleCoords);
+var triangleCoords = [
 
         <?php
-        for ($i = 0; $i <= count($SUBFARM); $i++) {
-            if ($i == 0) {
-                echo "
+        for ($i = 1; $i <= $countCoor; $i++)
+            echo " {
+        lat : " . $COORSFARM[$i]['Latitude'] . ",
+        lng: " . $COORSFARM[$i]['Longitude'] . "
+    },
+    "; ?>
+]; 
+<?php
+$k = 5;
+for ($i = 1; $i <= count($SUBFARM) - 2; $i++) {
+    echo "
+    var triangleCoords$i = [";
+
+        for ($j = 1; $j <= $countCoor; $j++) {
+
+            echo " {
+            lat: " . $COORSFARM[$k]['Latitude'] . ",
+                lng: " . $COORSFARM[$k]['Longitude'] . "
+        }, ";
+        $k++;
+    }
+    echo "];
+    ";
+} 
+?>
+
+console.log(triangleCoords);
+
+<?php
+for ($i = 0; $i <= count($SUBFARM); $i++) {
+    if ($i == 0) {
+        echo "
         var mapPoly = new google.maps.Polygon({
             paths: triangleCoords,
             strokeColor: '#FF0000',
@@ -1069,9 +1028,10 @@ print_r($ADDRESS);
             fillColor: '#FF0000',
             fillOpacity: 0.35
         });
-        mapPoly.setMap(mapcolor);";
-            } else {
-                echo "
+        mapPoly.setMap(mapcolor);
+        ";
+    } else {
+        echo "
         var mapPoly$i = new google.maps.Polygon({
             paths: triangleCoords$i,
             strokeColor: '#FF0000',
@@ -1080,73 +1040,72 @@ print_r($ADDRESS);
             fillColor: '#FF0000',
             fillOpacity: 0.35
         });
-        mapPoly$i.setMap(mapcolor);";
+        mapPoly$i.setMap(mapcolor);
+        ";
+    }
+}
+
+?>
+
+}
+
+function delfunction(_username, _uid) {
+    console.log("del");
+    swal({
+            title: "คุณต้องการลบ",
+            text: `${_username} หรือไม่ ?`,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            cancelButtonClass: "btn-secondary",
+            confirmButtonText: "ยืนยัน",
+            cancelButtonText: "ยกเลิก",
+            closeOnConfirm: false,
+            closeOnCancel: function() {
+                $('[data-toggle=tooltip]').tooltip({
+                    boundary: 'window',
+                    trigger: 'hover'
+                });
+                return true;
             }
+        },
+        function(isConfirm) {
+            if (isConfirm) {
+                console.log(_uid);
+                swal({
+
+                    title: "ลบข้อมูลสำเร็จ",
+                    type: "success",
+                    confirmButtonClass: "btn-danger",
+                    confirmButtonText: "ตกลง",
+                    closeOnConfirm: false,
+
+                }, function(isConfirm) {
+                    if (isConfirm) {
+                        deleteSub(_uid)
+                    }
+
+                });
+
+            } else {
+
+            }
+        });
+
+}
+
+function deleteSub(_fid) {
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            window.location.href = './OilPalmAreaListDetail.php';
+
         }
+    };
+    xhttp.open("POST", "manage.php", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send(`fsid=${_fid}&deleteSub=delete`);
 
-        ?>
-
-
-
-    }
-
-    function delfunction(_username, _uid) {
-
-        swal({
-                title: "คุณต้องการลบ",
-                text: `${_username} หรือไม่ ?`,
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonClass: "btn-danger",
-                cancelButtonClass: "btn-secondary",
-                confirmButtonText: "ยืนยัน",
-                cancelButtonText: "ยกเลิก",
-                closeOnConfirm: false,
-                closeOnCancel: function() {
-                    $('[data-toggle=tooltip]').tooltip({
-                        boundary: 'window',
-                        trigger: 'hover'
-                    });
-                    return true;
-                }
-            },
-            function(isConfirm) {
-                if (isConfirm) {
-                    console.log(_uid);
-                    swal({
-
-                        title: "ลบข้อมูลสำเร็จ",
-                        type: "success",
-                        confirmButtonClass: "btn-danger",
-                        confirmButtonText: "ตกลง",
-                        closeOnConfirm: false,
-
-                    }, function(isConfirm) {
-                        if (isConfirm) {
-                            deleteSub(_uid)
-                        }
-
-                    });
-
-                } else {
-
-                }
-            });
-
-    }
-
-    function deleteSub(_fid) {
-        var xhttp = new XMLHttpRequest();
-
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                window.location.href = './OilPalmAreaListDetail.php';
-
-            }
-        };
-        xhttp.open("POST", "manage.php", true);
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send(`fsid=${_fid}&deleteSub=delete`);
-
-    }
+}
 </script>

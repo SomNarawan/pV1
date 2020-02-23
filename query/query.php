@@ -282,6 +282,14 @@ function getOwnerFarm($ufid)
     $ownerFarm = selectData($sql);
     return $ownerFarm;
 }
+//----------------------------Fertilizer--------------------------------------
+
+function getCountFertilizer(){
+    $sql = "SELECT COUNT(*) AS countFer FROM `db-fertilizer` 
+    join `dim-fertilizer` on (`dbID` = `db-fertilizer`.`FID`) 
+    WHERE `db-fertilizer`.`Name` = `dim-fertilizer`.`Name` AND `db-fertilizer`.`Alias` = `dim-fertilizer`.`Alias`";
+    return selectData($sql)[1]['countFer'];
+}
 
 //-----------------------------OilPalmAreaList-------------------------------
 // จำนวนสวน
@@ -331,7 +339,7 @@ function getOilPalmAreaList()
 // ตารางรายการแปลงปลูกปาล์มน้ำมัน ต้องมีการส่งค่า DIMfarmID มาด้วย
 function getOilPalmAreaListDetail($DIMfarmID)
 {
-    $sql = "SELECT `db-subfarm`.`Name`,`db-subfarm`.`AreaRai`,`log-farm`.`NumTree` , FLOOR(TIMESTAMPDIFF(DAY,`dim-time`.`Date`,CURRENT_TIME)% 30.4375 )as day, FLOOR(TIMESTAMPDIFF( MONTH,`dim-time`.`Date`,CURRENT_TIME)% 12 )as month, FLOOR(TIMESTAMPDIFF( YEAR,`dim-time`.`Date`,CURRENT_TIME))as year 
+    $sql = "SELECT `db-subfarm`.`FSID`,`db-subfarm`.`Name`,`db-subfarm`.`AreaRai`,`db-subfarm`.`AreaNgan`,`log-farm`.`NumTree` , FLOOR(TIMESTAMPDIFF(DAY,`dim-time`.`Date`,CURRENT_TIME)% 30.4375 )as day, FLOOR(TIMESTAMPDIFF( MONTH,`dim-time`.`Date`,CURRENT_TIME)% 12 )as month, FLOOR(TIMESTAMPDIFF( YEAR,`dim-time`.`Date`,CURRENT_TIME))as year 
     from `log-farm` INNER JOIN `dim-farm` ON `dim-farm`.`ID` = `log-farm`.`DIMSubfID` INNER JOIN `log-planting` ON `dim-farm`.`ID` =`log-planting`.`DIMsubFID` INNER JOIN `dim-time` on `log-planting`.`DIMdateID` = `dim-time`.`ID` INNER JOIN `db-subfarm` ON `db-subfarm`.`FSID` = `dim-farm`.`dbID` 
     WHERE ISNULL(`log-farm`.`EndID`) AND `log-farm`.`DIMfarmID` = '$DIMfarmID'";
     $OilPalmAreaListDetail = selectData($sql);
@@ -343,10 +351,11 @@ function getOilPalmAreaListDetail($DIMfarmID)
 // sql ค่าของ areatotal มีการรับค่า ID ของ logfarmID
 function getLogfarmIDpalm($fmid)
 {
-    $sqllogfarmID = "SELECT  `log-farm`.`ID`,`dim-farm`.`Name`,`db-farmer`.`FirstName`,`db-farmer`.`LastName`,`db-farm`.`Alias` FROM `log-farm`
-    INNER JOIN `dim-farm` ON `dim-farm`.`ID` = `log-farm`.`DIMfarmID`
-    INNER JOIN `db-farm` ON `dim-farm`.`dbID` = `db-farm`.`FMID`
-    INNER JOIN `db-farmer` ON `db-farmer`.`UFID` = `db-farm`.`UFID`
+    $sqllogfarmID = "SELECT `log-farm`.`ID`,`dim-user`.`FullName`,`dim-farm`.`Name`,`db-farm`.`Alias` FROM `log-farm` 
+    INNER JOIN `dim-farm` ON `dim-farm`.`ID` = `log-farm`.`DIMfarmID` 
+    INNER JOIN `db-farm` ON `dim-farm`.`dbID` = `db-farm`.`FMID` 
+    INNER JOIN `db-farmer` ON `db-farmer`.`UFID` = `db-farm`.`UFID` 
+    INNER JOIN `dim-user` ON `dim-user`.`ID` = `log-farm`.`DIMownerID`
     WHERE `db-farm`.`FMID` = '" . $fmid . "' AND `dim-farm`.`IsFarm` = 1 AND`log-farm`.`EndT` is null AND `log-farm`.`DIMSubfID` is null";
     $logfarmID = selectData($sqllogfarmID);
     return  $logfarmID;
@@ -376,14 +385,25 @@ function getSubfarm($fmid)
     return $Subfarm;
 }
 
-// sql ค่าของ address มีการรับค่า ID ของ logfarmID
-function getAddress($logfarmID)
+// sql ค่าของ address มีการรับค่าชื่อสวน เราไม่รู้ว่า ทำไมอิงใช่ซื่อนะ ถ้าเปลี่ยนเป็น ID อันล่างที่เขียนไว้
+// function getAddress($Name)
+// {
+//     $sql = "SELECT Address , subDistrinct , Distrinct , Province FROM `db-farm`
+//     inner join db-subdistrinct on `db-subdistrinct`.`AD3ID` = `db-farm`.`AD3ID`
+//     inner join db-distrinct on `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID`
+//     inner join db-province on `db-province`.`AD1ID` = `db-distrinct`.`AD1ID`
+//     where Name = '$Name'";
+//     $address = selectData($sql);
+//     return $address;
+// }
+// อันนี้จะเป็นรับค่า ID FMID เขียนมาให้ 2 แบบลองเลือกเอาว่าอันไหนเหมาะสมกว่า
+function getAddress($FMID)
 {
-    $sql = "SELECT Address , subDistrinct , Distrinct , Province FROM `db-farm`
-    inner join `db-subdistrinct` on `db-subdistrinct`.`AD3ID` = `db-farm`.`AD3ID`
-    inner join `db-distrinct` on `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID`
+    $sql = "SELECT Address , subDistrinct , Distrinct , Province FROM `db-farm` 
+    inner join `db-subdistrinct` on `db-subdistrinct`.`AD3ID` = `db-farm`.`AD3ID` 
+    inner join `db-distrinct` on `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID` 
     inner join `db-province` on `db-province`.`AD1ID` = `db-distrinct`.`AD1ID`
-    where Name = '$logfarmID'";
+     where `FMID`='$FMID'";
     $address = selectData($sql);
     return $address;
 }
@@ -409,13 +429,14 @@ function getLatLong($logfarmID)
 
 
 // sql ค่าของ Manycoor มีการรับค่า ID ของ logfarmID
-function getManycoor($logfarmID)
+function getManycoor($fmid)
 {
     $sql = "SELECT `log-farm`.`Latitude` , `log-farm`.`Longitude` FROM `log-farm`
     INNER JOIN `dim-farm` on `dim-farm`.`ID` = `log-farm`.`DIMfarmID`
-    WHERE `log-farm`.`DIMSubfID` IS NOT null AND `dim-farm`.`Name` = '$logfarmID' AND `log-farm`.`EndT` IS NULL";
+    WHERE `log-farm`.`DIMSubfID` IS NOT null AND `dim-farm`.`dbID` = '$fmid' AND `log-farm`.`EndT` IS NULL";
     $Manycoor = selectData($sql);
     return $Manycoor;
+    
 }
 
 // sql ค่าของ Idfarmer มีการรับค่า ID ของ logfarmID
@@ -490,8 +511,12 @@ function getDataFarmByFSID($suid)
 // sql ค่าของ AddressSubDetail มีการรับค่า ID ของ FSID
 function getAddressSubDetail($suid)
 {
-    $sql = "SELECT 	`db-subfarm`.* ,`db-subdistrinct`.`AD2ID`,`db-distrinct`.`AD1ID` FROM `db-subfarm` INNER JOIN `db-subdistrinct`ON `db-subfarm`.`AD3ID`=`db-subdistrinct`.`AD3ID`
-    INNER JOIN `db-distrinct`ON`db-distrinct`.`AD2ID`=`db-subdistrinct`.`AD2ID` WHERE `FSID`='$suid'";
+    $sql = "SELECT Address , subDistrinct , Distrinct , Province FROM `db-farm`
+    inner join `db-subdistrinct` on `db-subdistrinct`.`AD3ID` = `db-farm`.`AD3ID`
+    inner join `db-distrinct` on `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID`
+    inner join `db-province` on `db-province`.`AD1ID` = `db-distrinct`.`AD1ID`
+    INNER JOIN `db-subfarm` on `db-subfarm`.`FMID` = `db-farm`.`FMID`
+    where `db-subfarm`.`FSID` = '$suid'";
     $AddressSubDetail = selectData($sql);
     return $AddressSubDetail;
 }
@@ -526,15 +551,16 @@ function getTree($logfarmID)
 }
 
 // sql ค่าของ Tree มีการรับค่า ID ของ logfarmID
-function getDmy($logfarmID)
+function getDmy($suid)
 {
     $sql = "SELECT `dim-farm`.`Name` , `log-planting`.`DIMdateID` ,FLOOR(TIMESTAMPDIFF(DAY,`dim-time`.`Date`,CURRENT_TIME)% 30.4375 )as day,FLOOR(TIMESTAMPDIFF( MONTH,`dim-time`.`Date`,CURRENT_TIME)% 12 )as month,FLOOR(TIMESTAMPDIFF( YEAR,`dim-time`.`Date`,CURRENT_TIME))as year from
     `dim-farm` INNER JOIN `log-planting` ON `dim-farm`.`ID` =`log-planting`.`DIMsubFID`
     INNER JOIN `dim-time` on `log-planting`.`DIMdateID` = `dim-time`.`ID`
-    where `dim-farm`.`Name` = '$logfarmID'
+    INNER JOIN `db-subfarm`ON `db-subfarm`.`FSID`=`dim-farm`.`dbID`
+    WHERE`dim-farm`.`dbID` = '$suid'
     group by `dim-farm`.`Name`,`dim-time`.`ID`";
-    $Tree = selectData($sql);
-    return $Tree;
+    $dmy = selectData($sql);
+    return $dmy;
 }
 
 // sql ค่าของ Year 
@@ -552,7 +578,7 @@ function getMaxyear($logfarmID)
 {
     $sql = "SELECT max(m.Year2) as max from (SELECT t.Year2 FROM(SELECT `dim-time`.`Year2`,`dim-farm`.`Name`,`log-harvest`.`Weight` FROM `log-harvest` INNER JOIN `dim-time` on `log-harvest`.`DIMdateID` = `dim-time`.`ID` INNER JOIN `dim-farm` on `dim-farm`.`ID` = `log-harvest`.`DIMsubFID` WHERE `dim-farm`.`Name` = '$logfarmID' AND`dim-farm`.`IsFarm`='0' ORDER BY `dim-time`.`Year2` ASC) as t 
     GROUP BY t.`Year2`) as m";
-    $Maxyear = selectData($sql);
+    $Maxyear = selectData($sql)[1]['max'];
     return $Maxyear;
 }
 
@@ -586,48 +612,52 @@ function getYearvol($logfarmID)
 }
 
 // sql ค่าของ Namevol มีการรับค่า ID ของ logfarmID
-function getNamevol($logfarmID)
+function getNamevol($suid)
 {
-    $sql = "SELECT `dim-fertilizer`.`ID`,`dim-fertilizer`.`Name`as namevol FROM `log-fertilising` 
+    $sql = "SELECT `dim-fertilizer`.`ID`,`dim-fertilizer`.`Name`as namevol , `dim-farm`.`Name` FROM `log-fertilising` 
     INNER JOIN `dim-time` ON `dim-time`.`ID` = `log-fertilising`.`DIMdateID`
     INNER JOIN `dim-fertilizer` ON `dim-fertilizer`.`ID` = `log-fertilising`.`DIMferID`  
     INNER JOIN `dim-farm` on `dim-farm`.`ID` = `log-fertilising`.`DIMsubFID`
-    where `dim-farm`.`Name` = '$logfarmID' 
+    INNER JOIN `db-subfarm` ON `db-subfarm`.`FSID` = `dim-farm`.`dbID`
+    where `dim-farm`.`dbID` = '$suid'
     GROUP BY `dim-fertilizer`.`Name` 
     ORDER BY `dim-fertilizer`.`Name`";
     $Namevol = selectData($sql);
     return $Namevol;
 }
 // sql ค่าของ Numvol มีการรับค่า ID ของ logfarmID
-function getNumvol($logfarmID)
+function getNumvol($suid)
 {
-    $sql = "SELECT  `db-fertilizer`.`EQ1`,`db-fertilizer`.`EQ2` FROM `db-fertilizer`
+    $sql = "SELECT  `db-fertilizer`.`EQ1`,`db-fertilizer`.`EQ2` , `dim-farm`.`Name` FROM `db-fertilizer`
     INNER JOIN `dim-fertilizer` ON `dim-fertilizer`.`dbID` = `db-fertilizer`.`FID`
     INNER JOIN `log-fertilising` ON `log-fertilising`.`DIMferID` = `dim-fertilizer`.`ID`
     INNER JOIN `dim-farm` on `dim-farm`.`ID`= `log-fertilising`.`DIMsubFID`
-    where `dim-farm`.`Name` ='$logfarmID'";
+    INNER JOIN `db-subfarm` ON `db-subfarm`.`FSID` = `dim-farm`.`dbID`
+    where `dim-farm`.`dbID` = '$suid'";
     $Numvol = selectData($sql);
     return $Numvol;
 }
 
 // sql ค่าของ IdfarmerSubDetail มีการรับค่า ID ของ logfarmID
-function getIdfarmerSubDetail($logfarmID)
+function getIdfarmerSubDetail($suid)
 {
     $sql = "SELECT `log-icon`.`DIMiconID`,`log-icon`.`Path`,`log-icon`.`FileName` FROM `log-icon` 
     INNER JOIN `dim-user` on`log-icon`.`DIMiconID` = `dim-user`.`ID`
     INNER JOIN `db-farmer` on `db-farmer`.`UFID` = `dim-user`.`dbID`
-    WHERE `log-icon`.`Type` = 5 AND `db-farmer`.`FirstName`='$logfarmID'";
+    inner JOIN `db-farm` ON `db-farm`.`UFID` = `db-farmer`.`UFID`
+    INNER JOIN `db-subfarm` on `db-subfarm`.`FMID` = `db-farm`.`FMID`
+    WHERE `log-icon`.`Type` = 5  AND `db-subfarm`.`FSID`= '$suid'";
     $IdfarmerSubDetail = selectData($sql);
     return $IdfarmerSubDetail;
 }
 
 // sql ค่าของ IdfarmSubDetail มีการรับค่า ID ของ logfarmID
-function getIdfarmSubDetail($logfarmID)
+function getIdfarmSubDetail($suid)
 {
     $sql = "SELECT `log-icon`.`DIMiconID`,`log-icon`.`Path`,`log-icon`.`FileName` FROM `log-icon` 
     INNER JOIN `dim-farm` on`log-icon`.`DIMiconID` = `dim-farm`.`ID`
     INNER JOIN `db-subfarm` on `db-subfarm`.`FSID` = `dim-farm`.`dbID`
-    WHERE `log-icon`.`Type` = 3 AND `db-subfarm`.`Name`= '$logfarmID'";
+    WHERE `log-icon`.`Type` = 3 AND `db-subfarm`.`FSID` = '$suid'";
     $IdfarmSubDetail = selectData($sql);
     return $IdfarmSubDetail;
 }
@@ -661,6 +691,50 @@ function getHarvestID($farmID)
     return $harvestCurrentYear;
 }
 
+//ผลผลิตต่อเดือน
+function getHarvestPerMonth($farmID,$year)
+{
+      
+    for($i = 1 ;$i <= 12; $i++)
+        $HARVESTMONTH["$i"] = 0 ; 
+      
+    $sql="SELECT * FROM `log-harvest` 
+        JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
+        WHERE `dim-farm`.`dbID` = $farmID AND `isDelete`= 0 ";
+    $HARVEST = selectData($sql);
+    $x = count($HARVEST);
+    for($i=0;$i<$x;$i++){
+        if((int)date('Y',$HARVEST[$i]["Modify"]) + 543==$year)
+        {
+            $HARVESTMONTH[(date("n",$HARVEST[$i]["Modify"]))] = $HARVESTMONTH[(date("n",$HARVEST[$i]["Modify"]))] + $HARVEST[$i]["Weight"];
+        }
+    }
+    
+    return $HARVESTMONTH;
+}
+
+//สรุปผลผลิตต่อปี
+function getSummarizeHarvest($farmID,$year)
+{
+    $sql="SELECT * FROM `log-harvest` 
+    JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
+    WHERE `dim-farm`.`dbID` = $farmID AND `isDelete`= 0 ";
+    $HARVEST = selectData($sql);
+    $SUMMARIZE["Weight"] = 0;
+    $SUMMARIZE["Price"] = 0;
+    $x = count($HARVEST);
+    for($i=1;$i<$x;$i++){
+        if((int)date('Y',$HARVEST[$i]["Modify"]) + 543==$year)
+        {
+            $SUMMARIZE["Weight"] = $SUMMARIZE["Weight"] + $HARVEST[$i]["Weight"];
+            $SUMMARIZE["Price"] = $SUMMARIZE["Price"] + $HARVEST[$i]["TotalPrice"];
+        }
+    }
+    return $SUMMARIZE;
+}
+
+
+//แก้ไข
 //ผลผลิตปาร์มแบบมี ID และเป็นแต่ละปีของตารางรายการเก็บผลผลิตต่อแปลง
 function getHarvestYearID($farmID,$year)
 {
@@ -674,13 +748,19 @@ function getHarvestYearID($farmID,$year)
     for($i=1;$i<$x;$i++)
     {
         if((int)date('Y',$HARVEST[$i]["Modify"]) + 543==$year){
-            $HARVESTYEAR[$num] = $HARVEST[$i];
+            $HARVESTYEAR[$num]["ID"] = $HARVEST[$i]['logID'];
+            $HARVESTYEAR[$num]["alias"] = $HARVEST[$i]['Alias'];
+            $HARVESTYEAR[$num]["modifyday"] = date('d',$HARVEST[$i]["Modify"]);
+            $HARVESTYEAR[$num]["modifymonth"] = date('n',$HARVEST[$i]["Modify"]);
+            $HARVESTYEAR[$num]["modifyyear"] = date('Y',$HARVEST[$i]["Modify"])+543;
+            $HARVESTYEAR[$num]["weight"] = $HARVEST[$i]['Weight'];
+            $HARVESTYEAR[$num]["price"] = $HARVEST[$i]['UnitPrice'];
+            $HARVESTYEAR[$num]["totalprice"] = $HARVEST[$i]['TotalPrice'];
             $num++;
         }
     }
     return $HARVESTYEAR;
 }
-// print_r(getHarvestYearID(1,2562));
 
 //ฟาร์มทั้งหมด
 function getFarm()
@@ -715,7 +795,7 @@ function getAllSubFarm()
 }
 
 //แปลงแบบมี ID
-function getSubFarmID($farmID)
+function getCountSubFarmID($farmID)
 {
     $sql = "SELECT count(*) AS countSubFarm FROM `db-subfarm` WHERE `FMID` = $farmID ";
     $farmArea = selectData($sql)[1]["countSubFarm"];
@@ -723,7 +803,7 @@ function getSubFarmID($farmID)
 }
 
 //พื้นที่ไร่ของแปลง
-function getAreaRaiByFMID($farmID)
+function getCountAreaRaiByFMID($farmID)
 {
     $sql = "SELECT sum(`AreaRai`) AS sumAreaRai FROM `db-subfarm` WHERE `FMID` = $farmID ";
     $areaRai = selectData($sql)[1]['sumAreaRai'];
@@ -731,7 +811,7 @@ function getAreaRaiByFMID($farmID)
 }
 
 //พื้นที่วาของแปลง
-function getAreaWa($farmID)
+function getCountAreaWa($farmID)
 {
     $sql = "SELECT sum(`AreaWa`) AS sumAreaWa FROM `db-subfarm` WHERE `FMID` = $farmID ";
     $areaWa = selectData($sql)[1]['sumAreaWa'];
@@ -739,7 +819,7 @@ function getAreaWa($farmID)
 }
 
 //พื้นที่งานของแปลง
-function getAreaNgan($farmID)
+function getCountAreaNgan($farmID)
 {
     $sql = "SELECT sum(`AreaNgan`) AS sumAreaNgan FROM `db-subfarm` WHERE `FMID` = $farmID ";
     $areaNgan = selectData($sql)[1]['sumAreaNgan'];
@@ -759,12 +839,89 @@ function getFarmByFMID($farmID){
     $sql = "SELECT * FROM `db-farm` WHERE `FMID` = $farmID";
     return selectData($sql);
 }
+//ปีของผลผลิตที่มีใน log
+function getYearOfHarvet($farmID)
+{
+    $num = 0;
+    $sql = "SELECT * FROM `log-harvest`
+            JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
+            WHERE `dbID` = $farmID AND `isDelete`= 0 AND `isFarm` = 1";
+    $HARVEST = selectData($sql);
+    $x = count($HARVEST);
+    $YEAR = 0;
+    for($i = 1;$i < $x;$i++)
+    {
+        $ALLYEAR[$num] = (date("Y",$HARVEST[$i]["Modify"])+543);
+        $num += 1;
+    }
+    $YEAR = array_unique($ALLYEAR);
+    rsort($YEAR);
+    return $YEAR;
+}
+//ผลผลิตต่อปี
+function getHarvestPerYear($farmID)
+{
+    $sql = "SELECT * FROM `log-harvest`
+                JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
+                WHERE `dim-farm`.`dbID` = $farmID AND `isDelete`= 0";
+    $A = selectData($sql);
+    $x = count($A);
+    $num = 0;
+    for($i=1;$i<$x;$i++)
+    {
+        $GETYEAR[$num] = (date("Y",$A[$i]["Modify"]));
+        $num += 1;
+    }
+    $YEAR= array_unique($GETYEAR);
+    rsort($YEAR);
+    $x= count($YEAR);
+      
+    $sql="SELECT * FROM `log-harvest` 
+        JOIN `dim-farm` ON `dim-farm`.`ID` = `log-harvest`.`DIMfarmID`
+        WHERE `dim-farm`.`dbID` = $farmID AND `isDelete`= 0 ";
+    $HARVEST = selectData($sql);
+    for ($i=1; $i < $x; $i++) { 
+        $PRODUCT["$YEAR[$i]"] = 0;
+    }
+    $x = count($HARVEST);
+    // print_r($PRODUCT);
+    for($i=1;$i<$x;$i++){
+        $PRODUCT[(date("Y",$HARVEST[$i]["Modify"]))] = $PRODUCT[(date("Y",$HARVEST[$i]["Modify"]))] + $HARVEST[$i]["Weight"];
+    }
+    
+    return $PRODUCT;
+}
+
+
+//แก้ไข
+//ข้อมูลของ เจ้าของฟาร์ม และ ฟาร์ม
+function getOwnerData($farmID)
+{
+    $sql = "SELECT `db-farm`.`FMID` AS `farmID` , `db-farm`.`Name` AS `farmName` , `db-farm`.`Alias` AS `farmAlias` , 
+            `db-farm`.`Icon` AS `farmIcon` ,`db-farmer`.`UFID` as `ownerID` , `db-farmer`.`FirstName` as `FirstName` ,
+            `db-farmer`.`LastName` as `LastName` , `db-farmer`.`Icon` as `ownerIcon`,
+            `dim-user`.`FullName` as FullName , `dim-user`.`Alias` as `ownerAlias` 
+            FROM `db-farm`
+            JOIN `db-farmer` ON `db-farm`.`UFID` = `db-farmer`.`UFID`
+            JOIN `dim-user` ON `db-farmer`.`UFID` = `dim-user`.`dbID`
+            WHERE `db-farm`.`FMID` = $farmID AND `dim-user`.`Type` = 'F' 
+            ORDER BY `dim-user`.`ID` DESC
+            ";
+    $FARMERDATA = selectData($sql);
+    return $FARMERDATA;
+}
 //ใช้ดึง icon หน้า OilPalmAreaVolDetail.php
 function getIcon($farmID){
     $sql = "SELECT * FROM `dim-farm` 
     JOIN `db-farm` ON `dim-farm`.`dbID` = `db-farm`.`FMID` 
     WHERE `dim-farm`.`dbID` = $farmID AND `isFarm` = 1";
     return selectdata($sql);
+}
+function getAllSubFarmById($farmID){
+    $sql = "SELECT * FROM `dim-farm`
+    JOIN `db-subfarm` ON `dim-farm`.`dbID` = `db-subfarm`.`FSID`
+    WHERE `isFarm` = 0 AND `FMID` = $farmID";
+    return selectData($sql);
 }
 //จำนวนต้นไม้ของฟาร์มนั้นๆ และ การ์ดจำนวนต้น หน้า OilPalmAreaVolDetail.php
 function getTreeID($farmID)
@@ -994,7 +1151,7 @@ function getTableAllHarvest()
     for($i=0;$i<$x;$i++)
     {
         $FMID = $FARMID[$i];
-        $countSubFarm = (int)getSubFarmID($FMID);
+        $countSubFarm = (int)getCountSubFarmID($FMID);
         $countArea = (int)getAreaRai($FMID);
         $countTree = (int)getTreeID($FMID);
         $countWeight = (int)getHarvestID($FMID);

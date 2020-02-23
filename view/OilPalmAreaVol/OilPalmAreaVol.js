@@ -208,23 +208,23 @@ $("#btn_search").on('click', function() {
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send(`year=${_year}`);
 }
-  function makeTable(result){
-    let text = ''
-    for(i in result){
-      text += `<tr>
-                  <td>${result[i].alias}</td>
-                  <td>${result[i].modifyday} / ${result[i].modifymonth} / ${result[i].modifyyear}</td>
-                  <td style="text-align:right;">${result[i].weight}</td>
-                  <td style="text-align:right;">${result[i].price}</td>
-                  <td style="text-align:right;">${result[i].totalprice}</td>
-                  <td style="text-align:center;">
-                    <button type="button" class="btn btn-info btn-sm picture" data-fid="${result[i].ID}" data-toggle="tooltip" title="รูปภาพ" ><i class="fas fa-images"></i></button>
-                    <button type="button" class="btn btn-danger btn-sm delete" data-fid="${result[i].ID}"  data-alias = "${result[i].alias}" data-toggle="tooltip" title="ลบ" ><i class="far fa-trash-alt"></i></button>
-                  </td>
-                </tr>`
-    }
-    $('#table').html(text)
-  }
+  // function makeTable(result){
+  //   let text = ''
+  //   for(i in result){
+  //     text += `<tr>
+  //                 <td>${result[i].alias}</td>
+  //                 <td>${result[i].modifyday} / ${result[i].modifymonth} / ${result[i].modifyyear}</td>
+  //                 <td style="text-align:right;">${result[i].weight}</td>
+  //                 <td style="text-align:right;">${result[i].price}</td>
+  //                 <td style="text-align:right;">${result[i].totalprice}</td>
+  //                 <td style="text-align:center;">
+  //                   <button type="button" class="btn btn-info btn-sm picture" data-fid="${result[i].ID}" data-toggle="tooltip" title="รูปภาพ" ><i class="fas fa-images"></i></button>
+  //                   <button type="button" class="btn btn-danger btn-sm delete" data-fid="${result[i].ID}"  data-alias = "${result[i].alias}" data-toggle="tooltip" title="ลบ" ><i class="far fa-trash-alt"></i></button>
+  //                 </td>
+  //               </tr>`
+  //   }
+  //   $('#table').html(text)
+  // }
 
   function rightbox(result){
   

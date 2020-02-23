@@ -29,7 +29,7 @@ switch($request){
         $Name = preg_replace('/[[:space:]]+/', ' ', trim($_POST['name']));
         $Alias = preg_replace('/[[:space:]]+/', ' ', trim($_POST['alias']));
         $Unit = 1;
-        // $Usage = $_POST['exampleRadios1'];
+        $Usage = $_POST['exampleRadios1'];
         $FID = $_POST['id'];
         $DIMID = $_POST['dimid'];
         $Icon = $_POST['icon'];
@@ -77,12 +77,12 @@ switch($request){
 
         $dataSelect = (select("SELECT * FROM `db-fertilizer` WHERE `FID` = $FID"))[1];
         if($Start==$dataSelect['Start']&&$End==$dataSelect['End']&&$Name==$dataSelect['Name']&&$Alias==$dataSelect['Alias']
-        &&$EQ1==$dataSelect['EQ1']&&$EQ2==$dataSelect['EQ2']&&$Unit==$dataSelect['Unit']&&$isIcon==false){
+        &&$EQ1==$dataSelect['EQ1']&&$EQ2==$dataSelect['EQ2']&&$Unit==$dataSelect['Unit']&&$isIcon==false&&$Usage==$dataSelect['usage']){
             $isData = false;
         }
         else{
             $sql_update = "UPDATE `db-fertilizer` 
-            SET `Start` = '$Start', `End`= '$End', `Name` = '$Name',`Alias` = '$Alias', `Usage` = 1,
+            SET `Start` = '$Start', `End`= '$End', `Name` = '$Name',`Alias` = '$Alias', `Usage` = '$Usage',
             `EQ1` = $EQ1, `EQ2` = $EQ2 ,`Unit` = $Unit ,`Icon` = '$Icon'
             WHERE `FID` = $FID;";
             updateData($sql_update); 
