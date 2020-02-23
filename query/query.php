@@ -1204,8 +1204,8 @@ function getTableAllHarvest()
     return $ALLHARVEST;
 }
 
-// query หน้าการจัดการศีตรูพืช
-// INSECTLIST.php
+//  start - หน้าการจัดการศีตรูพืช
+//INSECTLIST.php
 function getCountInsect()
 {
     $sql = "SELECT COUNT(*) AS countInsect FROM `db-pestlist` WHERE `PTID` = 1";
@@ -1238,7 +1238,7 @@ function getInsect()
     return $INSECT;
 }
 
-//  DISESASESLIST.php
+//DISESASESLIST.php
 function getCountDiseases()
 {
     $sql = "SELECT COUNT(*) AS countDiseases FROM `db-pestlist` WHERE `PTID` = 2";
@@ -1261,13 +1261,17 @@ function getDiseases()
     else if ($num > 0) $selectedID = $DATA[1]["PID"];
     else $selectedID = 0;
 
-    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=1 AND PID=" . $selectedID;
-    $INFODISESASES = selectData($sql);
-
-    return $INFODISESASES;
+    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=2 AND PID=" . $selectedID;
+    $INFO = selectData($sql);
+    
+    $DISESASES['info'] = $INFO;
+    $DISESASES['data'] = $DATA;
+    $DISESASES['selectedID'] = $selectedID;
+    
+    return $DISESASES;
 }
 
-//  WEEDLIST.php
+//WEEDLIST.php
 function getCountWeed()
 {
     $sql = "SELECT COUNT(*) AS countWeed FROM `db-pestlist` WHERE `PTID` = 3";
@@ -1290,13 +1294,17 @@ function getWeed()
     else if ($num > 0) $selectedID = $DATA[1]["PID"];
     else $selectedID = 0;
 
-    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=1 AND PID=" . $selectedID;
-    $INFOWEED = selectData($sql);
+    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=3 AND PID=" . $selectedID;
+    $INFO = selectData($sql);
 
-    return $INFOWEED;
+    $WEED['info'] = $INFO;
+    $WEED['data'] = $DATA;
+    $WEED['selectedID'] = $selectedID;
+
+    return $WEED;
 }
 
-// OTHER-PESTLIST.php
+//OTHER-PESTLIST.php
 function getCountOhterPest()
 {
     $sql = "SELECT COUNT(*) AS countOhterPest FROM `db-pestlist` WHERE `PTID` = 4";
@@ -1306,7 +1314,7 @@ function getCountOhterPest()
 
 function getOhterPest()
 {
-    $sql = "SELECT `PID`,`Alias`,`Icon` FROM `db-pestlist` WHERE `PTID` = 3";
+    $sql = "SELECT `PID`,`Alias`,`Icon` FROM `db-pestlist` WHERE `PTID` = 4";
     $ALLOTHER = selectData($sql);
     $countOther = count($ALLOTHER);
     $num = 0;
@@ -1319,11 +1327,50 @@ function getOhterPest()
     else if ($num > 0) $selectedID = $DATA[1]["PID"];
     else $selectedID = 0;
 
-    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=1 AND PID=" . $selectedID;
-    $INFOOTHER = selectData($sql);
+    $sql = "SELECT * FROM `db-pestlist` WHERE `PTID`=4 AND PID=" . $selectedID;
+    $INFO = selectData($sql);
 
-    return $INFOOTHER;
+    $OTHERPEST['info'] = $INFO;
+    $OTHERPEST['data'] = $DATA;
+    $OTHERPEST['selectedID'] = $selectedID;
+
+    return $OTHERPEST;
 }
+
+//manage.php
+function getImgPest($img)
+{
+  if ($img != null) {
+    $data = $img;
+    $img_array = explode(';', $data);
+    $img_array2 = explode(",", $img_array[1]);
+    $dataI = base64_decode($img_array2[1]);
+    return $dataI;
+  } 
+  else return null;
+}
+
+function last_idPest()
+{
+  $sql = "SELECT MAX(`PID`)as max FROM `db-pestlist`";
+  $myConDB = connectDB();
+  $result = $myConDB->prepare($sql);
+  $result->execute();
+  while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    $max =  $row['max'];
+  }
+  //$max = selectData($sql);
+  return $max;
+}
+
+function select_dimPest()
+{
+  $sql = "SELECT * FROM `dim-pest`";
+
+  $DATA = selectData($sql);
+  return $DATA;
+}
+// end - หน้าการจัดการศีตรูพืช
 
 
 

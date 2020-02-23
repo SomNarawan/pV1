@@ -44,7 +44,7 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="font-weight-bold  text-uppercase mb-1">จำนวนชนิดแมลง</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?=$INSECT['data'][0]['numrow']; ?> ชนิด</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?php print(getCountInsect()); ?> ชนิด</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-bug fa-3x"></i>
@@ -195,11 +195,11 @@
         <div class="Modal"> </div>
 
     </div>
-    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
     <?php include_once("../layout/LayoutFooter.php"); ?>
     <?php require("insectlistModal.php"); ?>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    
     <script src="PestList.js"></script>
     <script src="../../croppie/croppie.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>

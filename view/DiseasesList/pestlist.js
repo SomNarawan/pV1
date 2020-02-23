@@ -98,7 +98,7 @@ $(document).ready(function() {
         for (let i = 0; i < num; i++) {
             let num2 = i
             textPicChar += `<div class="card" width="70px" hight="70px">
-                                <div class="card-body" style="padding:0;">
+                            <div class="card-body" style="padding:0;">
          `;
             let path;
             console.log("i" + i)
@@ -119,8 +119,8 @@ $(document).ready(function() {
         }
         textPicChar += footer
         return textPicChar;
-
     }
+
     $('.btn_edit').click(function() {
         $("#editModal").modal();
         var pid = $(this).attr('pid');
@@ -133,24 +133,22 @@ $(document).ready(function() {
         var icon = $(this).attr('data-icon')
         var footer;
 
-
         console.log("icon = " + icon)
 
         $('#img-pic-logo-edit').attr('src', "../../icon/pest/" + pid + "/" + icon)
         footer = `<div class="img-reletive">
+            <img width="100px" height="100px" src="https://ast.kaidee.com/blackpearl/v6.18.0/_next/static/images/gallery-filled-48x48-p30-6477f4477287e770745b82b7f1793745.svg" width="50px" height="50px" alt="">
+            <input type="file" id="pic-style-char-edit" name="picstyle_insert-edit[]" accept=".jpg" multiple>
+        </div>`
 
-        <img width="100px" height="100px" src="https://ast.kaidee.com/blackpearl/v6.18.0/_next/static/images/gallery-filled-48x48-p30-6477f4477287e770745b82b7f1793745.svg" width="50px" height="50px" alt="">
-        <input type="file" id="pic-style-char-edit" name="picstyle_insert-edit[]" accept=".jpg" multiple>
-    </div>`
         $('#grid-pic-style-char-edit').html(setImgEdit(icon, pid, numPicChar, footer))
-
-
         footer = `<div class="img-reletive">
-        <img width="100px" height="100px" src="https://ast.kaidee.com/blackpearl/v6.18.0/_next/static/images/gallery-filled-48x48-p30-6477f4477287e770745b82b7f1793745.svg" width="50px" height="50px" alt="">
-        <input type="file" class="form-control" id="p_photo-edit" name="p_photo-edit[]" accept=".jpg,.png" multiple>
-    </div>`
-        $('#grid-p_photo-edit').html(setImgEdit(icon, pid, numPicDanger, footer))
+            <img width="100px" height="100px" src="https://ast.kaidee.com/blackpearl/v6.18.0/_next/static/images/gallery-filled-48x48-p30-6477f4477287e770745b82b7f1793745.svg" width="50px" height="50px" alt="">
+            <input type="file" class="form-control" id="p_photo-edit" name="p_photo-edit[]" accept=".jpg,.png" multiple>
+        </div>`
 
+        $('#grid-p_photo-edit').html(setImgEdit(icon, pid, numPicDanger, footer))
+        
         $('#e_name').val(alias);
         $('#e_alias').val(nameinsect);
         $('#e_charactor').text(charstyle);
@@ -210,7 +208,6 @@ $(document).ready(function() {
     }
 
     function check_alias(name) {
-
         for (i in dataD) {
             console.log(dataD[i].Alias);
             if (name.val().trim() == dataD[i].Alias) {
@@ -220,13 +217,11 @@ $(document).ready(function() {
                 name[0].setCustomValidity('');
             }
         }
-
         return true;
     }
 
     $('#edit').click(function() {
         console.log("edit");
-
         let nameinsect = $("input[name = 'e_name']");
         let alias = $("input[name = 'e_alias']");
         let charstyle = $("input[name = 'e_charactor']");
@@ -243,7 +238,6 @@ $(document).ready(function() {
         if (!check_blank(data)) return;
         if (!check_editpest(nameinsect, pid)) return;
         if (!check_editAlias(alias, pid)) return;
-
     })
 
     function check_duplicate(o_nameinsect, o_alias, o_charstyle, o_dangerInsect, nameinsect, alias, charstyle, dangerInsect) {
@@ -265,7 +259,6 @@ $(document).ready(function() {
                 name[0].setCustomValidity('');
             }
         }
-
         return true;
     }
 
@@ -280,7 +273,6 @@ $(document).ready(function() {
                 name[0].setCustomValidity('');
             }
         }
-
         return true;
     }
 
@@ -303,7 +295,6 @@ $(document).ready(function() {
 
             $(this).html(html);
         }
-
     });
 
     $(".morelink").click(function() {
@@ -317,7 +308,6 @@ $(document).ready(function() {
         $(this).parent().prev().toggle();
         $(this).prev().toggle();
         return false;
-
     });
 
     $('#addInsect').click(function() {
@@ -325,6 +315,7 @@ $(document).ready(function() {
         $('.Modal').append(addModal);
         $('#addModal').modal('show');
     });
+
 });
 
 $(document).on('click', '.delete', function() {
@@ -366,7 +357,6 @@ function delfunction(_sid, _alias) {
                     if (isConfirm) {
                         delete_1(_sid)
                     }
-
                 });
             } else {
 

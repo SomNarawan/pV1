@@ -1,20 +1,10 @@
 <?php
+
 session_start();
-
-function getImg($img)
-{
-  if ($img != null) {
-    $data = $img;
-    $img_array = explode(';', $data);
-    $img_array2 = explode(",", $img_array[1]);
-    $dataI = base64_decode($img_array2[1]);
-
-    return $dataI;
-  } else return null;
-}
 require "../../dbConnect.php";
 $request = $_POST['request'];
 require_once("../../set-log-login.php");
+include_once("./../../query/query.php");
 
 $loglogin = $_SESSION[md5('LOG_LOGIN')];
 $loglogin_id = $loglogin[1]['ID'];
@@ -43,7 +33,7 @@ switch ($request) {
 
     $t = time();
 
-    $dataLogo = getImg($_POST['pic1']);
+    $dataLogo = getImgPest($_POST['pic1']);
     $nameImg1 = null;
     if ($dataLogo != null) {
       $nameImg1 = time() . ".png";
@@ -82,7 +72,7 @@ switch ($request) {
         if ($i == 0)
           $nameImg2 = $nameImg1;
         else $nameImg2 = ($i - 1) . "_" . $nameImg1;
-        $Pic2 = getImg($dataPic2[$i]);
+        $Pic2 = getImgPest($dataPic2[$i]);
         file_put_contents("../../picture/Pest/weed/style/$id/$nameImg2", $Pic2);
       }
     }
@@ -92,7 +82,7 @@ switch ($request) {
         if ($i == 0)
           $nameImg3 = $nameImg1;
         else $nameImg3 = ($i - 1) . "_" . $nameImg1;
-        $Pic3 = getImg($dataPic3[$i]);
+        $Pic3 = getImgPest($dataPic3[$i]);
         file_put_contents("../../picture/Pest/weed/danger/$id/$nameImg3", $Pic3);
       }
     }
@@ -121,7 +111,7 @@ switch ($request) {
       while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         $ptid = $row['TypeTH'];
       }
-      $last_id = last_id();
+      $last_id = last_idPest();
 
       //echo $last_id;
       //echo toString($ptid);
@@ -136,7 +126,7 @@ switch ($request) {
       $id_d = addinsertData($sql);
       // echo $id_d;
       $data_t =  getDIMDate();
-      $id_t = last_id();
+      $id_t = last_idPest();
       // echo $id_t;
 
       // echo $id_t[1]['ID'];
@@ -213,7 +203,7 @@ switch ($request) {
       while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         $ptid = $row['TypeTH'];
       }
-      $last_id = last_id();
+      $last_id = last_idPest();
 
       //echo $last_id;
       //echo toString($ptid);
@@ -258,25 +248,6 @@ switch ($request) {
     break;
 }
 
-function last_id()
-{
-  $sql = "SELECT MAX(`PID`)as max FROM `db-pestlist`";
-  $myConDB = connectDB();
-  $result = $myConDB->prepare($sql);
-  $result->execute();
-  while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-    $max =  $row['max'];
-  }
-  //$max = selectData($sql);
-  return $max;
-}
-function select_dimPest()
-{
-  $sql = "SELECT * FROM `dim-pest`";
-
-  $DATA = selectData($sql);
-  return $DATA;
-}
 function getDIM($did, $o_name, $o_alias, $o_char, $o_dan, $o_ptid, $o_type)
 {
   $sql = "SELECT * FROM `dim-pest` WHERE `dbpestLID`='$did' AND `Name`='$o_name' AND `Alias`='$o_alias' 
@@ -285,6 +256,7 @@ function getDIM($did, $o_name, $o_alias, $o_char, $o_dan, $o_ptid, $o_type)
   $DATA = selectData($sql);
   return $DATA;
 }
+
 function getLog($dim_id)
 {
   $sql = "SELECT * FROM `log-pest` WHERE `DIMpestID`='$dim_id' AND `EndT` IS NULL";

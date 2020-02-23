@@ -3,13 +3,12 @@
 </head>
 
 <?php
-require('../../dbConnect.php');
-$id = $_POST['id'];
-$sql = "SELECT * FROM `db-pestlist` WHERE `PID` = $id";
-$myConDB = connectDB();
-$result = $myConDB->prepare($sql);
-$result->execute();
-
+    require('../../dbConnect.php');
+    $id = $_POST['id'];
+    $sql = "SELECT * FROM `db-pestlist` WHERE `PID` = $id";
+    $myConDB = connectDB();
+    $result = $myConDB->prepare($sql);
+    $result->execute();
 ?>
 
 <?php while ($row = $result->fetch(PDO::FETCH_ASSOC)) { ?>
