@@ -6,12 +6,7 @@
 
     include_once("../layout/LayoutHeader.php");
     include_once("./../../query/query.php");
-    //include_once("./search.php");
-
-
-    $FARMER[1] =array("dbID"=>1,"FullName"=>"นาย วิเชียร ธารสุวรรณ","Province"=>"ชุมพร","Distrinct"=>"ท่าแซะ","numFarm"=>1,"numSubFarm"=>2
-                        ,"AreaRai"=>1,"Ngan"=>2,"numTree"=>35); 
-    
+    include_once("./search.php");
 
 ?>
 
@@ -37,17 +32,16 @@
             </div>
         </div>
     </div>
+    
     <div class="row">
-
         <?php   
             creatCard( "card-color-one",   "จำนวนเกษตรกร", getcountFarmer()." คน", "waves" ); 
             creatCard( "card-color-two",   "จำนวนสวน",  getCountFarm()." สวน ".getCountSubfarm()." แปลง", "group" );
             creatCard( "card-color-three",   "พื้นที่ทั้งหมด", getCountArea()." ไร่", "format_size" ); 
             creatCard( "card-color-four",   "จำนวนต้นไม้", getCountTree()." ต้น", "format_size" ); 
+
         ?>
-
     </div>
-
 
     <form action="FarmerList.php?isSearch=1" method="post">
         <div class="row">
@@ -116,14 +110,17 @@
                                 <select id="s_province" name="s_province" class="form-control">
                                     <option selected value=0>เลือกจังหวัด</option>        
                                     <?php 
-                                    $PROVINCE = getProvince();
+                                    $sql = "SELECT * FROM `db-province`";
+                                    $myConDB = connectDB();
+                                    $result = $myConDB->prepare($sql);
+                                    $result->execute();
 
-                                    for($i = 1;$i<sizeof($PROVINCE);$i++){ 
-                                        if($fpro==$PROVINCE[$i]["AD1ID"])
+                                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) 
+                                        if($fpro==$row["AD1ID"])
                                             echo '<option value="'.$row["AD1ID"].'" selected>'.$row["Province"].'</option>';
                                         else
                                             echo '<option value="'.$row["AD1ID"].'">'.$row["Province"].'</option>';
-                                    }?>
+                                    ?>
                                 </select>
                             </div>
                         </div>
@@ -167,84 +164,81 @@
         </div>
     </form>
 
+    <div class="row mt-4">
+            <div class="col-xl-12 col-12">
+                <div class="card">
+                    <div class="card-header card-bg" >
+                    <h6 class="m-0 font-weight-bold" style="color:#006633;">รายชื่อเกษตรกร</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-xl-3 col-12">
+                                <button type="button" id="btn_comfirm" class="btn btn-outline-success btn-sm"><i class="fas fa-file-excel"></i> Excel</button>
+                                <button type="button" id="btn_comfirm" class="btn btn-outline-danger btn-sm"><i class="fas fa-file-pdf"></i> PDF</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id= table class="table table-bordered table-striped table-hover table-data" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>ชื่อ-นามสกุล</th>
+                                        <th>จังหวัด</th>
+                                        <th>อำเภอ</th>
+                                        <th>จำนวนสวน</th>
+                                        <th>จำนวนแปลง</th>
+                                        <th>พื้นที่ปลูก</th>
+                                        <th>จำนวนต้น</th>
+                                        <th>จัดการ</th>
+                                    </tr>
+                                </thead>
 
+                                <tfoot>
+                                    <tr>
+                                        <th>ชื่อ-นามสกุล</th>
+                                        <th>จังหวัด</th>
+                                        <th>อำเภอ</th>
+                                        <th>จำนวนสวน</th>
+                                        <th>จำนวนแปลง</th>
+                                        <th>พื้นที่ปลูก</th>
+                                        <th>จำนวนต้น</th>
+                                        <th>จัดการ</th>
+                                    </tr>
+                                </tfoot>
 
-    <!-- DataTales Example -->
-    <div class="card shadow mb-4">
-        <div class="card-header card-header-table py-3">
-            <h6 class="m-0 font-weight-bold" style="color:#006633;">รายชื่อเกษตรกร</h6>
-        </div>
-        <div class="card-body">
-
-            <div class="row mb-2">
-                <div class="col-xl-3 col-12">
-                    <button type="button" id="btn_comfirm" class="btn btn-outline-success btn-sm"><i
-                            class="fas fa-file-excel"></i> Excel</button>
-                    <button type="button" id="btn_comfirm" class="btn btn-outline-danger btn-sm"><i
-                            class="fas fa-file-pdf"></i> PDF</button>
-
+                                
+                                <tbody>
+                                <?php 
+                                //while ($row = $result->fetch(PDO::FETCH_ASSOC)){
+                                for($i=0;$i<$numFermer;$i++) {
+                                ?>
+                                    <tr>
+                                        <td><?php echo $FARMER[$i]['FullName']; ?></td>
+                                        <td><?php echo $FARMER[$i]["Province"] ?></td>
+                                        <td><?php echo $FARMER[$i]["Distrinct"] ?></td>
+                                        <td class = "text-right"><?php echo $FARMER[$i]['numFarm']; ?> สวน</td>
+                                        <td class = "text-right"><?php echo $FARMER[$i]['numSubFarm']; ;?> แปลง</td>
+                                        <td class = "text-right"><?php echo $FARMER[$i]['numArea1']; ?> ไร่ <?php echo $FARMER[$i]['numArea2']; ?> งาน</td>
+                                        <td class = "text-right"><?php echo $FARMER[$i]['numTree']; ?> ต้น</td>
+                                        <td style="text-align:center;">
+                                            <a href='FarmerListDetail.php?farmerID=<?php echo $FARMER[$i]['dbID'];?>'>
+                                            <button type='button' id='btn_info' 
+                                                class="btn btn-info btn-sm btn_edit tt"
+                                                data-toggle="tooltip" title="รายละเอียดข้อมูลเกษตรกร" >
+                                                <i class='fas fa-bars'></i>
+                                            </button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php
+                                }
+                                ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-            <div class="table-responsive">
-                <table class="table table-bordered table-data" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>ชื่อ-นามสกุล</th>
-                            <th>จังหวัด</th>
-                            <th>อำเภอ</th>
-                            <th>จำนวนสวน</th>
-                            <th>จำนวนแปลง</th>
-                            <th>พื้นที่ปลูก</th>
-                            <th>จำนวนต้น</th>
-                            <th>จัดการ</th>
-                        </tr>
-                    </thead>
-
-                    <tfoot>
-                        <tr>
-                            <th>ชื่อ-นามสกุล</th>
-                            <th>จังหวัด</th>
-                            <th>อำเภอ</th>
-                            <th>จำนวนสวน</th>
-                            <th>จำนวนแปลง</th>
-                            <th>พื้นที่ปลูก</th>
-                            <th>จำนวนต้น</th>
-                            <th>จัดการ</th>
-                        </tr>
-                    </tfoot>
-                    <tbody>
-                        <?php 
-                            for($i=1;$i<=sizeof($FARMER);$i++){
-                        ?>
-                        <tr>
-                            <td><?php echo $FARMER[$i]['FullName']; ?></td>
-                            <td><?php echo $FARMER[$i]["Province"] ?></td>
-                            <td><?php echo $FARMER[$i]["Distrinct"] ?></td>
-                            <td class="text-right"><?php echo $FARMER[$i]['numFarm']; ?> สวน</td>
-                            <td class="text-right"><?php echo $FARMER[$i]['numSubFarm']; ;?> แปลง</td>
-                            <td class="text-right"><?php echo $FARMER[$i]['AreaRai']; ?> ไร่
-                                <?php echo $FARMER[$i]['Ngan']; ?> งาน</td>
-                            <td class="text-right"><?php echo $FARMER[$i]['numTree']; ?> ต้น</td>
-
-                            <td style="text-align:center;">
-                                <a href='FarmerListDetail.php?farmerID=<?php echo $FARMER[$i]['dbID'];?>'>
-                                    <button type='button' id='btn_info' class="btn btn-info btn-sm btn_edit tt"
-                                        data-toggle="tooltip" title="รายละเอียดข้อมูลเกษตรกร">
-                                        <i class='fas fa-bars'></i>
-                                    </button>
-                                </a>
-                            </td>
-                        </tr>
-                        <?php 
-                            }
-                        ?>
-
-                    </tbody>
-                </table>
             </div>
         </div>
-    </div>
 
     <div class="Modal">
 
@@ -255,7 +249,7 @@
 
 <?php include_once("../layout/LayoutFooter.php"); ?>
 
-<script src="FarmerList.js"></script>
+<script src="FarmerListAdmin.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>

@@ -13,21 +13,6 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
 
-
-<style>
-#serach {
-    background-color: #E91E63;
-    color: white;
-    float: right;
-}
-
-#card-detail {
-    border-color: #E91E63;
-    border-top: none;
-}
-</style>
-
-
 <div class="container">
     <div class="row">
         <div class="col-xl-12 col-12 mb-4">

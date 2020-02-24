@@ -32,12 +32,12 @@ $MANYCOOR = getManyCoor($fmid);
 $COORSFARM = getCoorsFarm($fmid);
 $countCoor = getCountCoor($fmid);
 
-
-// print_r($COORSFARM);
-// echo "<br>";
-// print_r($countCoor);
-// echo "<br>";
-// print_r($MANYCOOR);
+// print_r($LATLONG);
+ print_r($COORSFARM);
+echo "<br>";
+print_r($countCoor);
+echo "<br>";
+ print_r($MANYCOOR);
 // echo "<br>";
 // print_r($LOGFARMIDPALM);
 // print_r($logfarmid);
@@ -270,7 +270,7 @@ $countCoor = getCountCoor($fmid);
                                             <button type='button' id='btn_delete'
                                                 class="btn btn-danger btn-sm btn_edit tt" data-toggle="tooltip"
                                                 title="ลบแปลง" style="margin-right:10px;"
-                                                onclick="delfunction('g','1')">
+                                                onclick="xxx">
                                                 <i class='far fa-trash-alt'></i>
                                             </button>
                                             </button>
