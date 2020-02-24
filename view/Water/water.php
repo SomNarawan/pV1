@@ -602,7 +602,7 @@ $totalPalm = selectDataOne("SELECT (SUM(`log-planting`.`NumGrowth1`)+SUM(`log-pl
             bolditalics: 'THSarabun-BoldItalic.ttf'
         }
     }
-    $('[data-toggle="tooltip"]').tooltip();  
+  
     $(document).ready(function() {
         $('.js-example-basic-single').select2();
         $('.js-example-basic-single').on('select2:open', function(e) {

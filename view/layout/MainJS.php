@@ -1,28 +1,42 @@
-  <!-- Bootstrap core JavaScript-->
-  <script src="../../lib/jquery/jquery.min.js"></script>
-  <script src="../../lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap core JS -->
+  <script src="../../js/jquery/jquery.min.js"></script>
+  <script src="../../js/bootstrap/bootstrap.bundle.min.js"></script>
 
-  <!-- Core plugin JavaScript-->
-  <script src="../../lib/jquery-easing/jquery.easing.min.js"></script>
+  <!-- Core plugin JS -->
+  <script src="../../js/jquery-easing/jquery.easing.min.js"></script>
 
-  <!-- Custom scripts for all pages-->
-  <script src="../../js/sb-admin-2.min.js"></script>
+  <!-- scripts template JS -->
+  <script src="../../js/styles-template/sb-admin-2.min.js"></script>
 
-  <script src="../../lib/datatables/jquery.dataTables.min.js"></script>
-  <script src="../../lib/datatables/dataTables.bootstrap4.min.js"></script>
-  <!-- <script src="../../lib/datatable-plus/datatables.min.js"></script> -->
+  <!-- Datable JS -->
+  <script src="../../js/datatable/jquery.dataTables.min.js"></script>
+  <script src="../../js/datatable/dataTables.bootstrap4.min.js"></script>
+  <script src="../../js/datatable/dataTables.buttons.min.js"></script>
+  <script src="../../js/datatable/buttons.bootstrap4.min.js"></script>
+  <script src="../../js/datatable/jszip.min.js"></script>
+  <script src="../../js/datatable/pdfmake.min.js"></script>
+  <script src="../../js/datatable/vfs_fonts.js"></script>
+  <script src="../../js/datatable/buttons.html5.min.js"></script>
+  <script src="../../js/datatable/setOption.DataTable.js"></script>
 
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <!-- RangeSlider Plugin JS -->
+  <script src="../../js/ion-rangeSlider 2.3.1/ion-rangerSlider.min.js"></script>
 
-  <!-- RangeSlider Plugin Js -->
-  <script src="../../lib/ion-rangeslider/js/ion.rangeSlider.js"></script>
+  <!-- bootstrap-sweetalert JS -->
+  <script src="../../js/bootstrap-sweetalert 1.0.1/sweetalert.min.js"></script>
 
-  <script src="../../lib/markmap/markerclusterer.js"></script>
+  <!-- Setting General JS -->
+  <script src='../../js/customize.js'></script>
 
-  <script src='../../lib/calendar/js/fullcalendar.js' type="text/javascript"></script>
+  <!-- Select2 JS -->
+  <script src="../../js/select2/select2.min.js"></script>
 
-  <script src="../../lib/chart.js/Chart.min.js"></script>
+  <!-- fengyuanchen-Datepicker JS -->
+  <script src="../../js/fengyuanchen-Datepicker/datepicker.js"></script>
+  <script src="../../js/fengyuanchen-Datepicker/datepicker.th-TH.js"></script>
 
-  <script src='../../js/customize.js' type="text/javascript"></script>
-  <script src='../../js/jquery.multi-select.js' type="text/javascript"></script>
-  <script src='../../lib/milkey/milkey.js' type="text/javascript"></script>
+  <!-- dmuy-MDTimePicker JS -->
+  <script src="../../js/cp-MDTimePicker/MDTimePicker.js"></script>
+
+  <!-- croppie JS -->
+  <script src="../../lib/croppie/croppie.js"></script>

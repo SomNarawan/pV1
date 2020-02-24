@@ -115,6 +115,7 @@
                                 >
                             </div>
                         </div>
+
                         <div class="row mb-4">
                             <div class="col-xl-4 col-12 text-right">
                                 <span>จังหวัด</span>
@@ -137,6 +138,7 @@
                                 </select>
                             </div>
                         </div>
+                        
                         <div class="row mb-4">
                             <div class="col-xl-4 col-12 text-right">
                                 <span>อำเภอ</span>

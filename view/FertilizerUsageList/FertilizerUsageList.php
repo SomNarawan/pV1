@@ -1,13 +1,19 @@
 <?php
     session_start();
+
     $idUT = $_SESSION[md5('typeid')];
     $CurrentMenu = "FertilizerUsageList";
+
     include_once("../layout/LayoutHeader.php");
+
     include_once("./../../query/query.php");
 
     $YearFer = getYearFer();
     $currentYear = date("Y") + 543;
     $backYear = date("Y") + 543 - 1;
+
+    $PROVINCE = getProvince();
+    $DISTRINCT_PROVINCE = getDistrinctInProvince($fpro); //fpro มาจาก search.php
 ?>
 
 
@@ -112,6 +118,7 @@
 <link rel="stylesheet" href="../../croppie/croppie.css">
 
 <div class="container">
+
     <!--------------------- Head Link --------------------->
     <div class="row">
         <div class="col-xl-12 col-12 mb-4">
@@ -119,14 +126,12 @@
                 <div class="card-header card-bg">
                     <div class="row">
                         <div class="col-12">
-                            <span class="link-active" style="color: #006664;" >การใส่ปุ๋ย</span>
+                            <span class="link-active" style="color:<?=$color?>;" >การใส่ปุ๋ย</span>
                             <span style="float:right;">
                                 <i class="fas fa-bookmark"></i>
-                                <!-- เข้าหน้า home page -->
                                 <a class="link-path" href="#">หน้าแรก</a> 
                                 <span> > </span>
-                                <!-- เข้าหน้า Fertilizer -->
-                                <a class="link-path link-active" style="color: #006664;" href="#">การใส่ปุ๋ย</a>
+                                <a class="link-path link-active" href="#" style="color:<?=$color?>;" >การใส่ปุ๋ย</a>
                             </span>
                         </div>
                     </div>
@@ -137,168 +142,170 @@
 
     <!--------------------- cards --------------------->
     <div class="row">
-        <div class="col-xl-3 col-12 mb-4">
-            <div class="card border-left-primary card-color-one shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">ปริมาณที่ใส่ปุ๋ยรวม</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php print(getVolumeFertilising()); ?> ก.ก</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">panorama_vertical</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-12 mb-4">
-            <div class="card border-left-primary card-color-two shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">ผลผลิตรวม ปี<?=$backYear?></div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php print(number_format(getHarvestBackYear())); ?> ก.ก</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">filter_vintage</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-12 mb-4">
-            <div class="card border-left-primary card-color-three shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">พื้นที่ทั้งหมด</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php print(number_format(getAllArea())); ?> ไร่</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">dashboard</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-12 mb-4">
-            <div class="card border-left-primary card-color-four shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="font-weight-bold  text-uppercase mb-1">ต้นปาล์มทั้งหมด</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"> <?php print(number_format(getAllTree())); ?> ต้น</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="material-icons icon-big">format_size</i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php   
+            creatCard( "card-color-one",   "ปริมาณที่ใส่ปุ๋ยรวม", getVolumeFertilising()." ก.ก", "panorama_vertical" ); 
+            creatCard( "card-color-two",   "ผลผลิตรวม ปี".$backYear,  number_format(getHarvestBackYear())." ก.ก", "filter_vintage" );
+            creatCard( "card-color-three",   "พื้นที่ทั้งหมด", getCountArea()." ไร่", "dashboard" ); 
+            creatCard( "card-color-four",   "จำนวนต้นไม้ทั้งหมด", getCountTree()." ต้น", "format_size" ); 
+        ?>
     </div>
 
     <!--------------------- Searching --------------------->
-    <div class="row">
-        <div class="col-xl-12 col-12">
-            <div id="accordion">
-                <div class="card">
-                    <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="cursor:pointer; background-color: #006664; color: white;">
-                        <div class="row">
-                            <div class="col-3">
-                                <i class="fas fa-search"> ค้นหาขั้นสูง</i>
+    <form action="FertilizerUsageList.php?isSearch=1" method="post">
+        <div class="row">
+            <div class="col-xl-12 col-12 mb-4">
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header collapsed" 
+                            id="headingOne" 
+                            data-toggle="collapse"
+                            data-target="#collapseOne" 
+                            <?php 
+                                if(isset($_GET['isSearch']) && $_GET['isSearch']==1)
+                                    echo 'aria-expanded="true"';
+                                else 
+                                    echo 'aria-expanded="false"';
+                            ?>
+                            aria-controls="collapseOne"
+                            style="cursor:pointer; background-color: <?=$color?>; color: white;">
+                            <div class="row">
+                                <div class="col-3">
+                                    <i class="fas fa-search"> ค้นหาขั้นสูง</i>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="collapseOne" class="card collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                <div class="card-header card-bg">
-                    ตำแหน่งการใส่ปุ๋ยสวนปาล์มน้ำมัน
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-xl-6 col-12">
-                            <div id="map" style="width:auto; height:75vh;"></div>
-                        </div>
-                        <div class="col-xl-6 col-12" id="forMap">
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>ปี</span>
-                                </div>
+                <div id="collapseOne" 
+                    <?php 
+                        if(isset($_GET['isSearch']) && $_GET['isSearch']==1)
+                            echo 'class="collapse show"';
+                        else 
+                            echo 'class="collapse"';
+                    ?>
+                    aria-labelledby="headingOne" 
+                    data-parent="#accordion">
+                    
+                    <div class="card-header card-bg">
+                        ตำแหน่งการใส่ปุ๋ยสวนปาล์มน้ำมัน
+                    </div>
+                    <div class="card-body" style="background-color: white; ">
+                        <div class="row">
+                            <div class="col-xl-6 col-12">
+                                <div id="map" style="width:auto; height:75vh;"></div>
                             </div>
-                            <div class="row mb-2">
-                                <div class="col-12">
-                                    <select id="year" class="form-control">
-                                        <?php
-                                        for ($i = 1; $i <= $YearFer[0]['numrow']; $i++) {
-                                            echo "<option value='{$YearFer[$i]['Year2']}'>{$YearFer[$i]['Year2']}</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-xl-12 col-12">
-                                    <div class="irs-demo">
-                                        <b>ปริมาณการใส่ปุ๋ย (%)</b>
-                                        <input type="text" id="palmvolsilder" value="" />
+                            <div id="forMap" class="col-xl-6 col-12" >
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <span>ปี</span>
                                     </div>
                                 </div>
-                            </div>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <select id="year" class="form-control">
+                                            <?php
+                                            for ($i = 1; $i <= $YearFer[0]['numrow']; $i++) {
+                                                echo "<option value='{$YearFer[$i]['Year2']}'>{$YearFer[$i]['Year2']}</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
 
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>จังหวัด</span>
+                                <div class="row">
+                                    <div class="col-xl-12 col-12">
+                                        <div class="irs-demo">
+                                            <b>ปริมาณการใส่ปุ๋ย (%)</b>
+                                            <input type="text" id="palmvolsilder" value="" />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-12">
-                                    <select id="province" class="js-example-basic-single">
-                                        <option disabled selected>เลือกจังหวัด</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>อำเภอ</span>
-                                </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-12">
-                                    <select id="amp" class="js-example-basic-single">
-                                        <option disabled selected>เลือกอำเภอ</option>
-                                    </select>
-                                </div>
-                            </div>
 
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>ชื่อเกษตรกร</span>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <span>จังหวัด</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-12">
-                                    <input type="text" class="form-control" id="name">
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <select id="s_province" name="s_province" class="form-control">
+                                            <option selected value=0>เลือกจังหวัด</option>        
+                                            <?php 
+                                            for($i=1;$i<sizeof($PROVINCE);$i++){ 
+                                                if($fpro==$PROVINCE[$i]["AD1ID"])
+                                                    echo '<option value="'.$PROVINCE[$i]["AD1ID"].'" selected>'.$PROVINCE[$i]["Province"].'</option>';
+                                                else
+                                                    echo '<option value="'.$PROVINCE[$i]["AD1ID"].'">'.$PROVINCE[$i]["Province"].'</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>หมายเลขบัตรประชาชน</span>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <span>อำเภอ</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-12">
-                                    <input type="password" class="form-control input-setting" id="idcard">
-                                    <i class="far fa-eye-slash eye-setting"></i>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <select id="s_distrinct" name="s_distrinct" class="form-control"> 
+                                            <option selected value=0>เลือกอำเภอ</option>>        
+                                            <?php 
+                                            if($fpro!=0){
+                                                for($i=1;$i<sizeof($DISTRINCT_PROVINCE);$i++){ 
+                                                    if($fdist==$DISTRINCT_PROVINCE[$i]["AD2ID"])
+                                                        echo '<option value="'.$DISTRINCT_PROVINCE[$i]["AD2ID"].'" selected>'.$DISTRINCT_PROVINCE[$i]["Distrinct"].'</option>';
+                                                    else
+                                                        echo '<option value="'.$DISTRINCT_PROVINCE[$i]["AD2ID"].'">'.$DISTRINCT_PROVINCE[$i]["Distrinct"].'</option>';
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row mb-2 padding">
-                                <div class="col-12">
-                                    <button type="button" id="btn_search" class="btn btn-success btn-sm form-control">ค้นหา</button>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <span>ชื่อเกษตรกร</span>
+                                    </div>
                                 </div>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <!-- <input type="text" class="form-control" id="name"> -->
+                                        <input type="text" class="form-control" 
+                                            id="s_name" name="s_name"  
+                                            <?php if($fullname!='') echo 'value="'.$fullname.'"'; ?>
+                                        >
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <span>หมายเลขบัตรประชาชน</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <!-- <input type="password" class="form-control input-setting" id="idcard">
+                                        <i class="far fa-eye-slash eye-setting"></i> -->
+                                        <input type="password" class="form-control input-setting" 
+                                            id="s_formalid" name="s_formalid"
+                                            <?php if($idformal!='') echo 'value="'.$idformal.'"'; ?>
+                                        >
+                                        <i class="far fa-eye-slash eye-setting"></i>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2 padding">
+                                    <div class="col-12">
+                                        <!-- <button type="button" id="btn_search" class="btn btn-success btn-sm form-control">ค้นหา</button> -->
+                                        <button type="submit" id="btn_pass"
+                                        class="btn btn-success btn-sm form-control">ค้นหา</button>
+                                    </div>
+                                </div>
+
                             </div>
 
                         </div>
@@ -306,9 +313,28 @@
                 </div>
             </div>
         </div>
-    </div>
+    </form>
+         
 
-    <!--------------------- Resault Searched --------------------->
+    <!--------------------- Resault Searched - DataTales --------------------->
+
+    <div class="card shadow mb-4">
+            <div class="card-header card-header-table py-3">
+                <h6 class="m-0 font-weight-bold" style="color:#006633;">รายชื่อเกษตรกรในระบบ</h6>
+            </div>
+            <div class="card-body">
+
+                <div class="row mb-2">
+                    <div class="col-xl-3 col-12">
+                        <button type="button" id="btn_comfirm" class="btn btn-outline-success btn-sm"><i
+                                class="fas fa-file-excel"></i> Excel</button>
+                        <button type="button" id="btn_comfirm" class="btn btn-outline-danger btn-sm"><i
+                                class="fas fa-file-pdf"></i> PDF</button>
+
+                    </div>
+
+                </div>
+
     <div class="row mt-4 mb-4">
         <div class="col-xl-12 col-12">
             <div class="card">

@@ -9,7 +9,6 @@
     $myConDB = connectDB();
     $result = $myConDB->prepare($sql);
     $result->execute();
-
 ?>
 
 <?php while ($row = $result->fetch(PDO::FETCH_ASSOC)) { ?>

@@ -10,14 +10,8 @@ UpdateLogLogin();
 IsBlock();
 
 $USER = $_SESSION[md5('user')];
-$iconpic = $USER[1]['Icon'];
 $userId = $USER[1]['UID'];
-if ($iconpic != "default.jpg") {
-  $userIdicon = $USER[1]['UID'];
-} else {
-  $userIdicon = '0';
-}
-
+$iconpic = $USER[1]['Icon'];
 if (!isset($_SESSION[md5('LOG_LOGIN')])) {
   header("location:../../index.php");
 }
@@ -39,9 +33,8 @@ $sql = "SELECT `mm-mainmenu`,`mm-submenu` ";
 $sql = $sql . " FROM `main-menu-list` as L INNER JOIN `web-menu` as M ";
 $sql = $sql . " ON L.`wm-id`= M.`wm-id` ";
 $sql = $sql . " WHERE `ut-id`='" . $idUT . "'";
-$sql = $sql . " && `wm-alias`='" . $CurrentMenu. "'";
+$sql = $sql . " && `wm-alias`='" . $CurrentMenu . "'";
 
-//echo $sql."<br>";
 $DATA = selectData($sql);
 
 $selectedMenu1 = $DATA[1]['mm-mainmenu'];
@@ -54,80 +47,11 @@ $sql = $sql . " ON L.`wm-id`=M.`wm-id` ";
 $sql = $sql . " WHERE L.`ut-id`=" . $idUT;
 $sql = $sql . " ORDER BY L.`mm-mainmenu`,L.`mm-submenu`";
 
-//echo $sql;
-
 $DATA = selectData($sql);
-
 
 $strMenu = "";
 
 for ($i = 1; $i <= $DATA[0]['numrow']; $i++) {
-  
-  if ($DATA[$i]['mm-submenu'] == 0) {
-    // main menu
-    $activeStyle = "";
-    $isActive = "";
-    if ($DATA[$i]['mm-mainmenu'] == $selectedMenu1) {
-      // active main menu
-      $classType = " class='nav-item active' ";
-      $isActive = " id='activityList' ";
-      if($DATA[$i]['mm-mainmenu'] != $DATA[$i + 1]['mm-mainmenu'])
-        $activeStyle = " style='background-color:yellow; color:#006664;' ";
-    } else {
-      //$activeStyle = " style='background-color:red; color:#006664;' ";
-      $classType = " class='nav-item' ";
-    }
-
-    if ($DATA[$i]['wm-icon'] == "") {
-      $icon = "favorite";
-    } else {
-      $icon =  $DATA[$i]['wm-icon'];
-    }
-    $url = $DATA[$i]['wm-alias']."/".$DATA[$i]['wm-page'];
-    
-    if ($DATA[$i]['mm-mainmenu'] != $DATA[$i + 1]['mm-mainmenu']){
-      $strMenu .= "
-      <li ".$classType." ".$isActive." >
-        <a class='nav-link' href='../".$url."' ".$activeStyle." >
-          <i class='material-icons' ".$activeStyle.">".$icon."</i>
-          <span>".$DATA[$i]['wm-name']."</span>
-        </a>
-      </li> ";
-    }else{
-      $strMenu .= " 
-      <li ".$classType." ".$isActive." >
-        <a class='nav-link collapsed' href='#' 
-          data-toggle='collapse' data-target='#link-".$i."' 
-          aria-expanded='true' aria-controls='link-" .$i."'>
-            <i class='material-icons'>".$icon."</i>
-            <span>".$DATA[$i]['wm-name']."</span>
-        </a>
-        <div id='link-".$i."' class='collapse' 
-          aria-labelledby='headingTwo' data-parent='#accordionSidebar'>
-        <div class=' py-2 collapse-inner rounded' 
-          style='border-left: 2px solid white; border-radius: 0% !important;'>";
-      //$strMenu .= "</div></div></li>";
-    }
-
-  }else{ // sub menu
-    if ($DATA[$i]['mm-mainmenu'] == $selectedMenu1 && $DATA[$i]['mm-submenu'] == $selectedMenu2) {
-      // active sub menu
-      $classType = "class='collapse-item active' style='background-color:yellow'";
-    } else {
-      $classType = "class='collapse-item'";
-    }
-    $url = $DATA[$i]['wm-alias']."/".$DATA[$i]['wm-page'];
-    $strMenu .= "<a ". $classType." href='../".$url."' 
-    style='color:white;'>". $DATA[$i]['wm-name']."</a>";
-    
-    if ($DATA[$i]['mm-mainmenu'] != $DATA[$i + 1]['mm-mainmenu']) 
-      $strMenu .= "</div></div></li>"; 
-
-  }
-}
-
-/*
-for ($i = 1; $i <= $DATA[0]['numrow']; $i++) {
   if ($DATA[$i]['mm-submenu'] == 0) {
     // main menu
     if ($DATA[$i]['mm-mainmenu'] == $selectedMenu1) {
@@ -144,14 +68,10 @@ for ($i = 1; $i <= $DATA[0]['numrow']; $i++) {
     }
 
 
-    if (($i + 1 <= $DATA[0]['numrow'] && 
-          $DATA[$i]['mm-mainmenu'] != $DATA[$i + 1]['mm-mainmenu']) || 
-          $DATA[$i]['wm-name'] == "ออกจากระบบ") {
+    if (($i + 1 <= $DATA[0]['numrow'] && $DATA[$i]['mm-mainmenu'] != $DATA[$i + 1]['mm-mainmenu']) || $DATA[$i]['wm-name'] == "ออกจากระบบ") {
       $url  = $DATA[$i]['wm-alias'] . "/" . $DATA[$i]['wm-page'];
 
-      if ($DATA[$i]['wm-name'] == "กิจกรรมต่างๆ" || 
-          $DATA[$i]['wm-name'] == "การจัดการผู้ใช้" || 
-          $DATA[$i]['wm-name'] == "การจัดการศัตรูพืช") {
+      if ($DATA[$i]['wm-name'] == "กิจกรรมต่างๆ" || $DATA[$i]['wm-name'] == "การจัดการผู้ใช้" || $DATA[$i]['wm-name'] == "การจัดการศัตรูพืช") {
         $strMenu .= " <li " . $classType . " id='activityList'>
                             <a class='nav-link' href='../" . $url . "'>
                               <i class='material-icons'>" . $icon . "</i>
@@ -168,9 +88,7 @@ for ($i = 1; $i <= $DATA[0]['numrow']; $i++) {
       }
     } else {
 
-      if ($DATA[$i]['wm-name'] == "กิจกรรมต่างๆ" || 
-          $DATA[$i]['wm-name'] == "การจัดการผู้ใช้" || 
-          $DATA[$i]['wm-name'] == "การจัดการศัตรูพืช") {
+      if ($DATA[$i]['wm-name'] == "กิจกรรมต่างๆ" || $DATA[$i]['wm-name'] == "การจัดการผู้ใช้" || $DATA[$i]['wm-name'] == "การจัดการศัตรูพืช") {
         $strMenu .= " <li class='nav-item' id='activityList'>
                             <a class='nav-link collapsed' href='#' data-toggle='collapse' data-target='#link-" . $i . "' aria-expanded='true' aria-controls='link-" . $i . "'>
                               <i class='material-icons'>" . $icon . "</i>
@@ -206,7 +124,6 @@ for ($i = 1; $i <= $DATA[0]['numrow']; $i++) {
     }
   }
 } //each menu  
-*/
 
 // change Type
 $strtpye = "";
@@ -238,6 +155,13 @@ if ($DATAUSER[1]['IsOperator'] == 1 && $idUT != 3) {
   <i class='fas fa-user fa-sm fa-fw mr-2 text-gray-400'></i>
   " . $DATATPYE[3]['UTName'] . "
   </a>";
+  $AmountChangeType++;
+}
+if ($DATAUSER[1]['IsFarmer'] == 1 && $idUT != 4) {
+  $strtpye = $strtpye . "<a class='dropdown-item' href='../../changeType.php?UTID=4'>
+    <i class='fas fa-user fa-sm fa-fw mr-2 text-gray-400'></i>
+    " . $DATATPYE[4]['UTName'] . "
+    </a>";
   $AmountChangeType++;
 }
 
@@ -342,7 +266,7 @@ if ($DATAUSER[1]['IsOperator'] == 1 && $idUT != 3) {
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo $DATAUSER[1]['UserName'] . " (" . $DATATPYEUSER[1]['UTName'] . ")"; ?></span>
 
-                <img class="img-radius img-profile" src="../../icon/user/<?php echo $userIdicon; ?>/<?php echo $iconpic; ?>" />
+                <img class="img-radius img-profile" src="../../icon/user/<?php echo $userId; ?>/<?php echo $iconpic; ?>" />
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
