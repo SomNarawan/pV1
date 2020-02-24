@@ -75,17 +75,13 @@
             <div class="col-xl-12 col-12 mb-4">
                 <div id="accordion">
                     <div class="card">
-                        <div class="card-header collapsed" 
-                            id="headingOne" 
-                            data-toggle="collapse"
-                            data-target="#collapseOne" 
-                    <?php 
+                        <div class="card-header collapsed" id="headingOne" data-toggle="collapse"
+                            data-target="#collapseOne" <?php 
                         if(isset($_GET['isSearch']) && $_GET['isSearch']==1)
                             echo 'aria-expanded="true"';
                         else 
                             echo 'aria-expanded="false"';
-                    ?>
-                            aria-controls="collapseOne"
+                    ?> aria-controls="collapseOne"
                             style="cursor:pointer; background-color: <?=$color?>; color: white;">
                             <div class="row">
                                 <div class="col-3">
@@ -95,15 +91,12 @@
                         </div>
                     </div>
                 </div>
-                <div id="collapseOne" 
-                <?php 
+                <div id="collapseOne" <?php 
                     if(isset($_GET['isSearch']) && $_GET['isSearch']==1)
                         echo 'class="collapse show"';
                     else 
                         echo 'class="collapse"';
-                ?>
-                    aria-labelledby="headingOne" 
-                    data-parent="#accordion">
+                ?> aria-labelledby="headingOne" data-parent="#accordion">
 
                     <div class="card-body" style="background-color: white; ">
                         <div class="row mb-4 ">
@@ -111,10 +104,8 @@
                                 <span>หมายเลขบัตรประชาชน</span>
                             </div>
                             <div class="col-xl-6 col-12">
-                                <input type="password" class="form-control input-setting" 
-                                    id="s_formalid" name="s_formalid"
-                                    <?php if($idformal!='') echo 'value="'.$idformal.'"'; ?>
-                                >
+                                <input type="password" class="form-control input-setting" id="s_formalid"
+                                    name="s_formalid" <?php if($idformal!='') echo 'value="'.$idformal.'"'; ?>>
                                 <i class="far fa-eye-slash eye-setting"></i>
                             </div>
                         </div>
@@ -123,10 +114,8 @@
                                 <span>ชื่อเกษตรกร</span>
                             </div>
                             <div class="col-xl-6 col-12">
-                                <input type="text" class="form-control" 
-                                    id="s_name" name="s_name"  
-                                    <?php if($fullname!='') echo 'value="'.$fullname.'"'; ?>
-                                >
+                                <input type="text" class="form-control" id="s_name" name="s_name"
+                                    <?php if($fullname!='') echo 'value="'.$fullname.'"'; ?>>
                             </div>
                         </div>
                         <div class="row mb-4">
@@ -135,7 +124,7 @@
                             </div>
                             <div class="col-xl-6 col-12">
                                 <select id="s_province" name="s_province" class="form-control">
-                                    <option selected value=0>เลือกจังหวัด</option>        
+                                    <option selected value=0>เลือกจังหวัด</option>
                                     <?php 
                                     for($i=1;$i<sizeof($PROVINCE);$i++){ 
                                         if($fpro==$PROVINCE[$i]["AD1ID"])
@@ -152,8 +141,8 @@
                                 <span>อำเภอ</span>
                             </div>
                             <div class="col-xl-6 col-12">
-                                <select id="s_distrinct" name="s_distrinct" class="form-control"> 
-                                    <option selected value=0>เลือกอำเภอ</option>>        
+                                <select id="s_distrinct" name="s_distrinct" class="form-control">
+                                    <option selected value=0>เลือกอำเภอ</option>>
                                     <?php 
                                     if($fpro!=0){
                                         for($i=1;$i<sizeof($DISTRINCT_PROVINCE);$i++){ 
@@ -164,11 +153,11 @@
                                         }
                                     }
                                     ?>
-                                    
+
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="row mb-4">
                             <div class="col-xl-4 col-12 text-right">
                             </div>
@@ -225,7 +214,7 @@
                         </tr>
                     </tfoot>
                     <tbody>
-                    <?php 
+                        <?php 
                         for($i=1;$i<sizeof($FARMER);$i++){ 
                             $fid = $FARMER[$i]["FormalID"];
                             $formalid = substr_replace($fid,"xxxxxxx",3,7);
@@ -250,28 +239,33 @@
                             </td>
 
                             <td style="text-align:center;">
-                        <?php
+                                <?php
                         if($FARMER[$i]["IsBlock"] == 0){ 
                             echo "<button type='button' data-toggle='tooltip' title='บล็อค' class='btn btn-success btn-sm tt' ";
                         }else{
                             echo "<button type='button' data-toggle='tooltip' title='ปลดบล็อค' class='btn btn-danger btn-sm tt' ";
                         }
                         ?> id="<?php echo $FARMER[$i]["UFID"] ?>" onclick="
-                        <?php if($FARMER[$i]["IsBlock"] == 0){
+                                <?php if($FARMER[$i]["IsBlock"] == 0){
                             echo "block";
                         }else{
                             echo "unblock"; 
                         }
                          ?>
-                        ('<?php echo $FARMER[$i]["FirstName"]; ?>' ,'<?php echo $FARMER[$i]["LastName"]; ?>', '<?php echo $FARMER[$i]["UFID"] ?>')">
-                                    <i class="fas fa-ban"></i></button>
+                                ('<?php echo $FARMER[$i]["FirstName"]; ?>' ,'<?php echo $FARMER[$i]["LastName"]; ?>',
+                                '<?php echo $FARMER[$i]["UFID"] ?>')">
+                                <i class="fas fa-ban"></i></button>
 
-                                <button type="button" class="btn btn-warning btn-sm btn_edit tt" data-toggle="tooltip" title="แก้ไขข้อมูล"
-                                    uid="<?php echo $FARMER[$i]["UFID"]; ?>" titles="<?php echo $FARMER[$i]["Title"]; ?>"
-                                    formalid="<?php echo $formalid; ?>" fname="<?php echo $FARMER[$i]["FirstName"]; ?>"
-                                    lname="<?php echo $FARMER[$i]["LastName"]; ?>" mail="<?php echo $FARMER[$i]["EMAIL"]; ?>"
-                                    type_email="<?php echo $FARMER[$i]["ETID"]; ?>" address="<?php echo $FARMER[$i]["Address"]; ?>"
-                                    province="<?php echo $FARMER[$i]["AD1ID"]; ?>" distrinct="<?php echo $FARMER[$i]["AD2ID"]; ?>"
+                                <button type="button" class="btn btn-warning btn-sm btn_edit tt" data-toggle="tooltip"
+                                    title="แก้ไขข้อมูล" uid="<?php echo $FARMER[$i]["UFID"]; ?>"
+                                    titles="<?php echo $FARMER[$i]["Title"]; ?>" formalid="<?php echo $formalid; ?>"
+                                    fname="<?php echo $FARMER[$i]["FirstName"]; ?>"
+                                    lname="<?php echo $FARMER[$i]["LastName"]; ?>"
+                                    mail="<?php echo $FARMER[$i]["EMAIL"]; ?>"
+                                    type_email="<?php echo $FARMER[$i]["ETID"]; ?>"
+                                    address="<?php echo $FARMER[$i]["Address"]; ?>"
+                                    province="<?php echo $FARMER[$i]["AD1ID"]; ?>"
+                                    distrinct="<?php echo $FARMER[$i]["AD2ID"]; ?>"
                                     subdistrinct="<?php echo $FARMER[$i]["AD3ID"]; ?>">
                                     <i class="fas fa-edit"></i></button>
                                 <button type="button" class="btn btn-danger btn-sm tt" data-toggle="tooltip" title="ลบ"
