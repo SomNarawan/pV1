@@ -1,6 +1,5 @@
 /*
-    // [21/02/63]
-    **** How to Funnction Set option .DataTable && Export.DataTable **** 
+    **** Funnction Set option .DataTable && Export.DataTable ****
 
     arguments[0] = Id_Table
     arguments[1] = FileName_PDF

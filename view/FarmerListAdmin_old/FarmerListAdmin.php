@@ -8,7 +8,7 @@
     include_once("./search.php");
 
     $PROVINCE = getProvince();
-    $DISTRINCT_PROVINCE = getDistrinctInProvince($fpro);
+    $DISTRINCT_PROVINCE = getDistrinctInProvince($fpro); 
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
@@ -177,6 +177,7 @@
                                     class="btn btn-success btn-sm form-control">ค้นหา</button>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -202,6 +203,7 @@
                 </div>
 
             </div>
+            
             <div class="table-responsive">
                 <table class="table table-bordered table-data" id="dataTable" width="100%" cellspacing="0">
                     <thead>
@@ -292,7 +294,6 @@
                     </tbody>
                 </table>
             </div>
-            
         </div>
     </div>
 

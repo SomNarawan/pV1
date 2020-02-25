@@ -7,10 +7,12 @@
 // });
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+    console.log("data-toggle=tab\n")
     $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
 });
 
 $(".eye-setting").click(function() {
+    console.log("eye-setting\n")
     if ($(this).hasClass('fa-eye')) {
         $(this).removeClass('fa-eye');
         $(this).addClass('fa-eye-slash');
@@ -30,21 +32,16 @@ $(".eye-setting").click(function() {
     }
 });
 
-// $('.carousel').carousel();
 
 
 var child = $($("#activityList")[0].childNodes[3].children[0].childNodes);
-//console.log($("#activityList")[0])
-
 for (let i = 0; i < child.length; i++) {
     if ($(child[i]).hasClass('active')) {
         let forceShowA = $($("#activityList")[0].childNodes[1]);
         let forceShowDiv = $($("#activityList")[0].childNodes[3]);
-
         forceShowA.removeClass('collapsed');
         forceShowA.attr('aria-expanded', true);
         forceShowDiv.addClass('show');
-
         break;
     }
 }
