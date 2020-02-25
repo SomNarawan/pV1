@@ -118,7 +118,7 @@ function getCountArea(){
 }
 
 //ตารางเกษตรกร (table)
-function getFarmer()
+function getFarmer(&$idformal,&$fullname,&$fpro,&$fdist)
 {
     $myConDB = connectDB();
 
@@ -161,59 +161,62 @@ function getFarmer()
 
     //INFO
     $sql = "SELECT `UFID`,`FirstName`,`LastName`,`Distrinct`,`Province`, 
-    `dim-user`.`FullName`, `dim-user`.`ID` AS dimFID
+    `dim-user`.`FullName`, `dim-user`.`ID` AS dimFID , `db-farmer`.`FormalID`
      FROM `db-farmer` 
      JOIN `dim-user` ON `dim-user`.`dbID`=`db-farmer`.`UFID`
      JOIN `db-subdistrinct` ON `db-subdistrinct`.`AD3ID` = `db-farmer`.`AD3ID` 
      JOIN `db-distrinct` ON `db-distrinct`.`AD2ID` = `db-subdistrinct`.`AD2ID`
      JOIN `db-province` ON `db-province`.`AD1ID` = `db-distrinct`.`AD1ID` 
      WHERE `dim-user`.`Type`='F' ";
-    if ($idformal != '') $sql = $sql . " AND FormalID LIKE '%" . $idformal . "%' ";
+    if ($idformal != '') $sql = $sql . " AND `db-farmer`.`FormalID` LIKE '%" . $idformal . "%' ";
     if ($fullname != '') $sql = $sql . " AND (FirstName LIKE '%" . $fnamef . "%' OR LastName LIKE '%" . $lnamef . "%') ";
     if ($fpro    != 0)  $sql = $sql . " AND `db-distrinct`.AD1ID = '" . $fpro . "' ";
     if ($fdist   != 0)  $sql = $sql . " AND `db-distrinct`.AD2ID = '" . $fdist . "' ";
     $sql = $sql . " ORDER BY  `dim-user`.`FullName`";
     //echo $sql;
-
     $myConDB = connectDB();
     $result = $myConDB->prepare($sql);
     $result->execute();
+
     $numFermer = 0;
+    $FARMER = NULL;
     foreach ($result as $tmp => $tmpDATA) {
         //print_r($tmpDATA);
         if ($tmpDATA['UFID'] > 0) {
-            $FARMER[$numFermer]['dbID']    = $tmpDATA['UFID'];
-            $FARMER[$numFermer]['dimID']    = $tmpDATA['dimFID'];
+            $FARMER[$numFermer]['dbID']        = $tmpDATA['UFID'];
+            $FARMER[$numFermer]['dimID']       = $tmpDATA['dimFID'];
             $FARMER[$numFermer]['FullName']    = $tmpDATA['FullName'];
             $FARMER[$numFermer]['Province']    = $tmpDATA['Province'];
-            $FARMER[$numFermer]['Distrinct']    = $tmpDATA['Distrinct'];
-            $FARMER[$numFermer]['numFarm']    = 0;
-            $FARMER[$numFermer]['numSubFarm']    = 0;
-            $FARMER[$numFermer]['numTree']    = 0;
-            $FARMER[$numFermer]['numArea1']    = 0;
-            $FARMER[$numFermer]['numArea2']    = 0;
+            $FARMER[$numFermer]['Distrinct']   = $tmpDATA['Distrinct'];
+            $FARMER[$numFermer]['numFarm']     = getCountOwnerFarm($tmpDATA['UFID']);
+            $FARMER[$numFermer]['numSubFarm']  = getCountOwnerSubFarm($tmpDATA['UFID']);
+            $FARMER[$numFermer]['numTree']     = getCountOwnerTree($tmpDATA['UFID']);
+            $FARMER[$numFermer]['numArea1']    = getCountOwnerAreaRai($tmpDATA['UFID']);
+            $FARMER[$numFermer]['numArea2']    = getCountOwnerAreaNgan($tmpDATA['UFID']);
+            $FARMER[$numFermer]['FormalID']    = $tmpDATA['FormalID'];
             $fermerINDEX[$tmpDATA['dimFID']]   = $numFermer;
             $numFermer++;
         }
     }
-    $sql1 = "SELECT `DIMownerID`, `DIMfarmID`, `NumSubFarm`,`NumTree`,`AreaRai`, `AreaNgan`FROM `log-farm`
-    WHERE `DIMSubfID` IS NULL AND `EndT` IS NULL";
-    $myConDB = connectDB();
-    $result1 = $myConDB->prepare($sql1);
-    $result1->execute();
-    foreach ($result1 as $tmp => $tmpDATA) {
-        $tmpID = $fermerINDEX[$tmpDATA['DIMownerID']];
-        if ($tmpID >= 0) {
-            //print_r($tmpDATA);
-            $FARMER[$tmpID]['numFarm']++;
-            $FARMER[$tmpID]['numSubFarm']   += $tmpDATA['NumSubFarm'];
-            $FARMER[$tmpID]['numTree']      += $tmpDATA['NumTree'];
-            $FARMER[$tmpID]['numArea1']     += $tmpDATA['AreaRai'];
-            $FARMER[$tmpID]['numArea2']     += $tmpDATA['AreaNgan'];
-        }
-    }
-
-    return $FARMER;
+    // $sql1 = "SELECT `DIMownerID`, `DIMfarmID`, `NumSubFarm`,`NumTree`,`AreaRai`, `AreaNgan`FROM `log-farm`
+    // WHERE `DIMSubfID` IS NULL AND `EndT` IS NULL";
+    // $myConDB = connectDB();
+    // $result1 = $myConDB->prepare($sql1);
+    // $result1->execute();
+    // foreach ($result1 as $tmp => $tmpDATA) {
+    //     $tmpID = $fermerINDEX[$tmpDATA['DIMownerID']];
+    //     if ($tmpID >= 0) {
+    //         //print_r($tmpDATA);
+    //         $FARMER[$tmpID]['numFarm']++;
+    //         $FARMER[$tmpID]['numSubFarm']   += $tmpDATA['NumSubFarm'];
+    //         $FARMER[$tmpID]['numTree']      += $tmpDATA['NumTree'];
+    //         $FARMER[$tmpID]['numArea1']     += $tmpDATA['AreaRai'];
+    //         $FARMER[$tmpID]['numArea2']     += $tmpDATA['AreaNgan'];
+    //     }
+    // }
+    if(!is_null($FARMER))
+        return $FARMER;
+    else return 0;
 }
 //-----------------------FarmerListDetail--------------------------
 
@@ -260,7 +263,17 @@ function getCountOwnerAreaRai($ufid)
         return 0;
     return $countownerAreaRai;
 }
-
+function getCountOwnerAreaNgan($ufid)
+{
+    $sql = "SELECT SUM(`AreaNgan`) AS countownerAreaNgan
+    FROM (SELECT `dim-user`.`dbID`, `DIMownerID`, `DIMfarmID`, `NumSubFarm`,`NumTree`,`AreaRai`, `AreaNgan`FROM `log-farm`
+    INNER JOIN `dim-user` ON `dim-user`.`ID` = `log-farm`.`DIMownerID` AND `dim-user`.`Type` = 'F'
+    WHERE `DIMSubfID` IS NULL AND `EndT` IS NULL AND `dim-user`.`dbID` = $ufid) AS farm";
+    $countownerAreaNgan = selectData($sql)[1]['countownerAreaNgan'];
+    if($countownerAreaNgan == NULL)
+        return 0;
+    return $countownerAreaNgan;
+}
 function getCountOwnerTree($ufid)
 {
     $sql = "SELECT SUM(`NumTree`) AS countownerTree

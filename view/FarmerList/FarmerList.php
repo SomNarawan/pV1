@@ -6,7 +6,7 @@
 
     include_once("../layout/LayoutHeader.php");
     include_once("./../../query/query.php");
-    //include_once("./search.php");
+    // include_once("./search.php");
     $idformal = '';
     $fullname = '';
     $fpro = 0;
@@ -15,9 +15,7 @@
     $PROVINCE = getProvince();
     $DISTRINCT_PROVINCE = getDistrinctInProvince($fpro);
 
-    $FARMER[1] =array("dbID"=>1,"FullName"=>"นาย วิเชียร ธารสุวรรณ","Province"=>"ชุมพร","Distrinct"=>"ท่าแซะ","numFarm"=>1,"numSubFarm"=>2
-                        ,"AreaRai"=>1,"Ngan"=>2,"numTree"=>35); 
-    
+    $FARMER = getFarmer($idformal,$fullname,$fpro,$fdist); 
 
 ?>
 
@@ -61,12 +59,7 @@
                 <div id="accordion">
                     <div class="card">
                         <div class="card-header collapsed" id="headingOne" data-toggle="collapse"
-                            data-target="#collapseOne" <?php 
-                        if(isset($_GET['isSearch']) && $_GET['isSearch']==1)
-                            echo 'aria-expanded="true"';
-                        else 
-                            echo 'aria-expanded="false"';
-                    ?> aria-controls="collapseOne"
+                            data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne"
                             style="cursor:pointer; background-color: <?=$color?>; color: white;">
                             <div class="row">
                                 <div class="col-3">
@@ -76,61 +69,54 @@
                         </div>
                     </div>
                 </div>
-                <div id="collapseOne" <?php 
-                    if(isset($_GET['isSearch']) && $_GET['isSearch']==1)
-                        echo 'class="collapse show"';
+                <div id="collapseOne" class="card collapse 
+                <?php 
+                    if(isset($_GET['isSearch']) && $_GET['isSearch']==1) 
+                        echo "show";
                     else 
-                        echo 'class="collapse"';
-                ?> aria-labelledby="headingOne" data-parent="#accordion">
-
-                    <div class="card-body" style="background-color: white; ">
-                        <div class="row mb-4 ">
-                            <div class="col-xl-4 col-12 text-right">
-                                <span>หมายเลขบัตรประชาชน</span>
+                        echo ""; 
+                ?> 
+                " aria-labelledby="headingOne" data-parent="#accordion">
+               
+                    <div class="card-header card-bg">
+                        ตำแหน่งสวนปาล์มน้ำมัน
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-6 col-12">
+                                <div id="map" style="width:auto;height:60vh;"></div>
                             </div>
                             <div class="col-xl-6 col-12">
-                                <input type="password" class="form-control input-setting" id="s_formalid"
-                                    name="s_formalid" <?php if($idformal!='') echo 'value="'.$idformal.'"'; ?>>
-                                <i class="far fa-eye-slash eye-setting"></i>
-                            </div>
-                        </div>
-                        <div class="row mb-4">
-                            <div class="col-xl-4 col-12 text-right">
-                                <span>ชื่อเกษตรกร</span>
-                            </div>
-                            <div class="col-xl-6 col-12">
-                                <input type="text" class="form-control" id="s_name" name="s_name"
-                                    <?php if($fullname!='') echo 'value="'.$fullname.'"'; ?>>
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-xl-4 col-12 text-right">
-                                <span>จังหวัด</span>
-                            </div>
-                            <div class="col-xl-6 col-12">
-                                <select id="s_province" name="s_province" class="form-control">
-                                    <option selected value=0>เลือกจังหวัด</option>
-                                    <?php 
-                                   for($i=1;$i<sizeof($PROVINCE);$i++){ 
-                                    if($fpro==$PROVINCE[$i]["AD1ID"])
-                                        echo '<option value="'.$PROVINCE[$i]["AD1ID"].'" selected>'.$PROVINCE[$i]["Province"].'</option>';
-                                    else
-                                        echo '<option value="'.$PROVINCE[$i]["AD1ID"].'">'.$PROVINCE[$i]["Province"].'</option>';
-                                }
-                                ?>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-4">
-                            <div class="col-xl-4 col-12 text-right">
-                                <span>อำเภอ</span>
-                            </div>
-                            <div class="col-xl-6 col-12">
-                                <select id="s_distrinct" name="s_distrinct" class="form-control">
-                                    <option selected value=0>เลือกอำเภอ</option>>
-                                    <?php 
+                                <div class="row">
+                                    <div class="col-12">
+                                        <span>จังหวัด</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <select id="s_province" name="s_province" class="form-control">
+                                            <option selected value=0>เลือกจังหวัด</option>
+                                            <?php 
+                                    for($i=1;$i<sizeof($PROVINCE);$i++){ 
+                                        if($fpro==$PROVINCE[$i]["AD1ID"])
+                                            echo '<option value="'.$PROVINCE[$i]["AD1ID"].'" selected>'.$PROVINCE[$i]["Province"].'</option>';
+                                        else
+                                            echo '<option value="'.$PROVINCE[$i]["AD1ID"].'">'.$PROVINCE[$i]["Province"].'</option>';
+                                    }
+                                    ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row  mb-2">
+                                    <div class="col-12">
+                                        <span>อำเภอ</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <select id="s_distrinct" name="s_distrinct" class="form-control">
+                                            <option selected value=0>เลือกอำเภอ</option>>
+                                            <?php 
                                     if($fpro!=0){
                                         for($i=1;$i<sizeof($DISTRINCT_PROVINCE);$i++){ 
                                             if($fdist==$DISTRINCT_PROVINCE[$i]["AD2ID"])
@@ -141,16 +127,43 @@
                                     }
                                     ?>
 
-                                </select>
-                            </div>
-                        </div>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-11">
 
-                        <div class="row mb-4">
-                            <div class="col-xl-4 col-12 text-right">
-                            </div>
-                            <div class="col-xl-6 col-12">
-                                <button type="submit" id="btn_pass"
-                                    class="btn btn-success btn-sm form-control">ค้นหา</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-11">
+                                        <span>ชื่อเกษตรกร</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <input type="text" class="form-control" id="s_name" name="s_name"
+                                            <?php if($fullname!='') echo 'value="'.$fullname.'"'; ?>>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-11">
+                                        <span>หมายเลขบัตรประชาชน</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <input type="password" class="form-control input-setting" id="s_formalid"
+                                            name="s_formalid" <?php if($idformal!='') echo 'value="'.$idformal.'"'; ?>>
+                                        <i class="fa fa-eye-slash eye-setting" id="hide1"></i>
+                                    </div>
+                                </div>
+                                <div class="row mb-2 padding">
+                                    <div class="col-12">
+                                        <button type="summit" id="btn_search"
+                                            class="btn btn-success btn-sm form-control">ค้นหา</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -158,7 +171,6 @@
             </div>
         </div>
     </form>
-
 
 
     <!-- DataTales Example -->
@@ -207,7 +219,8 @@
                     </tfoot>
                     <tbody>
                         <?php 
-                            for($i=1;$i<=sizeof($FARMER);$i++){
+                        if($FARMER != 0){
+                            for($i=0;$i<sizeof($FARMER);$i++){
                         ?>
                         <tr>
                             <td><?php echo $FARMER[$i]['FullName']; ?></td>
@@ -215,8 +228,8 @@
                             <td><?php echo $FARMER[$i]["Distrinct"] ?></td>
                             <td class="text-right"><?php echo $FARMER[$i]['numFarm']; ?> สวน</td>
                             <td class="text-right"><?php echo $FARMER[$i]['numSubFarm']; ;?> แปลง</td>
-                            <td class="text-right"><?php echo $FARMER[$i]['AreaRai']; ?> ไร่
-                                <?php echo $FARMER[$i]['Ngan']; ?> งาน</td>
+                            <td class="text-right"><?php echo $FARMER[$i]['numArea1']; ?> ไร่
+                                <?php echo $FARMER[$i]['numArea2']; ?> งาน</td>
                             <td class="text-right"><?php echo $FARMER[$i]['numTree']; ?> ต้น</td>
 
                             <td style="text-align:center;">
@@ -230,6 +243,7 @@
                         </tr>
                         <?php 
                             }
+                        }
                         ?>
 
                     </tbody>
@@ -247,13 +261,10 @@
 
 <?php include_once("../layout/LayoutFooter.php"); ?>
 
+<script src="FarmerList.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
-
-<script>
-
-$( document ).ready(function() {
-    $('.tt').tooltip();
-});
-
-</script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMLhtSzox02ZCq2p9IIuihhMv5WS2isyo&callback=initMap&language=th"
+    async defer></script>

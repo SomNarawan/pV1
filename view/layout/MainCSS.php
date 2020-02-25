@@ -32,6 +32,3 @@
 
 <!-- dmuy-MDTimePicker CSS -->
 <link href="../../css/cp-MDTimePicker/MDTimePicker.css" rel="stylesheet" type="text/css">
-
-<!-- shoe more -->
-<!-- <link herf  -->    
