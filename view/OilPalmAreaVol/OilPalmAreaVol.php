@@ -1,61 +1,68 @@
-<?php
-session_start();
+<?php 
+    session_start();
+    
+    $idUT = $_SESSION[md5('typeid')];
+    $CurrentMenu = "OilPalmAreaVol";
 
-$idUT = $_SESSION[md5('typeid')];
-$idUTLOG = $_SESSION[md5('LOG_LOGIN')];
-$CurrentMenu = "OilPalmAreaVol";
-$currentYear = date("Y") + 543;
-$backYear = date("Y") + 543 - 1;
 
-include_once("../layout/LayoutHeader.php"); 
-include_once("../../dbConnect.php"); 
-include_once("import_Js.php");
-include_once("./../../query/query.php");
+    include_once("./../layout/LayoutHeader.php");
+    include_once("./../../query/query.php");
 
-$OILPALMAREAVOL = getTableAllHarvest();
+    $idformal = '';
+    $fullname = '';
+    $fpro = 0;
+    $fdist = 0;
 
+    $currentYear = date("Y") + 543;
+    $backYear = date("Y") + 543 - 1;
+
+    $PROVINCE = getProvince();
+    $DISTRINCT_PROVINCE = getDistrinctInProvince($fpro);
+
+    $OILPALMAREAVOL = getTableAllHarvest();
 ?>
 
-<body>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.css">
 
-    <div class="container">
-        <div class="row">
-            <div class="col-xl-12 col-12 mb-4">
-                <div class="card">
-                    <div class="card-header card-bg">
-                        <div class="row">
-                            <div class="col-12">
-                                <span class="link-active font-weight-bold"
-                                    style="color:<?=$color?>;">ผลผลิตสวนปาล์มน้ำมัน</span>
-                                <span style="float:right;">
-                                    <i class="fas fa-bookmark"></i>
-                                    <a class="link-path" href="#">หน้าแรก</a>
-                                    <span> > </span>
-                                    <a class="link-path link-active" href="#"
-                                        style="color:#006633;">ผลผลิตสวนปาล์มน้ำมัน</a>
-                                </span>
-                            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-xl-12 col-12 mb-4">
+            <div class="card">
+                <div class="card-header card-bg">
+                    <div class="row">
+                        <div class="col-12">
+                            <span class="link-active font-weight-bold"
+                                style="color:<?=$color?>;">ผลผลิตสวนปาล์มน้ำมัน</span>
+                            <span style="float:right;">
+                                <i class="fas fa-bookmark"></i>
+                                <a class="link-path" href="#">หน้าแรก</a>
+                                <span> > </span>
+                                <a class="link-path link-active" href="#"
+                                    style="color:<?=$color?>;">ผลผลิตสวนปาล์มน้ำมัน</a>
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <?php   
-            creatCard( "card-color-one",   "ผลผลิตปี ".$currentYear, number_format(getHarvestCurrentYear(), 0, '.', ',')." ก.ก.", "waves" ); 
-            creatCard( "card-color-two",   "ผลผลิตปี".$backYear, number_format(getHarvestBackYear(),0,'.',',')." ก.ก.", "dashboard" ); 
-            creatCard( "card-color-three",   "พื้นที่ทั้งหมด", getCountArea()." ไร่", "format_size" ); 
-แ        ?>
+    </div>
+    <div class="row">
 
-        </div>
-
+        <?php   
+       creatCard( "card-color-one",   "ผลผลิตปี ".$currentYear, number_format(getHarvestCurrentYear(), 0, '.', ',')." ก.ก.", "waves" ); 
+       creatCard( "card-color-two",   "ผลผลิตปี".$backYear, number_format(getHarvestBackYear(),0,'.',',')." ก.ก.", "dashboard" ); 
+       creatCard( "card-color-three",   "พื้นที่ทั้งหมด", getCountArea()." ไร่", "format_size" ); 
+       creatCard( "card-color-four", "จำนวนต้น",  getCountTree()." ต้น", "format_size" );
+        ?>
+    </div>
+    <form action="OilPalmAreaList.php?isSearch=1" method="post">
         <div class="row">
-            <div class="col-xl-12 col-12">
+            <div class="col-xl-12 col-12 mb-4">
                 <div id="accordion">
                     <div class="card">
                         <div class="card-header collapsed" id="headingOne" data-toggle="collapse"
                             data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne"
-                            style="cursor:pointer; background-color: #006664; color: white;">
+                            style="cursor:pointer; background-color: <?=$color?>; color: white;">
                             <div class="row">
                                 <div class="col-3">
                                     <i class="fas fa-search"> ค้นหาขั้นสูง</i>
@@ -81,8 +88,16 @@ $OILPALMAREAVOL = getTableAllHarvest();
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-12">
-                                        <select id="province" class="js-example-basic-single form-control">
-                                            <option disabled selected value="0">เลือกจังหวัด</option>
+                                        <select id="s_province" name="s_province" class="form-control">
+                                            <option selected value=0>เลือกจังหวัด</option>
+                                            <?php 
+                                    for($i=1;$i<sizeof($PROVINCE);$i++){ 
+                                        if($fpro==$PROVINCE[$i]["AD1ID"])
+                                            echo '<option value="'.$PROVINCE[$i]["AD1ID"].'" selected>'.$PROVINCE[$i]["Province"].'</option>';
+                                        else
+                                            echo '<option value="'.$PROVINCE[$i]["AD1ID"].'">'.$PROVINCE[$i]["Province"].'</option>';
+                                    }
+                                    ?>
                                         </select>
                                     </div>
                                 </div>
@@ -93,8 +108,19 @@ $OILPALMAREAVOL = getTableAllHarvest();
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-12">
-                                        <select id="amp" class="js-example-basic-single form-control">
-                                            <option disabled selected value="0">เลือกอำเภอ</option>
+                                        <select id="s_distrinct" name="s_distrinct" class="form-control">
+                                            <option selected value=0>เลือกอำเภอ</option>>
+                                            <?php 
+                                    if($fpro!=0){
+                                        for($i=1;$i<sizeof($DISTRINCT_PROVINCE);$i++){ 
+                                            if($fdist==$DISTRINCT_PROVINCE[$i]["AD2ID"])
+                                                echo '<option value="'.$DISTRINCT_PROVINCE[$i]["AD2ID"].'" selected>'.$DISTRINCT_PROVINCE[$i]["Distrinct"].'</option>';
+                                            else
+                                                echo '<option value="'.$DISTRINCT_PROVINCE[$i]["AD2ID"].'">'.$DISTRINCT_PROVINCE[$i]["Distrinct"].'</option>';
+                                        }
+                                    }
+                                    ?>
+
                                         </select>
                                     </div>
                                 </div>
@@ -110,7 +136,8 @@ $OILPALMAREAVOL = getTableAllHarvest();
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-12">
-                                        <input type="text" class="form-control" id="name">
+                                        <input type="text" class="form-control" id="s_name" name="s_name"
+                                            <?php if($fullname!='') echo 'value="'.$fullname.'"'; ?>>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -120,7 +147,8 @@ $OILPALMAREAVOL = getTableAllHarvest();
                                 </div>
                                 <div class="row mb-2">
                                     <div class="col-12">
-                                        <input type="password" class="form-control input-setting" id="FormalID">
+                                        <input type="password" class="form-control input-setting" id="s_formalid"
+                                            name="s_formalid" <?php if($idformal!='') echo 'value="'.$idformal.'"'; ?>>
                                         <i class="fa fa-eye-slash eye-setting" id="hide1"></i>
                                     </div>
                                 </div>
@@ -136,133 +164,96 @@ $OILPALMAREAVOL = getTableAllHarvest();
                 </div>
             </div>
         </div>
-        <div class="row mt-4">
-            <div class="col-xl-12 col-12">
-                <div class="card">
-                    <div class="card-header card-bg">
-                        <div>
-                            <span>ผลผลิตสวนปาล์มน้ำมันในระบบ</span>
-                            <span style="float:right;">ปี <?php echo $currentYear; ?></span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col-xl-3 col-12">
-                                <button type="button" id="btn_comfirm" class="btn btn-outline-success btn-sm"><i
-                                        class="fas fa-file-excel"></i> Excel</button>
-                                <button type="button" id="btn_comfirm" class="btn btn-outline-danger btn-sm"><i
-                                        class="fas fa-file-pdf"></i> PDF</button>
+    </form>
 
-                            </div>
 
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-hover table-data" width="100%">
-                                <thead>
-                                    <tr>
-                                        <th>ชื่อเกษตรกร</th>
-                                        <th>ชื่อสวน</th>
-                                        <th>จำนวนแปลง</th>
-                                        <th>พื้นที่ปลูก</th>
-                                        <th>จำนวนต้น</th>
-                                        <th>ผลผลิต</th>
-                                        <th>จัดการ</th>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>ชื่อเกษตรกร</th>
-                                        <th>ชื่อสวน</th>
-                                        <th>จำนวนแปลง</th>
-                                        <th>พื้นที่ปลูก</th>
-                                        <th>จำนวนต้น</th>
-                                        <th>ผลผลิต</th>
-                                        <th>จัดการ</th>
-                                    </tr>
-                                </tfoot>
-                                <tbody>
-                                    <?php 
-                            for($i=0;$i<sizeof($OILPALMAREAVOL);$i++){
-                                ?>
-                                    <tr>
-                                        <td><?php echo $OILPALMAREAVOL[$i]["ownerName"]; ?></td>
-                                        <td><?php echo $OILPALMAREAVOL[$i]["farmName"];?></td>
-                                        <td style="text-align:right;"><?php echo $OILPALMAREAVOL[$i]["subFarm"]; ?> แปลง</td>
-                                        <td style="text-align:right;"><?php echo $OILPALMAREAVOL[$i]["area"]; ?> ไร่</td>
-                                        <td style="text-align:right;"><?php echo $OILPALMAREAVOL[$i]["tree"]; ?> ต้น</td>
-                                        <td style="text-align:right;"><?php echo $OILPALMAREAVOL[$i]["weight"];?> ก.ก.</td>
-                                        <td style="text-align:center;">
-                                            <form method="post" id="ID" name="formID" action="OilPalmAreaVolDetail.php">
-                                                <input type="text" hidden class="form-control" name="farmID" id="farmID"
-                                                    value="<?php echo $OILPALMAREAVOL[$i]["farmID"]?>">
-                                                <button type="submit" id="btn_info" class="btn btn-info btn-sm"
-                                                    data-toggle="tooltip" title="รายละเอียด"><i
-                                                        class="fas fa-bars"></i></button></a>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    <?php
-                                            }
-                                        
-                                        ?>
-                                    <!-- <tr>
-                                    <td>บรรยาวัชร</td>
-                                    <td>ไลอ้อน</td>
-                                    <td>50</td>
-                                    <td>210</td>
-                                    <td>50</td>
-                                    <td>150</td>
-                                    <td>19/05/1996</td>
-                                    <td style="text-align:center;">
-                                        <button type="button" id="btn_info" class="btn btn-info btn-sm"><i class="fas fa-bars"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>บรรยาวัชร</td>
-                                    <td>ไลอ้อน</td>
-                                    <td>50</td>
-                                    <td>210</td>
-                                    <td>50</td>
-                                    <td>150</td>
-                                    <td>19/05/1996</td>
-                                    <td style="text-align:center;">
-                                        <button type="button" id="btn_info" class="btn btn-info btn-sm"><i class="fas fa-bars"></i></button>
-                                    </td>
-                                </tr> -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header card-header-table py-3">
+            <span class="m-0 font-weight-bold" style="color:#006633;">ผลผลิตสวนปาล์มน้ำมันในระบบ</span>
+            <span class="m-0 font-weight-bold" style="float:right; color:#006633;">ปี <?php echo $currentYear; ?></span>
+        </div>
+        <div class="card-body">
+
+            <div class="row mb-2">
+                <div class="col-xl-3 col-12">
+                    <button type="button" id="btn_comfirm" class="btn btn-outline-success btn-sm"><i
+                            class="fas fa-file-excel"></i> Excel</button>
+                    <button type="button" id="btn_comfirm" class="btn btn-outline-danger btn-sm"><i
+                            class="fas fa-file-pdf"></i> PDF</button>
+
                 </div>
+
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-data" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ชื่อเกษตรกร</th>
+                            <th>ชื่อสวน</th>
+                            <th>จำนวนแปลง</th>
+                            <th>พื้นที่ปลูก</th>
+                            <th>จำนวนต้น</th>
+                            <th>ผลผลิต</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>ชื่อเกษตรกร</th>
+                            <th>ชื่อสวน</th>
+                            <th>จำนวนแปลง</th>
+                            <th>พื้นที่ปลูก</th>
+                            <th>จำนวนต้น</th>
+                            <th>ผลผลิต</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        <?php
+                        for($i=0;$i<sizeof($OILPALMAREAVOL);$i++){ ?>
+                        <tr>
+                            <td><?php echo $OILPALMAREAVOL[$i]["ownerName"]; ?></td>
+                            <td><?php echo $OILPALMAREAVOL[$i]["farmName"];?></td>
+                            <td style="text-align:right;"><?php echo $OILPALMAREAVOL[$i]["subFarm"]; ?> แปลง</td>
+                            <td style="text-align:right;"><?php echo $OILPALMAREAVOL[$i]["area"]; ?> ไร่</td>
+                            <td style="text-align:right;"><?php echo $OILPALMAREAVOL[$i]["tree"]; ?> ต้น</td>
+                            <td style="text-align:right;"><?php echo $OILPALMAREAVOL[$i]["weight"];?> ก.ก.</td>
+                            <td style="text-align:center;">
+                                <form method="post" id="ID" name="formID" action="OilPalmAreaVolDetail.php">
+                                    <input type="text" hidden class="form-control" name="farmID" id="farmID"
+                                        value="<?php echo $OILPALMAREAVOL[$i]["farmID"]?>">
+                                    <button type="submit" id="btn_info" class="btn btn-info btn-sm"
+                                        data-toggle="tooltip" title="รายละเอียด"><i
+                                            class="fas fa-bars"></i></button></a>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php
+                        }
+                                        
+                        ?>
+
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <?php include_once("../layout/LayoutFooter.php"); ?>
+    <div class="Modal">
+
+    </div>
+
+</div>
 
 
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVxLnsuNM9mJUqDFkj6r7FSxVcQCh4ic&callback=map_create"
-        async defer></script>
-    <script src="OilPalmAreaVol.js"></script>
-    <script src="OilPalmAreaVolModal.js"></script>
+<?php include_once("../layout/LayoutFooter.php"); ?>
 
-    <script>
-    $("#map_area").css('height', $("#forMap").css('height'));
-    // $("#card_add").click(function () {
-    //     $("body").append(addModal);
-    //     $("#addModal").modal('show');
-    // });
+<script src="OilPalmAreaVol.js"></script>
 
-    // $("#btn_info").click(function () {
-    //     console.log("testefe");
-    // });
-
-    $("#btn_delete").click(function() {
-        swal({
-            title: "ยืนยันการลบข้อมูล",
-            icon: "warning",
-            buttons: ["ยกเลิก", "ยืนยัน"],
-        });
-    });
-    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-sweetalert/1.0.1/sweetalert.min.js"></script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMLhtSzox02ZCq2p9IIuihhMv5WS2isyo&callback=initMap&language=th"
+    async defer></script>
